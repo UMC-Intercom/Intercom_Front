@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from "styled-components";
-import { PageContainer } from './join'
 
 export default function SignUp2() {
   const handleLaterButtonClick = () => {
@@ -91,6 +90,7 @@ height: 72px;
 border-radius: 10px;
 background: #A1A1A1;
 border: none;
+cursor: pointer;
 `;
 
 const SettingButton = styled.button`
@@ -109,4 +109,5 @@ height: 72px;
 border-radius: 10px;
 background: #5B00EF;
 border: none;
+cursor: pointer;
 `;
