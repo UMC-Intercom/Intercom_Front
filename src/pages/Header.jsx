@@ -32,7 +32,7 @@ const Header = () => {
         </PageLists>
         <ButtonBox>
           <SearchButton src="/assets/Search.png" alt="SearchButton" onClick={() => handlePageChange('/search')}/>
-          <JoinButton onClick={() => handlePageChange('/join')}>회원가입/로그인</JoinButton>        
+          <JoinButton onClick={() => handlePageChange('/signup')}>회원가입/로그인</JoinButton>        
         </ButtonBox>
       </HeaderBox>
     </HeaderContainer>

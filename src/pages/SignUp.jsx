@@ -260,7 +260,7 @@ export default function SignUp() {
         <hr />
   
         <br />
-        <button type='submit'>
+        <button type='submit'> 
           <img src='assets/임시가입버튼.png' />
         </button>
       </SignUpForm>
