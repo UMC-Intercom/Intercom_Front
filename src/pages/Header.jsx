@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from 'react-router-dom';
+import SettingsSidebar from './SettingsSideBar';
+
 
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
 
     useEffect(() => {
@@ -17,12 +21,45 @@ const Header = () => {
     navigate(path);
   };
 
+   // 사이드바를 표시하거나 숨기는 함수를 정의합니다.
+  const toggleSidebar = () => {
+    console.log('Toggling sidebar, current state:', isSidebarVisible);
+    setIsSidebarVisible(!isSidebarVisible);
+  };
+
+  // 사이드바를 닫는 함수를 정의합니다.
+  const closeSidebar = () => {
+    setIsSidebarVisible(false);
+  };
+
+  useEffect(() => {
+    const closeSidebarOnOutsideClick = (event) => {
+      // 사이드바가 열려있고, 클릭된 요소가 사이드바 내부가 아닐 때 사이드바를 닫습니다.
+      if (isSidebarVisible && !event.target.closest("#sidebar")) {
+        closeSidebar();
+      }
+    };
+
+    // 사이드바가 보여질 때만 이벤트 리스너를 추가합니다.
+    if (isSidebarVisible) {
+      window.addEventListener("click", closeSidebarOnOutsideClick);
+    }
+
+    // 클린업 함수를 반환하여, 컴포넌트가 언마운트되거나 사이드바가 다시 숨겨질 때
+    // 이벤트 리스너를 제거합니다.
+    return () => {
+      window.removeEventListener("click", closeSidebarOnOutsideClick);
+    };
+  }, [isSidebarVisible]); // 의존성 배열에 isSidebarVisible를 추가합니다.
+
+
   return (
+    <>
     <HeaderContainer>
       <HeaderBox>
         <Logo src="./assets/Logo.png" alt="IntercomLogo" onClick={() => handlePageChange('/home')}/>
         <PageLists>
-          <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
+        <Pages $active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
           <Pages active={activePage === '/saved-notices'} onClick={() => handlePageChange('/saved-notices')}>저장한 공고</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
           <Pages active={activePage === '/my-career'} onClick={() => handlePageChange('/my-career')}>내커리어</Pages>
@@ -32,17 +69,19 @@ const Header = () => {
         </PageLists>
         <ButtonBox>
           <SearchButton src="/assets/Search.png" alt="SearchButton" onClick={() => handlePageChange('/search')}/>
-          <JoinButton onClick={() => handlePageChange('/join')}>회원가입/로그인</JoinButton>        
+          <JoinButton onClick={(e) => {
+  e.stopPropagation(); // 이벤트 버블링을 중지합니다.
+  toggleSidebar();
+}}>회원가입/로그인</JoinButton>        
         </ButtonBox>
       </HeaderBox>
     </HeaderContainer>
+    <SettingsSidebar $isVisible={isSidebarVisible} onClose={closeSidebar} />
+        </>
   );
 };
 
 export default Header;
-
-
-
 
 
 const HeaderContainer = styled.header`
@@ -67,7 +106,7 @@ margin: 10px 0;
 
 const Pages = styled.div`
   font-size: 20px;
-  color: ${props => props.active ? '#5B00EF' : '#636363'};
+  color: ${(props) => props.$active ? '#5B00EF' : '#636363'};
   cursor: pointer;
   position: relative;
   padding: 0 10px;
