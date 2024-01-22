@@ -109,6 +109,7 @@ const ItemText = styled.span`
   line-height: normal;
   text-align: left; // 텍스트를 왼쪽 정렬
   margin-left: 2rem;
+  color: ${(props) => (props.active ? '#5B00EF' : '#636363')};
 `;
 
 const Line = styled.div`

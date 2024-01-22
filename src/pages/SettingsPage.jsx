@@ -1,68 +1,208 @@
 // SettingsPage.jsx
 import React from 'react';
 import styled from 'styled-components';
+import { useNavigate, useLocation  } from 'react-router-dom';
 
-const SettingPage = () => {
+const SettingsPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isCurrentPath = (path) => location.pathname === path;
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
   return (
     <PageContainer>
-      <Header>
-        <Title>설정</Title>
-      </Header>
-      <Section>
+      <Sidebar>
+      <MenuItem active={isCurrentPath('/scraps')} onClick={() => navigate('/scraps')}>
+        {isCurrentPath('/scraps') && <CheckIcon src="./assets/Check.png" alt="Check" />}
+        <ItemLabel active={isCurrentPath('/scraps')}>스크랩</ItemLabel>
+      </MenuItem>
+      <MenuItem active={isCurrentPath('/settings')} onClick={() => navigate('/settings')}>        
+        {isCurrentPath('/settings') && <CheckIcon src="./assets/Check.png" alt="Check" />}
+        <ItemLabel active={isCurrentPath('/settings')}>설정</ItemLabel>
+      </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => handleNavigation('/logout')}>
+          <LogoutLabel>로그아웃</LogoutLabel>
+        </MenuItem>
+      </Sidebar>
+      <Content>
+        <ProfileSection>
+          <ProfileImage src="./assets/SettingProfile.png" alt="Profile" />
+          <NameAndNickname>
+            <Name>김선정 님</Name>
+            <Nickname>닉네임</Nickname>
+          </NameAndNickname>
+        </ProfileSection>
         <SectionTitle>MY</SectionTitle>
-        <Input placeholder="내 카테고리" />
-        <Input placeholder="작성한 글" />
-      </Section>
-      <Section>
+        <MyAndAccountSection>
+          <Section>
+            <Option onClick={() => navigate('/my-career')}>내 커리어</Option>
+            <Option onClick={() => navigate('/my-posts')}>작성한 글</Option>
+          </Section>
+        </MyAndAccountSection>
+        <br /><br /><br />
         <SectionTitle>계정</SectionTitle>
-        <Input placeholder="계정 탈퇴" />
-        <Input placeholder="이용약관" />
-      </Section>
-      <Footer>
-        로그아웃
-      </Footer>
+        <MyAndAccountSection>
+          <Divider />
+          <Section>
+            <Option onClick={() => navigate('/deactivate-account')}>계정 탈퇴</Option>
+            <Option onClick={() => navigate('/terms')}>이용약관</Option>
+          </Section>
+        </MyAndAccountSection>
+      </Content>
     </PageContainer>
   );
 };
 
-export default SettingPage;
+export default SettingsPage;
+
+const CheckIcon = styled.img`
+  width: 0.8rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  position: absolute;
+  left: -1.5rem; // CheckIcon을 왼쪽으로 조금 더 이동
+  top: 0.2rem; // CheckIcon의 상단 위치 조정
+`;
 
 // 스타일 컴포넌트 정의
 const PageContainer = styled.div`
-  padding: 20px;
+  display: flex;
+  padding: 2rem;
 `;
 
-const Header = styled.div`
+const Sidebar = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-right: 2rem;
+  position: relative;
+`;
+
+const ItemLabel = styled.span`
+  color: #636363;
+  font-family: 'SUITE', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: normal;
+  text-align: left; // 텍스트를 왼쪽 정렬
+  margin-left: 15rem;
+  padding-left: 1.3rem;
+  color: ${(props) => (props.active ? '#5B00EF' : '#636363')};
+`;
+
+const Divider = styled.hr`
+  border: none;
+  position: absolute;
+  width: 11.25rem;
+  border-top:  solid #ccc;
+  margin: 2rem 1; /* 섹션 사이의 여백 */
+  bottom: -2rem;
+`;
+
+const LogoutLabel = styled.span`
+  color: #636363;
+  font-family: 'SUITE', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: normal;
+  text-align: left; // 텍스트를 왼쪽 정렬
+  margin-top: 10rem;
+  margin-left: 2rem;
+`;
+
+const MenuItem = styled.div`
+  color: #636363;
+  font-family: 'SUITE', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: normal;
+  text-align: left; // 텍스트를 왼쪽 정렬
+  margin-left: 2rem;
   display: flex;
   align-items: center;
+  margin-bottom: 1rem;
 `;
 
-const Title = styled.h1`
-  font-size: 1.5rem;
-  color: #333;
+const Content = styled.div`
+  flex-grow: 1;
+  border-left: 0.2rem solid #ccc;
+  margin-left: 5rem;
+  padding-left: 3rem;
+`;
+
+const ProfileSection = styled.section`
+  display: flex;
+  align-items: center;
+  margin-left: 2rem;
+  padding-bottom: 2rem; // 섹션 사이 간격
+`;
+
+const ProfileImage = styled.img`
+  width: 7.375rem;
+  height: 7.375rem;
+  flex-shrink: 0;
+  margin-right: 1rem;
+`;
+const NameAndNickname = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-left: 2rem;
+  margin-bottom: 0.2rem; /* 각 요소 간의 여백 */
+`;
+
+const Name = styled.h1`
+  color: #636363;
+  font-family: SUITE;
+  font-size: 3.125rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  margin-bottom: 0.1rem;
+`;
+
+const Nickname = styled.h2`
+  color: #636363;
+  font-family: SUITE;
+  font-size: 1.875rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
 `;
 
 const Section = styled.section`
-  margin-top: 20px;
+  &:not(:last-child) {
+    margin-bottom: 2rem; /* 섹션 사이의 여백 */
+  }
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 1.25rem;
+  font-size: 1.25rem; /* 20px */
   color: #666;
-  margin-bottom: 10px;
+  margin-bottom: 1rem; /* 제목과 입력란 사이의 간격 */
 `;
 
-const Input = styled.input`
-  display: block;
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
+const MyAndAccountSection = styled.div`
+  background: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
+  padding: 1rem;
 `;
 
-const Footer = styled.footer`
-  margin-top: 20px;
-  text-align: center;
-  color: #333;
+const Option = styled.div`
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f7f7f7;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
