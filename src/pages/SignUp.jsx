@@ -7,7 +7,7 @@ export default function SignUp() {
   const navigate = useNavigate();
 
   const navigateToSignUp2 = () => navigate('/signup2');
-  
+
   return (
     <Container>
       <Form>
@@ -213,5 +213,6 @@ line-height: normal;
 
 margin-left: 18rem;
 // 가운데 정렬이 안돼서 일단 눈대중으로 맞춤..
+cursor: pointer;
 `;
 
