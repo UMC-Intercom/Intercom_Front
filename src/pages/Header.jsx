@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from 'react-router-dom';
+import SearchModal from './SearchModal';
 
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
@@ -17,6 +18,11 @@ const Header = () => {
     navigate(path);
   };
 
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
+  const openSearchModal = () => setIsSearchModalOpen(true);
+  const closeSearchModal = () => setIsSearchModalOpen(false);
+
   return (
     <HeaderContainer>
       <HeaderBox>
@@ -31,9 +37,10 @@ const Header = () => {
           <Pages active={activePage === '/news'} onClick={() => handlePageChange('/news')}>취업 뉴스</Pages>
         </PageLists>
         <ButtonBox>
-          <SearchButton src="/assets/Search.png" alt="SearchButton" onClick={() => handlePageChange('/search')}/>
-          <JoinButton onClick={() => handlePageChange('/join')}>회원가입/로그인</JoinButton>        
-        </ButtonBox>
+        <SearchButton src="/assets/Search.png" alt="SearchButton" onClick={openSearchModal}/>
+        <JoinButton onClick={() => handlePageChange('/join')}>회원가입/로그인</JoinButton>
+      </ButtonBox>
+      {isSearchModalOpen && <SearchModal onClose={closeSearchModal} />}
       </HeaderBox>
     </HeaderContainer>
   );

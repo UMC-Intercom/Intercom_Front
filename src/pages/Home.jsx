@@ -91,7 +91,7 @@ const Home = () => {
           <Icons onClick={() => handlePageChange('/my-career')}>
             <img src="/assets/MyCareer.png" alt="MyCareer"
              style={{width:"74.61px", height:"67.15px", marginBottom:"32.85px"}}  />
-            <span>내커리어</span>
+            <span>내 커리어</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/talktalk')}>
             <img src="/assets/Talktalk.png" alt="Talktalk"
