@@ -224,6 +224,12 @@ const customStyles = {
     }),
 };
 
+const NoOptionsMessage = props => (
+    <components.NoOptionsMessage {...props}>
+      해당 항목 없음
+    </components.NoOptionsMessage>
+);
+
 const SearchModal = ({ onClose }) => {
     const [selectedJobs, setSelectedJobs] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState([]);
@@ -268,6 +274,7 @@ const SearchModal = ({ onClose }) => {
                         components={{
                             Option: CheckboxOption,
                             ValueContainer: CustomValueContainer,
+                            NoOptionsMessage: NoOptionsMessage,
                         }}
                         closeMenuOnSelect={false}
                         hideSelectedOptions={false}
@@ -283,6 +290,7 @@ const SearchModal = ({ onClose }) => {
                             Option: CheckboxOption,
                             MenuList: CustomMenuList,
                             ValueContainer: CustomValueContainer,
+                            NoOptionsMessage: NoOptionsMessage,
                         }}
                         closeMenuOnSelect={false}
                         hideSelectedOptions={false}
