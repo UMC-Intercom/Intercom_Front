@@ -70,9 +70,9 @@ const Header = () => {
         <ButtonBox>
           <SearchButton src="/assets/Search.png" alt="SearchButton" onClick={() => handlePageChange('/search')}/>
           <JoinButton onClick={(e) => {
-  e.stopPropagation(); // 이벤트 버블링을 중지합니다.
-  toggleSidebar();
-}}>회원가입/로그인</JoinButton>        
+            e.stopPropagation(); // 이벤트 버블링을 중지합니다.
+            toggleSidebar();
+          }}>회원가입/로그인</JoinButton>        
         </ButtonBox>
       </HeaderBox>
     </HeaderContainer>
