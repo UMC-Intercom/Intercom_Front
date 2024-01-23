@@ -1,7 +1,12 @@
 import React from 'react'
 import styled from "styled-components";
+import { useNavigate } from 'react-router-dom';
 
 export default function SignUp2() {
+  const navigate = useNavigate();
+  const navigateToOnBoarding1 = () => navigate('/onboarding1');
+  const navigateToSignUp3 = () => navigate('/signup3');
+
   const handleLaterButtonClick = () => {
     console.log('나중에 하기');
     // 로직 추가
@@ -17,8 +22,8 @@ export default function SignUp2() {
         <Text2>보다 더 정확한 추천을 위해<br /> <Strong>두가지만</Strong> 더 알려주세요</Text2>
         <Image><img src='./assets/emptybox.png'></img></Image>
         <ButtonWrap>
-          <LaterButton>나중에 하기</LaterButton>
-          <SettingButton>설정하기</SettingButton>
+          <LaterButton onClick={navigateToSignUp3}>나중에 하기</LaterButton>
+          <SettingButton onClick={navigateToOnBoarding1}>설정하기</SettingButton>
         </ButtonWrap>
     </Container>
   )

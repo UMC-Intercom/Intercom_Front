@@ -152,7 +152,7 @@ const customStyles = {
   placeholder: (provided) => ({
     ...provided,
     color: '#636363',
-    fontFamily: 'suite-SemiBold',
+    fontFamily: 'SUITE' //폰트 바꿈
   }),
   option: (provided, state) => ({
     ...provided,
@@ -200,14 +200,14 @@ const SearchResultTextWrapper = styled.div`
 const SearchResultText = styled.h2`
   text-align: left;
   font-size: 1.5625rem;
-  font-family: SUITE-Bold;
+  font-family: SUITE; //검색결과 폰트수정
 `;
 
 const ResultCount = styled.span`
   color: #636363;
   font-size: 1.5625rem;
   margin-left: 0.625rem;
-  font-family: SUITE-Bold;
+  font-family: SUITE; // 검색개수 폰트수정
 `;
 
 const ButtonWrapper = styled.div`
@@ -225,7 +225,7 @@ const StyledButton = styled.button`
   width: 7.8125rem;
   height: 2.5rem;
   font-size: 1rem;
-  font-family: SUITE-Bold;
+  font-family: SUITE; //정렬버튼 폰트수정
   cursor: pointer;
   transition: all 0.3s ease;
   &:not(:first-child) {
