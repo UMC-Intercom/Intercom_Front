@@ -13,6 +13,7 @@ const ModalContainer = styled.div`
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    font-family: 'SUITE', sans-serif;
 `;
 
 const ModalContent = styled.div`
@@ -198,7 +199,7 @@ const customStyles = {
     placeholder: (provided) => ({
         ...provided,
         color: '#636363',
-        fontFamily: 'suite-SemiBold',
+        fontFamily: 'SUITE' //폰트 바꿈
     }),
     option: (provided, state) => ({
         ...provided,
