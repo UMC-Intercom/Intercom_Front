@@ -1,12 +1,16 @@
 import React from 'react'
 import styled from "styled-components";
+import { useNavigate } from 'react-router-dom';
 
 export default function SignUp3() {
+  const navigate = useNavigate();
+  const navigateToHome = () => navigate('/home');
+
   return (
     <Container>
-      <Image src='assets/가입완료체크.png'></Image>
+      <Image src='assets/SignUpSuccess.png'></Image>
       <Text>가입이 완료되었습니다!</Text>
-      <CheckButton>확인</CheckButton>
+      <CheckButton onClick={navigateToHome}>확인</CheckButton>
     </Container>
   )
 }

@@ -1,13 +1,16 @@
 import React from 'react'
 import styled from "styled-components";
+import { useNavigate } from 'react-router-dom';
 
 export default function SignUp4() {
+  const navigate = useNavigate();
+  const navigateToJoin = () => navigate('/join');
   return (
     <Container>
-      {/* 이미지 화질 깨짐 이미지 다시 받기 */}
-      <Image src='assets/축하이모지.png'></Image>
-      <Text>모든 설정이 완료되었습니다!<br />인터콤과 함께 채용 여정을 떠나볼까요?</Text>
-      <CheckButton>로그인 하기</CheckButton>
+{/* 이미지 화질 깨짐 이미지 다시 받기 */}
+      <Image src='assets/Congratulation.png'></Image>
+      <Text>모든 설정이 완료되었습니다!<br />인터컴과 함께 채용 여정을 떠나볼까요?</Text>
+      <CheckButton onClick={navigateToJoin}>로그인 하기</CheckButton>
     </Container>
   )
 }
