@@ -23,7 +23,6 @@ const PostPage = () => {
             <PostContainer>
                <Title>{post.title}</Title>
                  <Content>{post.content}</Content>
-
                  <PostingInfoConatiner>
                     <User>{post.username}</User>
                     <WrittenTime>{post.time}</WrittenTime>

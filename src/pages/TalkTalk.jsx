@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation  } from 'react-router-dom';
 import fakeData from '../data/fakeData';
 import { useAuth } from './AuthContext';
 
-
 const Talktalk = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [top100Active, setTop100Active] = useState(true);
@@ -16,10 +17,17 @@ const Talktalk = () => {
     const [answersSortActive, setAnswersSortActive] = useState(false);
     const [tempSearchTerm, setTempSearchTerm] = useState("");
     const [userProfile, setUserProfile] = useState(null);
-
     const { isLoggedIn } = useAuth();
     useEffect(() => {
       setSearchResults(fakeData);
+      const fetchPosts = async () => {
+        // 여기에 서버로부터 글 목록을 불러오는 코드 작성
+        // 예: const response = await fetch('/api/posts');
+        // const data = await response.json();
+        // setPosts(data);
+      };
+  
+      fetchPosts();
     }, []);
 
     useEffect(() => {
@@ -51,11 +59,11 @@ const Talktalk = () => {
 
 
   const handleGoPosting=()=>{
-    navigate('/posting');
+    navigate('/posting?from=talktalk'); // URL에 쿼리 파라미터 추가
   };
   
     const handleGoLogin = () => {
-      navigate('/join');
+      navigate('/join', { state: { from: location } });
     };
   
     const handleGoSearch = () => {
@@ -106,10 +114,24 @@ const Talktalk = () => {
       setSearchResults(sortedByAnswers);
   };
 
+
+
+
+
+
+
+
+
+
+
+
+
+  
   const WritingArea = () => {
     if (isLoggedIn) {
       return (
         <WritingContainer onClick={handleGoPosting}>
+          <img src="./assets/TalkTalkUserProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
           <WritingBox>
             질문을 남겨 보세요.
           </WritingBox>
@@ -118,6 +140,7 @@ const Talktalk = () => {
     } else {
       return (
         <WritingContainer onClick={handleGoLogin}>
+                    <img src="./assets/Ellipse2.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
           <WritingBox>
             로그인하고 글을 남겨보세요.
           </WritingBox>
@@ -209,7 +232,8 @@ const WritingContainer = styled.div`
   height: 10.6875rem;
   justify-content: center;
   margin-top: 4.56rem;
-  width: 75rem;
+  width: 75rem;  
+  cursor: pointer;
 `;
 
 const WritingBox = styled.div`
@@ -286,6 +310,7 @@ const SearchResultItem = styled.div`
 
 const TalkListContainer = styled.div`
   margin-top: 3.56rem;
+  cursor: pointer;
   .none-search{
     display: flex;
     justify-content: center;
