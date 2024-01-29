@@ -45,7 +45,7 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
     <SidebarContainer ref={sidebarRef} $isVisible={$isVisible}>
       <SidebarItem>
         <ProfileIcon src="./assets/Profile.png" alt="Profile" />
-        <Username>김선정 님</Username>
+        <Username>사용자 님</Username>
         <Line />
       </SidebarItem>
       <MenuItem onMouseEnter={() => setHoveredItem('scraps')}

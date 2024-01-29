@@ -82,7 +82,7 @@ svg {
 }
 
 //수정필요
-select {
+select {    
   border: 3px solid #E1E1E1;
   border-radius: 10px;
   margin-right: 12px;

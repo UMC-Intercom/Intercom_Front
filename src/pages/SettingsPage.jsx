@@ -43,7 +43,7 @@ const SettingsPage = () => {
         <ProfileSection>
           <ProfileImage src="./assets/SettingProfile.png" alt="Profile" />
           <NameAndNickname>
-            <Name>User 님</Name>
+            <Name>사용자 님</Name>
             <Nickname>닉네임</Nickname>
           </NameAndNickname>
         </ProfileSection>
