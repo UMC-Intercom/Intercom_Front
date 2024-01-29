@@ -73,15 +73,17 @@ const Header = () => {
           {isLoggedIn ? (
             <UserProfileBox>
               <NotificationImage 
-              onClick={handleNotificationClick}//알림창구현시바꾸기
+              onClick={handleNotificationClick}
               src="./assets/Notification.png" 
               alt = "Notification Image"/>
-              <ProfileImage onClick={toggleSettingsSidebar}
+              <ProfileBox onClick={toggleSettingsSidebar}>
+              <ProfileImage 
               src="./assets/Profile.png" 
               alt="Profile" />
-              <UserName onClick={toggleSettingsSidebar}>
+              <UserName>
                 {userProfile.name} 님
-              </UserName>            
+              </UserName>    
+              </ProfileBox>        
               </UserProfileBox>
               ) : (
               <JoinButton 
@@ -95,6 +97,7 @@ const Header = () => {
         $isVisible={isSettingsSidebarVisible} 
         onClose={closeSettingsSidebar} 
       />
+      <NotificationModal isOpen={isNotificationModalOpen} onClose={closeNotificationModal} /> 
     </HeaderContainer>
   );
 };
@@ -206,6 +209,12 @@ const NotificationImage = styled.img`
 `;
 
 const UserProfileBox = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`;
+
+const ProfileBox = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;

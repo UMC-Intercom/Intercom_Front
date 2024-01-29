@@ -151,6 +151,7 @@ const LogoutItem = styled(SidebarItem)`
   font-weight: 800;
   text-align: left;
   margin-left: 2rem;
+  cursor: pointer;
 `;
 
 const MenuItem = styled(SidebarItem)`
