@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchModal from './SearchModal'; //다현 여기 추가
+import Modal from 'react-modal'; // 모달 라이브러리 추가
+import NotificationModal from "./NotificationModal";
 
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
@@ -28,7 +30,15 @@ const Header = () => {
   const openSearchModal = () => setIsSearchModalOpen(true); 
   const closeSearchModal = () => setIsSearchModalOpen(false); 
 
- 
+  const [isNotificationModalOpen, setNotificationModalOpen] = useState(false); //여기부터 추가
+
+  const handleNotificationClick = () => {
+    setNotificationModalOpen(true);
+  };
+
+  const closeNotificationModal = () => {
+    setNotificationModalOpen(false);
+  };
   return (
     <HeaderContainer>
       <HeaderBox>
@@ -50,7 +60,7 @@ const Header = () => {
           {isLoggedIn ? (
             <UserProfileBox>
               <NotificationImage 
-              onClick={()=>handlePageChange('/notification')}//알림창구현시바꾸기
+              onClick={handleNotificationClick}//알림창구현시바꾸기
               src="./assets/Notification.png" 
               alt = "Notification Image"/>
               <ProfileImage  
@@ -69,13 +79,23 @@ const Header = () => {
               </ButtonBox>
               {isSearchModalOpen && <SearchModal onClose={closeSearchModal} />}
       </HeaderBox>
+      <NotificationModal isOpen={isNotificationModalOpen} onClose={closeNotificationModal} /> 
+      {/* 위에 한줄 추가 */}
     </HeaderContainer>
   );
 };
 
 export default Header;
 
+const ModalContent = styled.div` 
+  text-align: center;
+`;
 
+const CloseButton = styled.button`
+  margin-top: 10px;
+  cursor: pointer;
+`;
+{/* 위에 추가 */}
 const HeaderContainer = styled.header`
   width: 100%;
   height: 6.125rem;

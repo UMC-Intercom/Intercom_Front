@@ -28,6 +28,8 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+
           <Route path="/talktalk" element={<TalkTalk />} />
           <Route path="/post/:postId" element={<PostPage />} />
           <Route path ="/posting" element={<Posting/>} />  
