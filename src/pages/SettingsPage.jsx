@@ -2,15 +2,23 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation  } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+
 
 const SettingsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toggleLogin } = useAuth();
 
   const isCurrentPath = (path) => location.pathname === path;
 
   const handleNavigation = (path) => {
     navigate(path);
+  };
+
+  const handleLogout = () => {
+    toggleLogin(); // 로그인 상태 변경
+    navigate('/'); // 홈으로 이동
   };
 
   return (
@@ -20,13 +28,13 @@ const SettingsPage = () => {
         {isCurrentPath('/scraps') && <CheckIcon src="./assets/Check.png" alt="Check" />}
         <ItemLabel>스크랩</ItemLabel>
       </MenuItem>
-      <MenuItem active={isCurrentPath('/settings')} onClick={() => navigate('/profilesetting')}>        
+      <MenuItem active={isCurrentPath('/settings')} onClick={() => navigate('/settings')}>        
         {isCurrentPath('/profilesetting') && <CheckIcon src="./assets/Check.png" alt="Check" />}
         <ItemLabel>설정</ItemLabel>
       </MenuItem>
       <LogoutSection>
         <Divider />
-        <MenuItem onClick={() => handleNavigation('/logout')}>
+        <MenuItem onClick={handleLogout}>
           <LogoutLabel>로그아웃</LogoutLabel>
         </MenuItem>
       </LogoutSection>

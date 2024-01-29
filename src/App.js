@@ -17,6 +17,7 @@ import OnBoarding2 from './pages/OnBoarding2';
 import FindingEmail from './pages/FindingEmail'; //추가
 import FindedEmail from './pages/FindedEmail'; //추가
 import UnfindedEmail from './pages/UnfindedEmail'; //추가
+import SettingsPage from './pages/SettingsPage';
 
 
 
@@ -37,11 +38,12 @@ function App() {
           <Route path="/signup2" element={<SignUp2 />} />
           <Route path="/signup3" element={<SignUp3 />} /> 
           <Route path="/signup4" element={<SignUp4 />} />  
+          <Route path='/settings' element={<SettingsPage />} />
           <Route path="/onboarding1" element={<OnBoarding1 />} /> 
           <Route path="/onboarding2" element={<OnBoarding2 />} />  
-          <Route path="/findingemail" element={<FindingEmail />} /> //추가
-          <Route path="/findedemail" element={<FindedEmail />} /> //추가
-          <Route path="/unfindedemail" element={<UnfindedEmail />} /> //추가
+          <Route path="/findingemail" element={<FindingEmail />} /> 
+          <Route path="/findedemail" element={<FindedEmail />} />  
+          <Route path="/unfindedemail" element={<UnfindedEmail />} /> 
         </Routes>
         </AuthProvider>
       </div>

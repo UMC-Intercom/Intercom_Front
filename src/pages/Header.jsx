@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchModal from './SearchModal'; //다현 여기 추가
+import SettingsSidebar from "./SettingsSideBar";
 
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
@@ -28,6 +29,16 @@ const Header = () => {
   const openSearchModal = () => setIsSearchModalOpen(true); 
   const closeSearchModal = () => setIsSearchModalOpen(false); 
 
+  const [isSettingsSidebarVisible, setIsSettingsSidebarVisible] = useState(false);
+
+  const toggleSettingsSidebar = () => {
+    setIsSettingsSidebarVisible(!isSettingsSidebarVisible);
+  };
+
+  const closeSettingsSidebar = () => {
+    setIsSettingsSidebarVisible(false);
+  };
+
  
   return (
     <HeaderContainer>
@@ -48,17 +59,16 @@ const Header = () => {
         alt="SearchButton" 
         onClick={openSearchModal}/>
           {isLoggedIn ? (
-            <UserProfileBox>
+            <UserProfileBox  onClick={toggleSettingsSidebar}>
               <NotificationImage 
               onClick={()=>handlePageChange('/notification')}//알림창구현시바꾸기
               src="./assets/Notification.png" 
               alt = "Notification Image"/>
-              <ProfileImage  
-              onClick={() => handlePageChange('/profile')}
+              <ProfileImage 
               src="./assets/Profile.png" 
               alt="Profile" />
-              <UserName 
-              onClick={toggleLogin}>{userProfile.name} 님
+              <UserName>
+                {userProfile.name} 님
               </UserName>            
               </UserProfileBox>
               ) : (
@@ -69,6 +79,10 @@ const Header = () => {
               </ButtonBox>
               {isSearchModalOpen && <SearchModal onClose={closeSearchModal} />}
       </HeaderBox>
+      <SettingsSidebar 
+        $isVisible={isSettingsSidebarVisible} 
+        onClose={closeSettingsSidebar} 
+      />
     </HeaderContainer>
   );
 };

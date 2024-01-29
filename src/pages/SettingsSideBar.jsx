@@ -1,13 +1,25 @@
 // SettingsSidebar.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useAuth } from './AuthContext';
 
 
 const SettingsSidebar = ({ $isVisible, onClose }) => {
   const sidebarRef = useRef();
   const [hoveredItem, setHoveredItem] = useState(null);
   const navigate = useNavigate();
+  const { toggleLogin } = useAuth();
+
+  const handleLogout = () => {
+    toggleLogin(); // 로그인 상태를 토글하여 로그아웃 처리
+    onClose(); // 사이드바를 닫습니다.
+  };
+
+  const handleSettingsClick = () => {
+    handleNavigation('/settings');
+    onClose();
+  };
 
 
   useEffect(() => {
@@ -43,12 +55,12 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
       </MenuItem>
       <MenuItem onMouseEnter={() => setHoveredItem('settings')}
                 onMouseLeave={() => setHoveredItem(null)}
-                onClick={() => handleNavigation('/settings')}>
+                onClick={handleSettingsClick}>
         {hoveredItem === 'settings' && <CheckIcon src="./assets/Check.png" alt="Check" />}
         <ItemText>설정</ItemText>
         <LogoutLine />
       </MenuItem>
-      <LogoutItem onClick={() => {}}>로그아웃</LogoutItem>
+      <LogoutItem onClick={handleLogout}>로그아웃</LogoutItem>
     </SidebarContainer>
   );
 };
