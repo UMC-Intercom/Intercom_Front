@@ -18,22 +18,24 @@ const SettingsPage = () => {
       <Sidebar>
       <MenuItem active={isCurrentPath('/scraps')} onClick={() => navigate('/scraps')}>
         {isCurrentPath('/scraps') && <CheckIcon src="./assets/Check.png" alt="Check" />}
-        <ItemLabel active={isCurrentPath('/scraps')}>스크랩</ItemLabel>
+        <ItemLabel>스크랩</ItemLabel>
       </MenuItem>
-      <MenuItem active={isCurrentPath('/settings')} onClick={() => navigate('/settings')}>        
-        {isCurrentPath('/settings') && <CheckIcon src="./assets/Check.png" alt="Check" />}
-        <ItemLabel active={isCurrentPath('/settings')}>설정</ItemLabel>
+      <MenuItem active={isCurrentPath('/settings')} onClick={() => navigate('/profilesetting')}>        
+        {isCurrentPath('/profilesetting') && <CheckIcon src="./assets/Check.png" alt="Check" />}
+        <ItemLabel>설정</ItemLabel>
       </MenuItem>
+      <LogoutSection>
         <Divider />
         <MenuItem onClick={() => handleNavigation('/logout')}>
           <LogoutLabel>로그아웃</LogoutLabel>
         </MenuItem>
+      </LogoutSection>
       </Sidebar>
       <Content>
         <ProfileSection>
           <ProfileImage src="./assets/SettingProfile.png" alt="Profile" />
           <NameAndNickname>
-            <Name>김선정 님</Name>
+            <Name>User 님</Name>
             <Nickname>닉네임</Nickname>
           </NameAndNickname>
         </ProfileSection>
@@ -47,7 +49,6 @@ const SettingsPage = () => {
         <br /><br /><br />
         <SectionTitle>계정</SectionTitle>
         <MyAndAccountSection>
-          <Divider />
           <Section>
             <Option onClick={() => navigate('/deactivate-account')}>계정 탈퇴</Option>
             <Option onClick={() => navigate('/terms')}>이용약관</Option>
@@ -76,12 +77,14 @@ const PageContainer = styled.div`
 `;
 
 const Sidebar = styled.div`
-  display: flex;
   flex-direction: column;
   padding-right: 2rem;
   position: relative;
 `;
 
+const LogoutSection = styled.div`
+  margin-top: 10
+`;
 const ItemLabel = styled.span`
   color: #636363;
   font-family: 'SUITE', sans-serif;
@@ -90,18 +93,19 @@ const ItemLabel = styled.span`
   line-height: normal;
   text-align: left; // 텍스트를 왼쪽 정렬
   margin-left: 15rem;
-  padding-left: 1.3rem;
+  padding-left: 2rem;
   color: ${(props) => (props.active ? '#5B00EF' : '#636363')};
 `;
 
 const Divider = styled.hr`
   border: none;
-  position: absolute;
-  width: 11.25rem;
-  border-top:  solid #ccc;
-  margin: 2rem 1; /* 섹션 사이의 여백 */
-  bottom: -2rem;
-`;
+  height: 0.1rem;
+  background-color: #ccc;
+  margin-top: 30Rem; // Divider 위쪽 여백 조정
+  margin-bottom: 1rem; // Divider 아래쪽 여백 조정
+  width: 60%; // Divider의 너비를 90%로 조정
+  align-self: center; // Divider를 Sidebar 중앙으로 위치시킴
+  `;
 
 const LogoutLabel = styled.span`
   color: #636363;
@@ -110,8 +114,8 @@ const LogoutLabel = styled.span`
   font-weight: 800;
   line-height: normal;
   text-align: left; // 텍스트를 왼쪽 정렬
-  margin-top: 10rem;
-  margin-left: 2rem;
+  margin-top: 2rem;
+  margin-left: 15rem;
 `;
 
 const MenuItem = styled.div`
