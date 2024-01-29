@@ -1,12 +1,204 @@
-import React from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
+import fakeUsersData from '../data/fakeUsersData';
 
+//이메일 유효성
+const validateEmail = (email) => {
+  return email
+    .toLowerCase()
+    .match(/([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/);
+};
+// 이메일 중복 검사 함수 수정 실패!! 수정해야함
+const isEmailDuplicated = async (email) => {
+  try {
+    // 가짜 서버 대신 localStorage에서 이메일 목록을 가져옴
+    const emails = JSON.parse(localStorage.getItem('userEmails')) || [];
+
+    // 이메일 중복 여부 체크
+    const isDuplicated = emails.includes(email.toLowerCase());
+
+    return isDuplicated;
+  } catch (error) {
+    console.error('Error checking email duplication:', error);
+    return false;
+  }
+};
+//비밀번호 유효성 체크 세개를 위한 함수
+// 1) 소문자포함여부, 글자수는 8~20자
+const hasLowerCaseAndValidLength = (password) => {
+  return /^(?=.*[a-z]).{8,20}$/.test(password);
+};
+// 2) 대문자 포함 여부
+const hasUpperCase = (password) => {
+  return /[A-Z]/.test(password);
+};
+// 3) 특수문자(!@#$%^*+=-) 포함여부
+const hasSpecialCharacter = (password) => {
+  return /[!@#$%^*+=-]/.test(password);
+};
 
 export default function SignUp() {
   const navigate = useNavigate();
-
   const navigateToSignUp2 = () => navigate('/signup2');
+
+  const [email, setEmail] = useState("");
+  const [checkEmail, setCheckEmail] = useState(false)
+  const [password, setPassword] = useState("");
+  const [checkPwd1, setCheckPwd1] = useState(false);
+  const [checkPwd2, setCheckPwd2] = useState(false);
+  const [checkPwd3, setCheckPwd3] = useState(false);
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [name, setName] = useState("");
+  const [nickName, setNickName] = useState("");
+  const [gender, setGender] = useState("");
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
+  const [phoneNum, setPhoneNum] = useState("");
+  const [isFullAgreement, setIsFullAgreement] = useState(false);
+
+  const isEmailValid = validateEmail(email);
+  const isPwdValid1 = hasLowerCaseAndValidLength(password);
+  const isPwdValid2 = hasUpperCase(password);
+  const isPwdValid3 = hasSpecialCharacter(password);
+  const [confirmPwdMsg, setConfirmPwdMsg]= useState(false);
+  const isConfirmPwd = password === confirmPwd;
+
+  const [isRequiredConsent1, setRequiredConsent1] = useState(false);
+  const [isRequiredConsent2, setRequiredConsent2] = useState(false);
+
+  //모든 조건 충족/ 이용약관관련 추가하기
+  const isAllValid = isEmailValid && isPwdValid1 && isPwdValid2 && isPwdValid3 && isConfirmPwd && checkEmail && isRequiredConsent1 && isRequiredConsent2;
+
+
+  //이메일 형식
+  const onChangeEmail = useCallback(async (e) => {
+    const currEmail = e.target.value;
+    setEmail(currEmail);
+
+    if (!validateEmail(currEmail)) {
+      setCheckEmail(false)
+    } else {
+      setCheckEmail(true)
+    }
+  }, []);
+
+  //비밀번호 조건 1~3
+  const onChangePwd1 = useCallback((e) => {
+    const currPwd = e.target.value;
+    const isUpperCase = hasUpperCase(currPwd);
+    const isSpecialCharacter = hasSpecialCharacter(currPwd);
+  
+    setPassword(currPwd);
+    setCheckPwd1(hasLowerCaseAndValidLength(currPwd));
+    setCheckPwd2(isUpperCase);
+    setCheckPwd3(isSpecialCharacter);
+  }, []);
+  
+  const onChangePwd2 = useCallback((e) => {
+    const currPwd = e.target.value;
+    const isLowerCase = hasLowerCaseAndValidLength(currPwd);
+    const isSpecialCharacter = hasSpecialCharacter(currPwd);
+  
+    setPassword(currPwd);
+    setCheckPwd1(isLowerCase);
+    setCheckPwd2(hasUpperCase(currPwd));
+    setCheckPwd3(isSpecialCharacter);
+  }, []);
+  
+  const onChangePwd3 = useCallback((e) => {
+    const currPwd = e.target.value;
+    const isLowerCase = hasLowerCaseAndValidLength(currPwd);
+    const isUpperCase = hasUpperCase(currPwd);
+  
+    setPassword(currPwd);
+    setCheckPwd1(isLowerCase);
+    setCheckPwd2(isUpperCase);
+    setCheckPwd3(hasSpecialCharacter(currPwd));
+  }, []);
+
+  //비밀번호 확인
+  const onChangeConfirmPwd = useCallback((e) => {
+    const currConfirmPwd = e.target.value;
+    setConfirmPwd(currConfirmPwd);
+  
+    setConfirmPwdMsg(currConfirmPwd === password);
+  }, [password]);
+
+  //수정하기
+  const onCheckEmail = useCallback(async (e) => {
+    e.preventDefault();
+  
+    try {
+      const isDuplicated = await isEmailDuplicated(email);
+  
+      if (isDuplicated) {
+        setCheckEmail(false);
+      } else {
+        setCheckEmail(true);
+  
+        // 이메일이 중복되지 않으면 localStorage에 추가
+        const emails = JSON.parse(localStorage.getItem('userEmails')) || [];
+        await new Promise((resolve) => {
+          localStorage.setItem('userEmails', JSON.stringify([...emails, email.toLowerCase()]));
+          resolve();
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [email]);
+
+  //약관 전체동의
+  const handleFullAgreementChange = useCallback((e) => {
+    setIsFullAgreement(e.target.checked);
+  }, []);
+
+  // 각 약관 동의 체크박스 핸들러
+const handleRequiredConsent1Change = useCallback((e) => {
+  setRequiredConsent1(e.target.checked);
+}, []);
+
+const handleRequiredConsent2Change = useCallback((e) => {
+  setRequiredConsent2(e.target.checked);
+}, []);
+
+// 약관 전체 동의가 변경될 때 각 약관 동의 상태 업데이트
+useEffect(() => {
+  if (isFullAgreement) {
+    setRequiredConsent1(true);
+    setRequiredConsent2(true);
+  } else {
+    setRequiredConsent1(false);
+    setRequiredConsent2(false);
+  }
+}, [isFullAgreement]);
+
+const onSubmit = (e) => {
+  e.preventDefault();
+
+  // 로컬 스토리지에 가입 정보 추가
+  const user = {
+    email,
+    password,  
+    name, 
+    nickName,
+    phoneNum,
+    gender,
+    birthYear,
+    birthMonth,
+    birthDay,
+    isRequiredConsent1,
+    isRequiredConsent2
+  };
+
+  // 로컬 스토리지에 가입 정보 저장
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  localStorage.setItem('users', JSON.stringify([...users, user]));
+
+  navigateToSignUp2();
+}
 
   return (
     <Container>
@@ -14,52 +206,102 @@ export default function SignUp() {
         <Title>회원가입</Title>
         <InputWrap>
         <Label>이메일</Label>
-        <InputField></InputField>
+        <InputField type="email" onChange={onChangeEmail} />
+        {checkEmail !== null && (
+                  <img
+                    src={checkEmail ? 'assets/Check2.png' : 'assets/UnChecked.png'}
+                    alt="이메일 중복 확인"
+                    style={{ width: '17px', height: '11px', marginRight: '5px', marginLeft:'10px' }}
+                  />
+                )} 중복확인
         </InputWrap>
 
         <InputWrap>
         <Label>비밀번호</Label>
-        <InputField></InputField>
+        <InputField type="password" onChange={onChangePwd1} />
+        {checkPwd1 !== null && (
+          <img
+            className='check'
+            src={checkPwd1 ? 'assets/Check2.png' : 'assets/UnChecked.png'} // 변경필요
+            alt="비밀번호수 제한 확인"
+            style={{ width: '17px', height: '11px', marginRight: '5px',  marginLeft:'10px'}} // 변경필요
+          />
+        )} 영문 8~20자
+                {checkPwd2 !== null && (
+          <img
+            src={checkPwd2 ? 'assets/Check2.png' : 'assets/UnChecked.png'} // 변경필요
+            alt="대문자 포함 확인"
+            style={{width: '17px', height: '11px', marginRight: '5px', marginLeft:'70px' }} // 변경필요
+          />
+        )} 대문자 포함
+                {checkPwd3 !== null && (
+          <img
+            src={checkPwd3 ? 'assets/Check2.png' : 'assets/UnChecked.png'} // 변경필요
+            alt="특수문자 포함 확인"
+            style={{ width: '17px', height: '11px', marginRight: '5px',  marginLeft:'70px'}} // 변경필요
+          />
+        )} 특수문자
+
         </InputWrap>
 
         <InputWrap>
         <Label>비밀번호 확인</Label>
-        <InputField></InputField>
+        <InputField type="password" onChange={onChangeConfirmPwd} />
+        {confirmPwdMsg !== null && (
+          <img
+            className='check'
+            src={confirmPwdMsg ? 'assets/Check2.png' : 'assets/UnChecked.png'}
+            alt="비밀번호 확인"
+            style={{ width: '17px', height: '11px', marginRight: '5px', marginLeft:'10px'}}
+          />
+        )} 확인완료
         </InputWrap>
 
         <InputWrap>
         <Label>이름</Label>
-        <InputField></InputField>
+        <InputField type="text" value={name} onChange={(e) => setName(e.target.value)} />
         </InputWrap>
 
         <InputWrap>
         <Label>닉네임</Label>
-        <InputField></InputField>
+        <InputField type="text" value={nickName} onChange={(e) => setNickName(e.target.value)} />
         </InputWrap>
 
         <InputWrap>
         <Label>휴대폰</Label>
-        <InputField></InputField>
+        <InputField type="text" value={phoneNum} onChange={(e) => setPhoneNum(e.target.value)} />
         </InputWrap>
 
         <InputWrap>
         <Label>성별</Label>
-        <input type='radio' name='gender' value='female' />여자
-        <input type='radio' name='gender' value='female' />남자
-        <input type='radio' name='gender' value='female' />선택 안 함
+        <input type='radio' name='gender' value='female' onChange={(e) => setGender(e.target.value)} checked={gender === 'female'} />여자
+        <input type='radio' name='gender' value='male' onChange={(e) => setGender(e.target.value)} checked={gender === 'male'} />남자
+        <input type='radio' name='gender' value='none-selected' onChange={(e) => setGender(e.target.value)} checked={gender === 'none-selected'} />선택 안 함
         </InputWrap>
 
         <InputWrap>
         <Label>생년월일</Label>
-        <select>
-          <option value="" disabled />
-        </select>년
-        <select>
-          <option value="" disabled />
-        </select>월
-        <select>
-          <option value="" disabled />
-        </select>일
+        <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)}>
+          <option value="" disabled></option>
+          {Array.from({ length: 125 }, (_, index) => 2024 - index).map((year) => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
+        년
+        <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
+          <option value="" disabled></option>
+          {Array.from({ length: 12 }, (_, index) => index + 1).map((month) => (
+            <option key={month} value={month}>{month}</option>
+          ))}
+        </select>
+        월
+        <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)}>
+          <option value="" disabled></option>
+          {Array.from({ length: 31 }, (_, index) => index + 1).map((day) => (
+            <option key={day} value={day}>{day}</option>
+          ))}
+        </select>
+        일
         </InputWrap>
 
         <svg xmlns="http://www.w3.org/2000/svg" width="1201" height="4" viewBox="0 0 1201 4" fill="none">
@@ -68,23 +310,25 @@ export default function SignUp() {
 
         <Terms>
         <InputWrap>
-        <Label>이용약관동의</Label>
-        <InputField type="checkbox" id="fullagreement" name="fullagreement" />
-        <FullAgreement for="scales">전체 동의합니다.</FullAgreement>
+          <Label>이용약관동의</Label>
+          <InputField type="checkbox" id="fullagreement" name="fullagreement" onChange={handleFullAgreementChange} checked={isFullAgreement} />
+          <FullAgreement for="scales">전체 동의합니다.</FullAgreement>
         </InputWrap>
 
         <InputWrap>
-        <InputField type="checkbox" id="requiredconsent1" name="requiredconsent1" />
+        <InputField type="checkbox" id="requiredconsent1" name="requiredconsent1" onChange={handleRequiredConsent1Change} checked={isFullAgreement || isRequiredConsent1} />
         <RequiredConsent for="scales">이용약관 동의 (필수)</RequiredConsent>
         </InputWrap>
 
         <InputWrap>
-        <InputField type="checkbox" id="requiredconsent2" name="requiredconsent2" />
+        <InputField type="checkbox" id="requiredconsent2" name="requiredconsent2" onChange={handleRequiredConsent2Change} checked={isFullAgreement || isRequiredConsent2} />
         <RequiredConsent for="scales">개인정보 수집 이용 동의 (필수)</RequiredConsent>
         </InputWrap>
         </Terms>
 
-        <SignUpButton type="submit" onClick={navigateToSignUp2}>회원가입 하기</SignUpButton>
+        <SignUpButton type="submit" onClick={onSubmit} disabled={!isAllValid}>
+          확인
+        </SignUpButton>
       </Form>
     </Container>
   )
@@ -214,5 +458,10 @@ line-height: normal;
 margin-left: 18rem;
 // 가운데 정렬이 안돼서 일단 눈대중으로 맞춤..
 cursor: pointer;
+
+&:disabled {
+  background: #A1A1A1;  
+  cursor: not-allowed;
+}
 `;
 
