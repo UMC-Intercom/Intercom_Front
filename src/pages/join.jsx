@@ -184,7 +184,8 @@ const Join = () => {
 
 
 const navigateToSignUp = () => navigate('/signup');
-  
+const navigateToFindingEmail = () => navigate('/findingemail');
+
 
   return (
     <PageContainer>
@@ -206,11 +207,11 @@ const navigateToSignUp = () => navigate('/signup');
         <LinksContainer>
         <BlackLink onClick={navigateToSignUp}>회원가입</BlackLink>
           <span style={{ color: '#000', margin: '0 10px' }}>|</span>
-          <BlackLink onClick={() => console.log('이메일 찾기')}>이메일 찾기</BlackLink>
-        </LinksContainer>
+          <BlackLink onClick={navigateToFindingEmail}>이메일 찾기</BlackLink>        </LinksContainer>
       </FormContent>
     </PageContainer>
   );
 };
 
 export default Join;
+
