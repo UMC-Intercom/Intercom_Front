@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SearchModal from './SearchModal'; //다현 여기 추가
+import SettingsSidebar from "./SettingsSideBar";
 
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
@@ -28,6 +29,16 @@ const Header = () => {
   const openSearchModal = () => setIsSearchModalOpen(true); 
   const closeSearchModal = () => setIsSearchModalOpen(false); 
 
+  const [isSettingsSidebarVisible, setIsSettingsSidebarVisible] = useState(false);
+
+  const toggleSettingsSidebar = () => {
+    setIsSettingsSidebarVisible(!isSettingsSidebarVisible);
+  };
+
+  const closeSettingsSidebar = () => {
+    setIsSettingsSidebarVisible(false);
+  };
+
  
   return (
     <HeaderContainer>
@@ -48,18 +59,19 @@ const Header = () => {
         alt="SearchButton" 
         onClick={openSearchModal}/>
           {isLoggedIn ? (
-            <UserProfileBox>
+            <UserProfileBox  >
               <NotificationImage 
               onClick={()=>handlePageChange('/notification')}//알림창구현시바꾸기
               src="./assets/Notification.png" 
               alt = "Notification Image"/>
-              <ProfileImage  
-              onClick={() => handlePageChange('/profile')}
+              <SidebarArea onClick={toggleSettingsSidebar}>
+              <ProfileImage 
               src="./assets/Profile.png" 
               alt="Profile" />
-              <UserName 
-              onClick={toggleLogin}>{userProfile.name} 님
-              </UserName>            
+              <UserName>
+                {userProfile.name} 님
+              </UserName>    
+              </SidebarArea>
               </UserProfileBox>
               ) : (
               <JoinButton 
@@ -69,6 +81,10 @@ const Header = () => {
               </ButtonBox>
               {isSearchModalOpen && <SearchModal onClose={closeSearchModal} />}
       </HeaderBox>
+      <SettingsSidebar 
+        $isVisible={isSettingsSidebarVisible} 
+        onClose={closeSettingsSidebar} 
+      />
     </HeaderContainer>
   );
 };
@@ -180,8 +196,8 @@ const UserProfileBox = styled.div`
 const ProfileImage = styled.img`
   width: 1.5rem;
   height: 1.5rem;
-  margin-right: 0.31rem; 
-  margin-top: -0.1rem;
+  margin-right: 0.41rem; 
+ margin-top: -0.1rem;
 `;
 
 const UserName = styled.span`
@@ -192,4 +208,9 @@ text-align: right;
 font-family: SUITE;
 font-size: 1.32813rem;
 font-weight: 700;
+`;
+
+const SidebarArea = styled.div`
+display: flex;
+align-items: center;
 `;
