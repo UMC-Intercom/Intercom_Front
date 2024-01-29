@@ -20,7 +20,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
           display: 'flex',
           flexDirection: 'column',
           marginTop: '5rem',
-          marginLeft: '48.5rem',
+          marginLeft: '48rem',
         },
       }}
     >
