@@ -158,4 +158,3 @@ const MenuItem = styled(SidebarItem)`
     background-color: #f7f7f7;
   }
 `;
-
