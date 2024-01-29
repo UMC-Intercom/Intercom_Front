@@ -59,19 +59,17 @@ const Header = () => {
         alt="SearchButton" 
         onClick={openSearchModal}/>
           {isLoggedIn ? (
-            <UserProfileBox  >
+            <UserProfileBox  onClick={toggleSettingsSidebar}>
               <NotificationImage 
               onClick={()=>handlePageChange('/notification')}//알림창구현시바꾸기
               src="./assets/Notification.png" 
               alt = "Notification Image"/>
-              <SidebarArea onClick={toggleSettingsSidebar}>
               <ProfileImage 
               src="./assets/Profile.png" 
               alt="Profile" />
               <UserName>
                 {userProfile.name} 님
-              </UserName>    
-              </SidebarArea>
+              </UserName>            
               </UserProfileBox>
               ) : (
               <JoinButton 
@@ -196,8 +194,8 @@ const UserProfileBox = styled.div`
 const ProfileImage = styled.img`
   width: 1.5rem;
   height: 1.5rem;
-  margin-right: 0.41rem; 
- margin-top: -0.1rem;
+  margin-right: 0.31rem; 
+  margin-top: -0.1rem;
 `;
 
 const UserName = styled.span`
@@ -208,9 +206,4 @@ text-align: right;
 font-family: SUITE;
 font-size: 1.32813rem;
 font-weight: 700;
-`;
-
-const SidebarArea = styled.div`
-display: flex;
-align-items: center;
 `;
