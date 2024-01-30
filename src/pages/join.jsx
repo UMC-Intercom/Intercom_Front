@@ -176,11 +176,12 @@ const Join = () => {
           withCredentials: true   // config
         })
         .then((res) => {
-          const accessToken = res.data;
+          console.log("**data: ", res.data);  // 데이터 출력해보고
 
-          console.log("**assessToken: ", accessToken);
-
-          localStorage.setItem('accessToken', accessToken);
+          // 필요한 정보 로컬스토리지에 저장
+          localStorage.setItem('accessToken', res.data.token);
+          localStorage.setItem('userName', res.data.name);
+          localStorage.setItem('userNickname', res.data.nickname);
 
           alert("로그인 성공");
           navigate(from, { replace: true });
