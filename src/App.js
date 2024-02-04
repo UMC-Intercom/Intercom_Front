@@ -18,7 +18,9 @@ import FindingEmail from './pages/FindingEmail'; //추가
 import FindedEmail from './pages/FindedEmail'; //추가
 import UnfindedEmail from './pages/UnfindedEmail'; //추가
 import SettingsPage from './pages/SettingsPage';
-
+import MyCareer from './pages/MyCareer';
+import ProfileEdit from './pages/ProfileEdit';
+import WrittenContent from './pages/WrittenContent';
 
 function App() {
   return (
@@ -40,10 +42,13 @@ function App() {
           <Route path="/signup4" element={<SignUp4 />} />  
           <Route path="/onboarding1" element={<OnBoarding1 />} /> 
           <Route path="/onboarding2" element={<OnBoarding2 />} />  
-          <Route path="/findingemail" element={<FindingEmail />} /> //추가
-          <Route path="/findedemail" element={<FindedEmail />} /> //추가
-          <Route path="/unfindedemail" element={<UnfindedEmail />} /> //추가
+          <Route path="/findingemail" element={<FindingEmail />} /> 
+          <Route path="/findedemail" element={<FindedEmail />} /> 
+          <Route path="/unfindedemail" element={<UnfindedEmail />} />
           <Route path="/settings" element={<SettingsPage/>}/>
+          <Route path="/mycareer" element={<MyCareer/>}/>
+          <Route path="/profile-edit" element={<ProfileEdit />} />
+          <Route path="/written-content" element={<WrittenContent />} />
           </Routes>
         </AuthProvider>
       </div>

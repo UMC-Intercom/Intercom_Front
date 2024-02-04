@@ -60,7 +60,7 @@ const Header = () => {
           <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
           <Pages active={activePage === '/saved-notices'} onClick={() => handlePageChange('/saved-notices')}>저장한 공고</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
-          <Pages active={activePage === '/my-career'} onClick={() => handlePageChange('/my-career')}>내커리어</Pages>
+          <Pages active={activePage === '/mycareer'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
           <Pages active={activePage === '/cover-letters'} onClick={() => handlePageChange('/cover-letters')}>합격 자소서</Pages>
           <Pages active={activePage === '/interviews'} onClick={() => handlePageChange('/interviews')}>면접 후기</Pages>
           <Pages active={activePage === '/news'} onClick={() => handlePageChange('/news')}>취업 뉴스</Pages>
