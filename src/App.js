@@ -25,6 +25,8 @@ import Deactivate3 from './pages/Deactivate3';
 import Deactivate4 from './pages/Deactivate4';
 import Deactivate5 from './pages/Deactivate5';
 import DeactivatePDF from './pages/DeactivatePDF';
+import MyCareer from './pages/MyCareer';
+import WrittenContent from './pages/WrittenContent';
 
 function App() {
   return (
@@ -57,7 +59,13 @@ function App() {
           <Route path="/deactivate-account4" element={<Deactivate4 />} />
           <Route path="/deactivate-account5" element={<Deactivate5 />} />
           <Route path="/deactivate-downloadPDF" element={<DeactivatePDF />} />
-        </Routes>
+          <Route path="/findedemail" element={<FindedEmail />} /> 
+          <Route path="/unfindedemail" element={<UnfindedEmail />} />
+          <Route path="/settings" element={<SettingsPage/>}/>
+          <Route path="/mycareer" element={<MyCareer/>}/>
+          <Route path="/profile-edit" element={<ProfileEdit />} />
+          <Route path="/written-content" element={<WrittenContent />} />
+          </Routes>
         </AuthProvider>
       </div>
     </Router>

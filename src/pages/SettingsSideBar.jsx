@@ -21,6 +21,12 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
     onClose();
   };
 
+  const handleScrapsClick = () => {
+    handleNavigation('/scrap');
+    onClose();
+  };
+
+
 
   useEffect(() => {
     const closeSidebarOnOutsideClick = (event) => {
@@ -49,7 +55,8 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
         <Line />
       </SidebarItem>
       <MenuItem onMouseEnter={() => setHoveredItem('scraps')}
-                   onMouseLeave={() => setHoveredItem(null)}>
+                   onMouseLeave={() => setHoveredItem(null)}
+                   onClick={handleScrapsClick}>
         {hoveredItem === 'scraps' && <CheckIcon src="./assets/Check.png" alt="Check" />}
         <ItemText>스크랩</ItemText>
       </MenuItem>
@@ -152,7 +159,6 @@ const LogoutItem = styled(SidebarItem)`
   font-weight: 800;
   text-align: left;
   margin-left: 2rem;
-  cursor: pointer;
 `;
 
 const MenuItem = styled(SidebarItem)`
