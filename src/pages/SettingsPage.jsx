@@ -164,7 +164,7 @@ const Content = styled.div`
   position: relative;
   margin-left: calc(7rem + 0.1875rem + 7rem);
   top: 3rem;
-  padding-left: 18rem;
+  left: 7.8rem;
 `;
 
 const ProfileSection = styled.section`
