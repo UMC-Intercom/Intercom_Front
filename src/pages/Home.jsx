@@ -1,73 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
+import fakeNotices from '../data/fakeNotices';
 
-const fakeNotices = [
-    {
-      id: 1,
-      imageUrl: "/assets/notice1.jpg",
-      title: "가짜 공고 냠냠냠",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-      id: 2,
-      imageUrl: "/assets/notice2.jpg",
-      title: "가짜 공고 냉돌이",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-      id: 3,
-      imageUrl: "/assets/notice3.jpg",
-      title: "가짜 공고 냥돌냥",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-        id: 4,
-        imageUrl: "/assets/notice4.jpg",
-        title: "가짜 공고 돌돌이",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    }, 
-    {
-        id: 5,
-        imageUrl: "/assets/notice5.jpg",
-        title: "가짜 공고 냠냠냠",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-        id: 6,
-        imageUrl: "/assets/notice6.jpg",
-        title: "가짜 공고 냉돌이",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-        id: 7,
-        imageUrl: "/assets/notice7.jpg",
-        title: "가짜 공고 냥돌냥",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-          id: 8,
-          imageUrl: "/assets/notice8.jpg",
-          title: "가짜 공고 돌돌이",
-          information: "2024년 상반기 체험형 청년인턴",
-          deadline:15,
-          views:1202
-        },
-  ];
+
 
 const Home = () => {
     const [activePage, setActivePage] = useState("/home");
@@ -85,33 +21,38 @@ const Home = () => {
       <PageIcons>
           <Icons onClick={() => handlePageChange('/saved-notices')}>
             <img src="/assets/SavedNotices.png" alt="SavedNotices" 
-            style={{width:"64px", height:"80px", marginBottom:"20px"}} />
+            style={{width: "4rem", height: "5rem", marginBottom: "1.25rem"}} />
             <span>저장한 공고</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/my-career')}>
             <img src="/assets/MyCareer.png" alt="MyCareer"
+<<<<<<< HEAD
              style={{width:"74.61px", height:"67.15px", marginBottom:"32.85px"}}  />
             <span>내 커리어</span>
+=======
+            style={{width: "4.663rem", height: "4.197rem", marginBottom: "2.053rem"}}  />
+            <span>내커리어</span>
+>>>>>>> seongbin
           </Icons>
           <Icons onClick={() => handlePageChange('/talktalk')}>
             <img src="/assets/Talktalk.png" alt="Talktalk"
-             style={{width:"82.19px", height:"81.99px", marginBottom:"18.01px"}}  />
-            <span>톡톡</span>
+             style={{width: "5.136rem", height: "5.124rem", marginBottom: "1.126rem"}} />
+             <span>톡톡</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/cover-letters')}>
             <img src="/assets/Coverletters.png" alt="Coverletters"
-             style={{width:"64px", height:"81px", marginBottom:"19px"}}  />
-            <span>합격 자소서</span>
+             style={{width: "4rem", height: "5.063rem", marginBottom: "1.188rem"}} />
+             <span>합격 자소서</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/interviews')}>
             <img src="/assets/interviews.png" alt="Interviews"
-             style={{width:"66px", height:"80px", marginBottom:"20px"}}  />
-            <span>면접 후기</span>
+             style={{width: "4.125rem", height: "5rem", marginBottom: "1.25rem"}} />
+             <span>면접 후기</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/news')}>
             <img src="/assets/News.png" alt="News"
-             style={{width:"64px", height:"64px", marginBottom:"36px"}}  />
-            <span>취업 뉴스</span>
+             style={{width: "4rem", height: "4rem", marginBottom: "2.25rem"}} />
+             <span>취업 뉴스</span>
           </Icons>
         </PageIcons>
       </MenuBox>
@@ -122,12 +63,12 @@ const Home = () => {
         </StartButton>
       </RecommendBox>
       <PopularNoticesBox>
-        <span style={{fontSize: "25px", fontWeight: "800"}}>실시간 인기 공고</span>
+        <span style={{fontSize: "1.563rem", fontWeight: "800"}}>실시간 인기 공고</span>
         <ContentsBox>
             <Content>
                 {fakeNotices.map(notice => (
                  <NoticeItem key={notice.id}>
-                    <img src={notice.imageUrl} alt={notice.title} style={{marginBottom:"20px"}}/>
+                    <img src={notice.imageUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
                     <div>
                         <Title>[{notice.title}] </Title>
                         <Information>{notice.information}</Information>
@@ -149,75 +90,76 @@ export default Home;
 
 
 
-
 const PopularNoticesBox = styled.div`
-width: 1200px;
-margin: 50px auto;
-padding: 20px; 
-display: flex;
-flex-direction: column;
-justify-content: center; 
+  width: 75rem;
+  margin: 3.125rem auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
-const ContentsBox = styled.div`
-width: 1200px;
-min-height: 437px; 
-background-color: #FFFFFF;
-border-radius: 20px;
-`
-;
-const Content = styled.div`
-display: flex;
-gap: 25px;
-flex-wrap: wrap;
 
-@media (max-width: 1200px) {
-justify-content: space-around;
-}
+const ContentsBox = styled.div`
+  width: 75rem;
+  min-height: 27.313rem;
+  background-color: #FFFFFF;
+  border-radius: 1.25rem;
+`;
+
+const Content = styled.div`
+  display: flex;
+  gap: 1.563rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 75rem) {
+    justify-content: space-around;
+  }
 `;
 
 const NoticeItem = styled.div`
-flex: 0 0 calc(25% - 20px);
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-margin-top: 20px;
+  flex: 0 0 calc(25% - 1.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.25rem;
 
-img {
+  img {
     background-color: #D9D9D9;
-  width: 100%; 
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover; 
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
 
-span {
-  font-size: 20px;
-  text-align: left;
-  margin-top: 20px; 
-}
+  span {
+    font-size: 1.25rem;
+    text-align: left;
+    margin-top: 1.25rem;
+  }
 `;
 
 const RecommendBox = styled.div`
-width: 1200px;
-height: 196px;
-background-color: #EFF0F4;
-border-radius: 20px;
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin: 50px auto;
-margin-top: 80px;
+  width: 75rem;
+  height: 12.25rem;
+  background-color: #EFF0F4;
+  border-radius: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 3.125rem auto;
+  margin-top: 5rem;
 
-span {
-    font-size: 30px;
+  span {
+    font-size: 1.875rem;
     font-weight: bold;
     text-align: left;
-    margin-left: 95px; 
-
+    margin-left: 5.938rem;
   }
-`
+`;
+
 const Main = styled.div`
-  padding: 20px;
+  padding: 1.25rem;
 `;
 
 const MenuBox = styled.div`
@@ -232,59 +174,59 @@ const PageIcons = styled.div`
   align-items: center;
   flex-wrap: wrap;
   width: 90%;
-  margin-top: 70px;
-  max-width: 1000px;
+  margin-top: 4.375rem;
+  max-width: 62.5rem;
 `;
 
 const Icons = styled.div`
-display: flex;
-flex-direction: column;
-align-items: center;
-cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
   span {
-    font-size: 17px;
+    font-size: 1.063rem;
     text-align: center;
   }
 `;
 
 const StartButton = styled.div`
-width: 224px;
-height: 72px;
-background-color: #5B00EF;
-border-radius: 10px;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-margin-right: 62px;
+  width: 14rem;
+  height: 4.5rem;
+  background-color: #5B00EF;
+  border-radius: 0.625rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 3.875rem;
 
-span {
-font-size: 25px;
-color: #fff;
-display: inline-block;
-width: 100%;
-white-space: nowrap;
-overflow: hidden;
-}
+  span {
+    font-size: 1.563rem;
+    color: #fff;
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+  }
 `;
 
 const Title = styled.span`
-font-weight: bold;
-font-size: 20px;
+  font-weight: bold;
+  font-size: 1.25rem;
 `;
 
 const Information = styled.span`
-font-size: 20px;
-font-weight: bold;
+  font-size: 1.25rem;
+  font-weight: bold;
 `;
 
 const Deadline = styled.span`
-font-size: 17px;
-color: #5B00EF;
+  font-size: 1.063rem;
+  color: #5B00EF;
 `;
 
 const Views = styled.span`
-color: #636363;
-
+  color: #636363;
 `;

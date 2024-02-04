@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+=======
+import { useNavigate ,useLocation  } from 'react-router-dom';
+import styled from 'styled-components';
+import { useAuth } from './AuthContext';
+
+>>>>>>> seongbin
 
 export const PageContainer = styled.div`
   display: flex;
@@ -148,6 +155,7 @@ export const FlexRow = styled.div`
 const Join = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+<<<<<<< HEAD
   const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const navigate = useNavigate();
 
@@ -161,6 +169,44 @@ const Join = () => {
 
   const navigateToSignUp = () => navigate('/signup');
   
+=======
+  const { isLoggedIn, toggleLogin, stayLoggedIn, toggleStayLoggedIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const from = location.state?.from?.pathname || "/"; //이전경로 저장
+
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+  const handleStayLoggedInChange = (e) => toggleStayLoggedIn(e.target.checked);
+  
+  //모든 페이지에서 로그인 상태 유지할 수 있도록 useAuth 훅 사용해서 수정함
+  //로그인시 사용자가 로그인화면 이전 진행중이던 페이지로 돌아갈 수 있도록 useLocation 훅 사용
+  const handleLogin = () => {
+  // 사용자 인증 처리 로직 구현 필요 (예: API 요청)
+  // 예를 들어, 사용자 인증이 성공했다고 가정
+  const isAuthSuccess = true; // 실제 로그인 성공 여부는 API 요청 등에 의해 결정됨 나중에 바꺼야댐
+
+  if (isAuthSuccess) {
+    toggleLogin(); 
+    if (stayLoggedIn) { //로그인유지 선택시 로그인 상태를 로컬 스토리지에 저장 (창 닫았다가 다시 켜도 로그인상태 유지)
+      localStorage.setItem('isLoggedIn', true);
+    } 
+    else {
+      localStorage.removeItem('isLoggedIn');
+    }
+    navigate(from, { replace: true }); //로그인하면 이전으로돌아가깅
+  } 
+  else {
+    alert('로그인에 실패했습니다.');
+  }
+};
+
+
+const navigateToSignUp = () => navigate('/signup');
+const navigateToFindingEmail = () => navigate('/findingemail');
+
+>>>>>>> seongbin
 
   return (
     <PageContainer>
@@ -182,11 +228,19 @@ const Join = () => {
         <LinksContainer>
         <BlackLink onClick={navigateToSignUp}>회원가입</BlackLink>
           <span style={{ color: '#000', margin: '0 10px' }}>|</span>
+<<<<<<< HEAD
           <BlackLink onClick={() => console.log('이메일 찾기')}>이메일 찾기</BlackLink>
         </LinksContainer>
+=======
+          <BlackLink onClick={navigateToFindingEmail}>이메일 찾기</BlackLink>        </LinksContainer>
+>>>>>>> seongbin
       </FormContent>
     </PageContainer>
   );
 };
 
 export default Join;
+<<<<<<< HEAD
+=======
+
+>>>>>>> seongbin

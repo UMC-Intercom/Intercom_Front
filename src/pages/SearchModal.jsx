@@ -13,6 +13,10 @@ const ModalContainer = styled.div`
     align-items: center;
     justify-content: center;
     z-index: 1000;
+<<<<<<< HEAD
+=======
+    font-family: 'SUITE', sans-serif;
+>>>>>>> seongbin
 `;
 
 const ModalContent = styled.div`
@@ -23,6 +27,11 @@ const ModalContent = styled.div`
     align-items: center;
     background: white;
     padding: 20px;
+<<<<<<< HEAD
+=======
+    font-family: 'SUITE', sans-serif;
+
+>>>>>>> seongbin
 `;
 
 const FlexContainer = styled.div`
@@ -53,6 +62,10 @@ const SearchBarContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+<<<<<<< HEAD
+=======
+    
+>>>>>>> seongbin
 `;
 
 const SearchInput = styled.input`
@@ -63,7 +76,13 @@ const SearchInput = styled.input`
     font-size: 1.2rem;
     box-sizing: border-box;
     border-radius: 10px;
+<<<<<<< HEAD
     font-family: 'suite-SemiBold', sans-serif;
+=======
+    font-family: 'SUITE', sans-serif;
+    font-weight: 700;
+
+>>>>>>> seongbin
     color: #636363;
 `;
 
@@ -117,6 +136,10 @@ const CheckboxOption = ({ innerProps, label, isSelected }) => (
 );
 
 const jobOptions = [
+<<<<<<< HEAD
+=======
+    
+>>>>>>> seongbin
     { value: 'sales', label: '영업/고객상담' },
     { value: 'management', label: '경영/사무' },
     { value: 'marketing', label: '마케팅/경영/홍보' },
@@ -192,7 +215,11 @@ const customStyles = {
     placeholder: (provided) => ({
         ...provided,
         color: '#636363',
+<<<<<<< HEAD
         fontFamily: 'suite-SemiBold',
+=======
+        fontFamily: 'SUITE' //폰트 바꿈
+>>>>>>> seongbin
     }),
     option: (provided, state) => ({
         ...provided,
@@ -304,4 +331,8 @@ const SearchModal = ({ onClose }) => {
     );
 };
 
+<<<<<<< HEAD
 export default SearchModal;
+=======
+export default SearchModal;
+>>>>>>> seongbin
