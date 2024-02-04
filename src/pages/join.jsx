@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
-<<<<<<< HEAD
-import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-=======
 import { useNavigate ,useLocation  } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from './AuthContext';
 
->>>>>>> seongbin
 
 export const PageContainer = styled.div`
   display: flex;
@@ -155,21 +150,6 @@ export const FlexRow = styled.div`
 const Join = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-<<<<<<< HEAD
-  const [stayLoggedIn, setStayLoggedIn] = useState(false);
-  const navigate = useNavigate();
-
-  const handleEmailChange = (e) => setEmail(e.target.value);
-  const handlePasswordChange = (e) => setPassword(e.target.value);
-  const handleStayLoggedInChange = (e) => setStayLoggedIn(e.target.checked);
-  const handleLogin = () => {
-    console.log(email, password, stayLoggedIn);
-    // 여기에 로그인 로직 구현
-  };
-
-  const navigateToSignUp = () => navigate('/signup');
-  
-=======
   const { isLoggedIn, toggleLogin, stayLoggedIn, toggleStayLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -206,7 +186,6 @@ const Join = () => {
 const navigateToSignUp = () => navigate('/signup');
 const navigateToFindingEmail = () => navigate('/findingemail');
 
->>>>>>> seongbin
 
   return (
     <PageContainer>
@@ -228,19 +207,10 @@ const navigateToFindingEmail = () => navigate('/findingemail');
         <LinksContainer>
         <BlackLink onClick={navigateToSignUp}>회원가입</BlackLink>
           <span style={{ color: '#000', margin: '0 10px' }}>|</span>
-<<<<<<< HEAD
-          <BlackLink onClick={() => console.log('이메일 찾기')}>이메일 찾기</BlackLink>
-        </LinksContainer>
-=======
           <BlackLink onClick={navigateToFindingEmail}>이메일 찾기</BlackLink>        </LinksContainer>
->>>>>>> seongbin
       </FormContent>
     </PageContainer>
   );
 };
 
 export default Join;
-<<<<<<< HEAD
-=======
-
->>>>>>> seongbin

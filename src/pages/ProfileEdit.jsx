@@ -47,7 +47,6 @@ export default function ProfileEdit() {
   // 폼 제출 처리
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
-<<<<<<< HEAD
     const isPasswordFieldsEmpty = newPassword === '' && confirmNewPassword === '';
   
     if (isPasswordFieldsEmpty) {
@@ -73,18 +72,6 @@ export default function ProfileEdit() {
         }
     }
   }, [user, newPassword, confirmNewPassword, isValidPwd1, isValidPwd2, isValidPwd3, isPwdMatched, navigate]);
-=======
-    if (isValidPwd1 && isValidPwd2 && isValidPwd3 && isPwdMatched) {
-      // 유효성 검사 통과 후 로컬 스토리지에 저장
-      localStorage.setItem('user', JSON.stringify({ ...user, newPassword }));
-      setMessage('회원 정보가 저장되었습니다.');
-      setTimeout(() => {
-        setMessage('');
-        navigate('/settings');
-      }, 3000); // 메시지를 3초간 보여준 후 /settings로 이동
-    }
-  }, [user, newPassword, isValidPwd1, isValidPwd2, isValidPwd3, isPwdMatched, navigate]);
->>>>>>> develop
 
   // 사용자 입력 처리
   const handleInputChange = useCallback((e) => {
@@ -93,7 +80,6 @@ export default function ProfileEdit() {
   }, []);
 
   // 메시지 창
-<<<<<<< HEAD
   const MessageModal = ({ message, onClose }) => (
     <MessageContainer>
       <p>{message}</p>
@@ -109,15 +95,6 @@ export default function ProfileEdit() {
       setMessage('');
   };
 
-=======
-  const MessageModal = ({ message }) => (
-    <MessageContainer>
-      <p>{message}</p>
-      <button onClick={() => setMessage('')}>확인</button>
-    </MessageContainer>
-  );
-
->>>>>>> develop
   const getDaysInMonth = (year, month) => {
     return new Date(year, month, 0).getDate();
   };
@@ -135,11 +112,7 @@ export default function ProfileEdit() {
             </InputWrap>
 
             <InputWrap>
-<<<<<<< HEAD
             <Label>새 비밀번호</Label>
-=======
-            <Label>비밀번호</Label>
->>>>>>> develop
             <InputField type="password" value={newPassword} onChange={handleChangePassword} />
             </InputWrap>
 
@@ -216,11 +189,7 @@ export default function ProfileEdit() {
             <SubmitButton type="submit">저장하기</SubmitButton>
         </Form>
 
-<<<<<<< HEAD
         {message && <MessageModal message={message} onClose={handleCloseMessageModal} />}
-=======
-        {message && <MessageModal message={message} />}
->>>>>>> develop
         </Container>
     </SettingTitle>
   );
@@ -512,22 +481,15 @@ const SubmitButton = styled.button`
 
 const MessageContainer = styled.div`
   position: fixed;
-<<<<<<< HEAD
   top: 1rem;
-=======
-  top: 20px;
->>>>>>> develop
   left: 50%;
   transform: translateX(-50%);
   background-color: white;
   padding: 20px;
   border: 1px solid #ccc;
   z-index: 1000;
-<<<<<<< HEAD
   text-align: center;
   
-=======
->>>>>>> develop
 
   p {
     margin: 0;
@@ -546,7 +508,3 @@ const MessageContainer = styled.div`
     }
   }
 `;
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
