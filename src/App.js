@@ -18,6 +18,7 @@ import FindingEmail from './pages/FindingEmail'; //추가
 import FindedEmail from './pages/FindedEmail'; //추가
 import UnfindedEmail from './pages/UnfindedEmail'; //추가
 import SettingsPage from './pages/SettingsPage';
+import ProfileEdit from './pages/ProfileEdit';
 
 
 function App() {
@@ -28,7 +29,6 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
           <Route path="/talktalk" element={<TalkTalk />} />
           <Route path="/post/:postId" element={<PostPage />} />
           <Route path ="/posting" element={<Posting/>} />  
@@ -38,13 +38,14 @@ function App() {
           <Route path="/signup2" element={<SignUp2 />} />
           <Route path="/signup3" element={<SignUp3 />} /> 
           <Route path="/signup4" element={<SignUp4 />} />  
+          <Route path='/settings' element={<SettingsPage />} />
           <Route path="/onboarding1" element={<OnBoarding1 />} /> 
           <Route path="/onboarding2" element={<OnBoarding2 />} />  
-          <Route path="/findingemail" element={<FindingEmail />} /> //추가
-          <Route path="/findedemail" element={<FindedEmail />} /> //추가
-          <Route path="/unfindedemail" element={<UnfindedEmail />} /> //추가
-          <Route path="/settings" element={<SettingsPage/>}/>
-          </Routes>
+          <Route path="/findingemail" element={<FindingEmail />} /> 
+          <Route path="/findedemail" element={<FindedEmail />} />  
+          <Route path="/unfindedemail" element={<UnfindedEmail />} /> 
+          <Route path="/profile-edit" element={<ProfileEdit />} />
+        </Routes>
         </AuthProvider>
       </div>
     </Router>
