@@ -54,17 +54,10 @@ const SettingsPage = () => {
             <SectionTitle>MY</SectionTitle>
             <MyAndAccountSection>
               <Option>
-<<<<<<< HEAD
-                <OptionText onClick={() => navigate('/my-career')}>내 커리어</OptionText>
-              </Option>
-              <Option>
-                <OptionText onClick={() => navigate('/my-posts')}>작성한 글</OptionText>
-=======
                 <OptionText onClick={() => navigate('/mycareer')}>내 커리어</OptionText>
               </Option>
               <Option>
                 <OptionText onClick={() => navigate('/written-content')}>작성한 글</OptionText>
->>>>>>> develop
               </Option>
             </MyAndAccountSection>
           </Section>
@@ -72,11 +65,7 @@ const SettingsPage = () => {
             <SectionTitle>계정</SectionTitle>
             <MyAndAccountSection>
               <Option>
-<<<<<<< HEAD
                 <OptionText onClick={() => navigate('/deactivate-account1')}>계정 탈퇴</OptionText>
-=======
-                <OptionText onClick={() => navigate('/deactivate-account')}>계정 탈퇴</OptionText>
->>>>>>> develop
               </Option>
               <Option>
                 <OptionText onClick={() => navigate('/terms')}>이용약관</OptionText>
@@ -276,8 +265,4 @@ const OptionText = styled.div`
   font-weight: 600;
   color: #636363;
   cursor: pointer;
-<<<<<<< HEAD
 `;
-=======
-`;
->>>>>>> develop
