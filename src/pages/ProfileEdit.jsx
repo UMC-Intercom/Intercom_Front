@@ -47,16 +47,31 @@ export default function ProfileEdit() {
   // 폼 제출 처리
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
-    if (isValidPwd1 && isValidPwd2 && isValidPwd3 && isPwdMatched) {
-      // 유효성 검사 통과 후 로컬 스토리지에 저장
-      localStorage.setItem('user', JSON.stringify({ ...user, newPassword }));
+    const isPasswordFieldsEmpty = newPassword === '' && confirmNewPassword === '';
+  
+    if (isPasswordFieldsEmpty) {
+      // 다른 정보만 변경하고 비밀번호는 변경하지 않는 경우
+      const updatedUser = { ...user };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
       setMessage('회원 정보가 저장되었습니다.');
-      setTimeout(() => {
-        setMessage('');
-        navigate('/settings');
-      }, 3000); // 메시지를 3초간 보여준 후 /settings로 이동
+    } else if (isValidPwd1 && isValidPwd2 && isValidPwd3 && isPwdMatched) {
+      // 모든 유효성 검사를 통과한 경우
+      const updatedUser = { ...user, password: newPassword };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setMessage('회원 정보가 저장되었습니다.');
+    } else {
+        // 비밀번호 유효성 검사 실패 시
+        if (!isValidPwd1) {
+            setMessage('비밀번호는 8자 이상이며 소문자를 포함해야 합니다.');
+        } else if (!isValidPwd2) {
+            setMessage('비밀번호는 대문자를 포함해야 합니다.');
+        } else if (!isValidPwd3) {
+            setMessage('비밀번호는 특수 문자(!@#$%^*+=-)를 포함해야 합니다.');
+        } else if (!isPwdMatched) {
+            setMessage('새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.');
+        }
     }
-  }, [user, newPassword, isValidPwd1, isValidPwd2, isValidPwd3, isPwdMatched, navigate]);
+  }, [user, newPassword, confirmNewPassword, isValidPwd1, isValidPwd2, isValidPwd3, isPwdMatched, navigate]);
 
   // 사용자 입력 처리
   const handleInputChange = useCallback((e) => {
@@ -65,12 +80,20 @@ export default function ProfileEdit() {
   }, []);
 
   // 메시지 창
-  const MessageModal = ({ message }) => (
+  const MessageModal = ({ message, onClose }) => (
     <MessageContainer>
       <p>{message}</p>
-      <button onClick={() => setMessage('')}>확인</button>
+      <button onClick={onClose}>확인</button>
     </MessageContainer>
   );
+
+  const handleCloseMessageModal = () => {
+    if (message === '회원 정보가 저장되었습니다.') {
+        navigate('/settings');
+      }
+      // 메시지 상태 초기화
+      setMessage('');
+  };
 
   const getDaysInMonth = (year, month) => {
     return new Date(year, month, 0).getDate();
@@ -89,7 +112,7 @@ export default function ProfileEdit() {
             </InputWrap>
 
             <InputWrap>
-            <Label>비밀번호</Label>
+            <Label>새 비밀번호</Label>
             <InputField type="password" value={newPassword} onChange={handleChangePassword} />
             </InputWrap>
 
@@ -166,7 +189,7 @@ export default function ProfileEdit() {
             <SubmitButton type="submit">저장하기</SubmitButton>
         </Form>
 
-        {message && <MessageModal message={message} />}
+        {message && <MessageModal message={message} onClose={handleCloseMessageModal} />}
         </Container>
     </SettingTitle>
   );
@@ -458,13 +481,15 @@ const SubmitButton = styled.button`
 
 const MessageContainer = styled.div`
   position: fixed;
-  top: 20px;
+  top: 1rem;
   left: 50%;
   transform: translateX(-50%);
   background-color: white;
   padding: 20px;
   border: 1px solid #ccc;
   z-index: 1000;
+  text-align: center;
+  
 
   p {
     margin: 0;

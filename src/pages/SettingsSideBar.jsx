@@ -114,6 +114,7 @@ const CheckIcon = styled.img`
 `;
 
 const ItemText = styled.span`
+  cursor: pointer;
   color: #636363;
   font-family: 'SUITE', sans-serif;
   font-size: 1.2rem;

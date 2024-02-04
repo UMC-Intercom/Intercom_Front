@@ -3,11 +3,6 @@ import { AuthProvider } from './pages/AuthContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './pages/Header'; 
 import Home from './pages/Home'; 
-<<<<<<< HEAD
-import Join from './pages/join';
-import SignUp from './pages/SignUp';
-import SearchResults from './pages/SearchResults'; // SearchResults 컴포넌트 추가
-=======
 import TalkTalk from './pages/TalkTalk';
 import PostPage from './pages/PostPage';
 import Posting from './pages/Posting';
@@ -24,8 +19,12 @@ import FindedEmail from './pages/FindedEmail'; //추가
 import UnfindedEmail from './pages/UnfindedEmail'; //추가
 import SettingsPage from './pages/SettingsPage';
 import ProfileEdit from './pages/ProfileEdit';
->>>>>>> seongbin
-
+import Deactivate1 from './pages/Deactivate1';
+import Deactivate2 from './pages/Deactivate2';
+import Deactivate3 from './pages/Deactivate3';
+import Deactivate4 from './pages/Deactivate4';
+import Deactivate5 from './pages/Deactivate5';
+import DeactivatePDF from './pages/DeactivatePDF';
 
 function App() {
   return (
@@ -34,13 +33,8 @@ function App() {
       <AuthProvider>
         <Header />
         <Routes>
-<<<<<<< HEAD
-          <Route path="/join" element={<Join />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/search-results" element={<SearchResults />} /> {/* 검색 결과 페이지 라우트 추가 */}
-=======
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/talktalk" element={<TalkTalk />} />
           <Route path="/post/:postId" element={<PostPage />} />
           <Route path ="/posting" element={<Posting/>} />  
@@ -57,7 +51,12 @@ function App() {
           <Route path="/findedemail" element={<FindedEmail />} />  
           <Route path="/unfindedemail" element={<UnfindedEmail />} /> 
           <Route path="/profile-edit" element={<ProfileEdit />} />
->>>>>>> seongbin
+          <Route path="/deactivate-account1" element={<Deactivate1 />} />
+          <Route path="/deactivate-account2" element={<Deactivate2 />} />
+          <Route path="/deactivate-account3" element={<Deactivate3 />} />
+          <Route path="/deactivate-account4" element={<Deactivate4 />} />
+          <Route path="/deactivate-account5" element={<Deactivate5 />} />
+          <Route path="/deactivate-downloadPDF" element={<DeactivatePDF />} />
         </Routes>
         </AuthProvider>
       </div>
