@@ -1,0 +1,34 @@
+@font-face {
+    font-family: "SUITE-Bold";
+    src: url("./fonts/SUITE-Bold.ttf;");
+  }
+
+  @font-face {
+    font-family: "SUITE-ExtraBold";
+    src: url("./fonts/SUITE-ExtraBold.ttf");
+  }
+
+  @font-face {
+    font-family: "SUITE-Heavy";
+    src: url("./fonts/SUITE-Heavy.ttf");
+  }
+
+  @font-face {
+    font-family: "SUITE-Light";
+    src: url("./fonts/SUITE-Light.ttf");
+  }
+
+  @font-face {
+    font-family: "SUITE-Medium";
+    src: url("./fonts/SUITE-Medium.ttf");
+  }
+
+  @font-face {
+    font-family: "SUITE-Regular";
+    src: url("./fonts/SUITE-Regular.ttf");
+  }
+
+  @font-face {
+    font-family: "SUITE-Semibold";
+    src: url("./fonts/SUITE-SemiBold.ttf");
+  }
