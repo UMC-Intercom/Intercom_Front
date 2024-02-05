@@ -21,6 +21,12 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
     onClose();
   };
 
+  const handleScrapsClick = () => {
+    handleNavigation('/scrap');
+    onClose();
+  };
+
+
 
   useEffect(() => {
     const closeSidebarOnOutsideClick = (event) => {
@@ -45,11 +51,12 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
     <SidebarContainer ref={sidebarRef} $isVisible={$isVisible}>
       <SidebarItem>
         <ProfileIcon src="./assets/Profile.png" alt="Profile" />
-        <Username>김선정 님</Username>
+        <Username>사용자 님</Username>
         <Line />
       </SidebarItem>
       <MenuItem onMouseEnter={() => setHoveredItem('scraps')}
-                   onMouseLeave={() => setHoveredItem(null)}>
+                   onMouseLeave={() => setHoveredItem(null)}
+                   onClick={handleScrapsClick}>
         {hoveredItem === 'scraps' && <CheckIcon src="./assets/Check.png" alt="Check" />}
         <ItemText>스크랩</ItemText>
       </MenuItem>
@@ -114,6 +121,7 @@ const CheckIcon = styled.img`
 `;
 
 const ItemText = styled.span`
+  cursor: pointer;
   color: #636363;
   font-family: 'SUITE', sans-serif;
   font-size: 1.2rem;
@@ -143,6 +151,7 @@ const LogoutLine = styled.div`
 `;
 
 const LogoutItem = styled(SidebarItem)`
+  cursor:pointer;
   margin-top: 7rem;
   justify-content: left;
   color: #636363;

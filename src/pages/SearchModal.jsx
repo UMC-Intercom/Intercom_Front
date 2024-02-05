@@ -69,7 +69,6 @@ const SearchInput = styled.input`
     border-radius: 10px;
     font-family: 'SUITE', sans-serif;
     font-weight: 700;
-
     color: #636363;
 `;
 
@@ -123,7 +122,6 @@ const CheckboxOption = ({ innerProps, label, isSelected }) => (
 );
 
 const jobOptions = [
-    
     { value: 'sales', label: '영업/고객상담' },
     { value: 'management', label: '경영/사무' },
     { value: 'marketing', label: '마케팅/경영/홍보' },

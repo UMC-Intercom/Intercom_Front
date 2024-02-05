@@ -214,4 +214,3 @@ const navigateToFindingEmail = () => navigate('/findingemail');
 };
 
 export default Join;
-

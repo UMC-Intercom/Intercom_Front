@@ -19,15 +19,15 @@ const Home = () => {
      
       <MenuBox>
       <PageIcons>
-          <Icons onClick={() => handlePageChange('/saved-notices')}>
+          <Icons onClick={() => handlePageChange('/scrap')}>
             <img src="/assets/SavedNotices.png" alt="SavedNotices" 
             style={{width: "4rem", height: "5rem", marginBottom: "1.25rem"}} />
             <span>저장한 공고</span>
           </Icons>
-          <Icons onClick={() => handlePageChange('/my-career')}>
+          <Icons onClick={() => handlePageChange('/mycareer')}>
             <img src="/assets/MyCareer.png" alt="MyCareer"
             style={{width: "4.663rem", height: "4.197rem", marginBottom: "2.053rem"}}  />
-            <span>내커리어</span>
+            <span>내 커리어</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/talktalk')}>
             <img src="/assets/Talktalk.png" alt="Talktalk"
@@ -51,12 +51,10 @@ const Home = () => {
           </Icons>
         </PageIcons>
       </MenuBox>
-      <RecommendBox>
-        <span>내 스펙을 분석해 <br/> 관심 있을 만한 포지션을 추천해 드려요.</span>
-        <StartButton>
-            <span onClick={() => handlePageChange('/recommend')}>지금 시작하기</span>
-        </StartButton>
-      </RecommendBox>
+      <BannerImg>
+        <img src="/assets/Banner.png" alt="Banner" 
+        style={{width: "75rem", height: "17rem"}} />
+      </BannerImg>
       <PopularNoticesBox>
         <span style={{fontSize: "1.563rem", fontWeight: "800"}}>실시간 인기 공고</span>
         <ContentsBox>
@@ -134,23 +132,11 @@ const NoticeItem = styled.div`
   }
 `;
 
-const RecommendBox = styled.div`
-  width: 75rem;
-  height: 12.25rem;
-  background-color: #EFF0F4;
-  border-radius: 1.25rem;
+const BannerImg = styled.div`
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  margin: 3.125rem auto;
-  margin-top: 5rem;
-
-  span {
-    font-size: 1.875rem;
-    font-weight: bold;
-    text-align: left;
-    margin-left: 5.938rem;
-  }
+  margin-top: 4rem;
 `;
 
 const Main = styled.div`
@@ -182,28 +168,6 @@ const Icons = styled.div`
   span {
     font-size: 1.063rem;
     text-align: center;
-  }
-`;
-
-const StartButton = styled.div`
-  width: 14rem;
-  height: 4.5rem;
-  background-color: #5B00EF;
-  border-radius: 0.625rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-right: 3.875rem;
-
-  span {
-    font-size: 1.563rem;
-    color: #fff;
-    display: inline-block;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
   }
 `;
 

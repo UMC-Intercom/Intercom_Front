@@ -18,6 +18,17 @@ import FindingEmail from './pages/FindingEmail'; //추가
 import FindedEmail from './pages/FindedEmail'; //추가
 import UnfindedEmail from './pages/UnfindedEmail'; //추가
 import SettingsPage from './pages/SettingsPage';
+import ProfileEdit from './pages/ProfileEdit';
+import Deactivate0 from './pages/Deactivate0';
+import Deactivate1 from './pages/Deactivate1';
+import Deactivate2 from './pages/Deactivate2';
+import Deactivate3 from './pages/Deactivate3';
+import Deactivate4 from './pages/Deactivate4';
+import Deactivate5 from './pages/Deactivate5';
+import DeactivatePDF from './pages/DeactivatePDF';
+import MyCareer from './pages/MyCareer';
+import WrittenContent from './pages/WrittenContent';
+import Scrap from './pages/Scrap';
 
 
 function App() {
@@ -38,12 +49,27 @@ function App() {
           <Route path="/signup2" element={<SignUp2 />} />
           <Route path="/signup3" element={<SignUp3 />} /> 
           <Route path="/signup4" element={<SignUp4 />} />  
+          <Route path='/settings' element={<SettingsPage />} />
           <Route path="/onboarding1" element={<OnBoarding1 />} /> 
           <Route path="/onboarding2" element={<OnBoarding2 />} />  
-          <Route path="/findingemail" element={<FindingEmail />} /> //추가
-          <Route path="/findedemail" element={<FindedEmail />} /> //추가
-          <Route path="/unfindedemail" element={<UnfindedEmail />} /> //추가
+          <Route path="/findingemail" element={<FindingEmail />} /> 
+          <Route path="/findedemail" element={<FindedEmail />} />  
+          <Route path="/unfindedemail" element={<UnfindedEmail />} /> 
+          <Route path="/profile-edit" element={<ProfileEdit />} />
+          <Route path="/deactivate-account0" element={<Deactivate0 />} />
+          <Route path="/deactivate-account1" element={<Deactivate1 />} />
+          <Route path="/deactivate-account2" element={<Deactivate2 />} />
+          <Route path="/deactivate-account3" element={<Deactivate3 />} />
+          <Route path="/deactivate-account4" element={<Deactivate4 />} />
+          <Route path="/deactivate-account5" element={<Deactivate5 />} />
+          <Route path="/deactivate-downloadPDF" element={<DeactivatePDF />} />
+          <Route path="/findedemail" element={<FindedEmail />} /> 
+          <Route path="/unfindedemail" element={<UnfindedEmail />} />
           <Route path="/settings" element={<SettingsPage/>}/>
+          <Route path="/mycareer" element={<MyCareer/>}/>
+          <Route path="/profile-edit" element={<ProfileEdit />} />
+          <Route path="/written-content" element={<WrittenContent />} />
+          <Route path="/scrap" element={<Scrap />} />
           </Routes>
         </AuthProvider>
       </div>
