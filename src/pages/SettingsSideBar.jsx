@@ -151,6 +151,7 @@ const LogoutLine = styled.div`
 `;
 
 const LogoutItem = styled(SidebarItem)`
+  cursor:pointer;
   margin-top: 7rem;
   justify-content: left;
   color: #636363;

@@ -107,14 +107,22 @@ const Divider = styled.img.attrs({
 `;
 
 // 새 구분선 스타일링
-const NewDivider = styled.img.attrs({
-  src: './assets/Divider2.png'
-})`
-  position: absolute;
-  bottom: 16rem;
-  left: -1rem;
+const NewDivider = styled.div`
+  position: sticky; // 요소를 스티키 포지셔닝합니다.
+  margin-top: 56rem; // 부모 컨테이너 대비 하단에서부터의 거리를 지정합니다.
+  height: 0.1875rem;
+  background: url('./assets/Divider2.png') center/cover no-repeat;
+  width: 11.25rem; // Divider의 너비를 지정합니다.
 `;
-
+// 로그아웃 텍스트 스타일링
+const LogoutText = styled.div`
+    cursor: pointer;
+    margin-top: 1.44rem;
+    margin-left: 4.7rem;
+    font-family: SUITE;
+    font-size: 1.5625rem;
+    color: #636363;
+`;
 // 왼쪽 사이드 메뉴 아이템 스타일링
 const MenuItem = styled.div`
   cursor: pointer;
@@ -122,6 +130,7 @@ const MenuItem = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  margin-bottom: 2.62rem;
   
 
   &:before {
@@ -141,17 +150,6 @@ const MenuItem = styled.div`
     opacity: 1;
   }
 `;
-
-// 로그아웃 텍스트 스타일링
-const LogoutText = styled.div`
-  cursor: pointer;
-  margin-top: 35rem;
-  margin-left: 4.7rem;
-  font-family: SUITE;
-  font-size: 1.5625rem;
-  color: #636363;
-`;
-
 
 // 스타일 컴포넌트 정의
 const PageContainer = styled.div`

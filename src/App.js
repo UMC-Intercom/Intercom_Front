@@ -28,6 +28,7 @@ import Deactivate5 from './pages/Deactivate5';
 import DeactivatePDF from './pages/DeactivatePDF';
 import MyCareer from './pages/MyCareer';
 import WrittenContent from './pages/WrittenContent';
+import Scrap from './pages/Scrap';
 
 
 function App() {
@@ -68,6 +69,7 @@ function App() {
           <Route path="/mycareer" element={<MyCareer/>}/>
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
+          <Route path="/scrap" element={<Scrap />} />
           </Routes>
         </AuthProvider>
       </div>
