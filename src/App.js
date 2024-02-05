@@ -19,12 +19,14 @@ import FindedEmail from './pages/FindedEmail'; //추가
 import UnfindedEmail from './pages/UnfindedEmail'; //추가
 import SettingsPage from './pages/SettingsPage';
 import ProfileEdit from './pages/ProfileEdit';
+import Deactivate0 from './pages/Deactivate0';
 import Deactivate1 from './pages/Deactivate1';
 import Deactivate2 from './pages/Deactivate2';
 import Deactivate3 from './pages/Deactivate3';
 import Deactivate4 from './pages/Deactivate4';
 import Deactivate5 from './pages/Deactivate5';
 import DeactivatePDF from './pages/DeactivatePDF';
+
 
 function App() {
   return (
@@ -51,6 +53,7 @@ function App() {
           <Route path="/findedemail" element={<FindedEmail />} />  
           <Route path="/unfindedemail" element={<UnfindedEmail />} /> 
           <Route path="/profile-edit" element={<ProfileEdit />} />
+          <Route path="/deactivate-account0" element={<Deactivate0 />} />
           <Route path="/deactivate-account1" element={<Deactivate1 />} />
           <Route path="/deactivate-account2" element={<Deactivate2 />} />
           <Route path="/deactivate-account3" element={<Deactivate3 />} />

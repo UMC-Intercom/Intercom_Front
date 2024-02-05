@@ -65,7 +65,7 @@ const SettingsPage = () => {
             <SectionTitle>계정</SectionTitle>
             <MyAndAccountSection>
               <Option>
-                <OptionText onClick={() => navigate('/deactivate-account1')}>계정 탈퇴</OptionText>
+                <OptionText onClick={() => navigate('/deactivate-account0')}>계정 탈퇴</OptionText>
               </Option>
               <Option>
                 <OptionText onClick={() => navigate('/terms')}>이용약관</OptionText>

@@ -7,8 +7,8 @@ const fakeUserData = {
     birthYear: "2000",
     birthMonth: "01",
     birthDay: "01",
-    newPassword: "",
-    confirmNewPassword: "",
+    newPassword: "Aaa123456!",
+    confirmNewPassword: "Aaa123456!",
   };
   
   export default fakeUserData;

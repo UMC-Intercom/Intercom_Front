@@ -52,16 +52,17 @@ const Content = styled.div`
 
 const Message = styled.p`
     color: #636363;
-    margin-bottom: 3.75rem;
+    margin-bottom: 0.2rem;
     font-size: 1.5625rem;
     font-weight: 600;
     line-height: 2.34375rem;
 `;
 
 const DeactivateImg = styled.img `
-    width: 23.75rem;
-    height: 27rem;
-    margin-bottom: 5.12rem;
+    width: 20.88906rem;
+    height: 28.8125rem;
+    margin-top: 4.75rem;
+    margin-bottom: 1rem;
 `;
 
 const NextButton = styled.button`
@@ -76,7 +77,7 @@ const NextButton = styled.button`
     font-family: SUITE;
     font-size: 1.25rem;
     font-weight: 700;
-    margin-top: 5rem;
+    margin-top: 1rem;
 
     &:hover {
     background-color: #4a00d1;
