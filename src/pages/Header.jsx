@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import SearchModal from './SearchModal'; //다현 여기 추가
+import SearchModal from './SearchModal'; 
 import SettingsSidebar from "./SettingsSideBar";
 import Modal from 'react-modal'; // 모달 라이브러리 추가
 import NotificationModal from "./NotificationModal";
@@ -60,7 +60,7 @@ const Header = () => {
           <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
           <Pages active={activePage === '/saved-notices'} onClick={() => handlePageChange('/saved-notices')}>저장한 공고</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
-          <Pages active={activePage === '/my-career'} onClick={() => handlePageChange('/my-career')}>내커리어</Pages>
+          <Pages active={activePage === '/my-career'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
           <Pages active={activePage === '/cover-letters'} onClick={() => handlePageChange('/cover-letters')}>합격 자소서</Pages>
           <Pages active={activePage === '/interviews'} onClick={() => handlePageChange('/interviews')}>면접 후기</Pages>
           <Pages active={activePage === '/news'} onClick={() => handlePageChange('/news')}>취업 뉴스</Pages>

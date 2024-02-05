@@ -54,10 +54,10 @@ const SettingsPage = () => {
             <SectionTitle>MY</SectionTitle>
             <MyAndAccountSection>
               <Option>
-                <OptionText onClick={() => navigate('/my-career')}>내 커리어</OptionText>
+                <OptionText onClick={() => navigate('/mycareer')}>내 커리어</OptionText>
               </Option>
               <Option>
-                <OptionText onClick={() => navigate('/my-posts')}>작성한 글</OptionText>
+                <OptionText onClick={() => navigate('/written-content')}>작성한 글</OptionText>
               </Option>
             </MyAndAccountSection>
           </Section>

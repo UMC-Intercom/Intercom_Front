@@ -24,10 +24,10 @@ const Home = () => {
             style={{width: "4rem", height: "5rem", marginBottom: "1.25rem"}} />
             <span>저장한 공고</span>
           </Icons>
-          <Icons onClick={() => handlePageChange('/my-career')}>
+          <Icons onClick={() => handlePageChange('/mycareer')}>
             <img src="/assets/MyCareer.png" alt="MyCareer"
             style={{width: "4.663rem", height: "4.197rem", marginBottom: "2.053rem"}}  />
-            <span>내커리어</span>
+            <span>내 커리어</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/talktalk')}>
             <img src="/assets/Talktalk.png" alt="Talktalk"

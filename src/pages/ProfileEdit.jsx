@@ -508,4 +508,3 @@ const MessageContainer = styled.div`
     }
   }
 `;
-
