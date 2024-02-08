@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import fakeCareerData from '../data/fakeCareerData';
 import fakeCareerDetailData from '../data/fakeCareerDetailData';
 import fakeUserData from '../data/fakeUserData';
+import html2pdf from 'html2pdf.js';
 
 const MainContainer = styled.div`
   font-family: SUITE;
@@ -366,6 +367,91 @@ const DownloadPDFButton = styled.button`
   }
 `;
 
+const ModalBackground = styled.div`
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+`;
+
+const ModalContainer = styled.div`
+  width: 834px;
+  height: 581px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+`;
+
+const ModalCloseButton = styled.img`
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  cursor: pointer;
+`;
+
+const ModalTitle = styled.h2`
+  font-family: SUITE;
+  font-weight: 700;
+  font-size: 50px;
+  text-align: center;
+  margin-bottom: 30px;
+`;
+
+const ModalEditButton = styled.button`
+  width: 200px;
+  height: 64px;
+  background-color: #A1A1A1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: SUITE;
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 10px;
+  &:hover {
+    background-color: #939393;
+  }
+`;
+
+const ModalPDFButton = styled.button`
+  width: 200px;
+  height: 64px;
+  background-color: #5B00EF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: SUITE;
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 10px;
+  &:hover {
+    background-color: #4a00cf;
+  }
+`;
+
+const ModalButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 40px;
+`;
+
+
 const MyProfile = () => {
   const [profileImage, setProfileImage] = useState('./assets/MyProfile.png');
   const navigate = useNavigate();
@@ -410,7 +496,11 @@ const MyProfile = () => {
 };
 
 const MyCareer = () => {
+  const [isPdfDownloadMode, setIsPdfDownloadMode] = useState(false);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false); 
+  const contentRef = useRef(null);
+
 
   const calculateDuration = (start, end) => {
     const startDate = new Date(start.split('. ').join('-'));
@@ -421,27 +511,79 @@ const MyCareer = () => {
     return `${years > 0 ? `${years}년 ` : ''}${remainingMonths > 0 ? `${remainingMonths}개월` : ''}`.trim();
   };
 
-  const handleNavigate = () => {
-    navigate('/mycareer-edit');
+  
+  const togglePdfDownloadMode = () => {
+    setIsPdfDownloadMode(!isPdfDownloadMode);
   };
 
   const handleDownloadPDF = () => {
-    // PDF 다운로드 로직 구현
+    if (isPdfDownloadMode) {
+      setShowModal(true); 
+    } else {
+      togglePdfDownloadMode();
+    }
   };
 
+  const handleEdit = () => {
+    setShowModal(false);
+    navigate('/mycareer-edit');
+  };
+
+
+  const handleDownload = () => {
+    setShowModal(false);
+    setIsPdfDownloadMode(true);
+    
+    setTimeout(() => {
+      const element = document.getElementById('pdf-content');
+      const fileName = `${fakeUserData.name}님의 커리어.pdf`;
+  
+      const options = {
+      margin: [10, 10, 10, 10],
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        logging: true, 
+        useCORS: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight 
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    };
+    
+    html2pdf().from(element).set(options).save();
+  }, 500);
+};
+
   return (
-    <MainContainer>
-      <Title>내 커리어</Title>
+    <>
+      {showModal && (
+        <ModalBackground>
+          <ModalContainer>
+            <ModalCloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setShowModal(false)} />
+            <ModalTitle>이대로 내려받을까요?</ModalTitle>
+            <ModalButtonContainer>
+              <ModalEditButton onClick={handleEdit}>편집하기</ModalEditButton>
+              <ModalPDFButton onClick={handleDownload}>내려받기</ModalPDFButton>
+            </ModalButtonContainer>
+          </ModalContainer>
+        </ModalBackground>
+      )}
+    <MainContainer ref={contentRef} >
+      <Title>{isPdfDownloadMode ? '내 커리어 - PDF 내려받기' : '내 커리어'}</Title>
       <ContentContainer>
-        <MyProfile />
-        <CareerBox>
+        {!isPdfDownloadMode && <MyProfile />}
+        <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '1200px' : '792px' }}>
         <LanguageTitleContainer>
             <LanguageTitle>어학</LanguageTitle>
-            <EditCareerButton onClick={handleNavigate}>편집하기</EditCareerButton>
+            {!isPdfDownloadMode && <EditCareerButton onClick={() => navigate('/mycareer-edit')}>편집하기</EditCareerButton>}
           </LanguageTitleContainer>
       {fakeCareerData.languages.map((language, index) => (
         <CenteredContainer key={index}>
-          <LanguageBox>
+          <LanguageBox style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
             <LanguageEntry>
               <LanguageName>{language.name}</LanguageName>
               <VerticalLine />
@@ -454,7 +596,7 @@ const MyCareer = () => {
           <CertificateTitle>자격증</CertificateTitle>
       {fakeCareerData.certificates.map((certificate, index) => (
         <CenteredContainer key={index}>
-          <CertificateBox>
+          <CertificateBox style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
             <CertificateEntry>
               <CertificateName>{certificate.name}</CertificateName>
               <VerticalLine />
@@ -468,7 +610,7 @@ const MyCareer = () => {
           
           <EducationTitle>학력</EducationTitle>
           <CenteredContainer>
-            <EducationBox>
+            <EducationBox style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
               <MajorText>{fakeCareerData.major}</MajorText>
               <UniversityText>{fakeCareerData.university}</UniversityText>
             </EducationBox>
@@ -477,7 +619,7 @@ const MyCareer = () => {
           <CareerTitle>경력</CareerTitle>
           {fakeCareerDetailData.map((career, index) => (
             <CenteredContainer key={index}>
-              <CareerBox2>
+              <CareerBox2 style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
                 <CareerContainer>
                   <CareerInfoLeft>
                     <CareerText>{`${career.start_data} ~ ${career.end_data}`}</CareerText>
@@ -505,6 +647,7 @@ const MyCareer = () => {
             </DownloadPDFButton>
           </DownloadButtonContainer>
     </MainContainer>
+    </>
   );
 };
 
