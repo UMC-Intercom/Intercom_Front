@@ -53,7 +53,7 @@ const Home = () => {
       </MenuBox>
       <BannerImg>
         <img src="/assets/Banner.png" alt="Banner" 
-        style={{width: "75rem", height: "17rem"}} />
+        style={{width: "75rem"}} />
       </BannerImg>
       <PopularNoticesBox>
         <span style={{fontSize: "1.563rem", fontWeight: "800"}}>실시간 인기 공고</span>
@@ -85,7 +85,7 @@ export default Home;
 
 const PopularNoticesBox = styled.div`
   width: 75rem;
-  margin: 3.125rem auto;
+  margin: auto;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
