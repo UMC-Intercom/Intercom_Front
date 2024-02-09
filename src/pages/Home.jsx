@@ -44,11 +44,6 @@ const Home = () => {
              style={{width: "4.125rem", height: "5rem", marginBottom: "1.25rem"}} />
              <span>면접 후기</span>
           </Icons>
-          <Icons onClick={() => handlePageChange('/news')}>
-            <img src="/assets/News.png" alt="News"
-             style={{width: "4rem", height: "4rem", marginBottom: "2.25rem"}} />
-             <span>취업 뉴스</span>
-          </Icons>
         </PageIcons>
       </MenuBox>
       <BannerImg>
@@ -156,7 +151,7 @@ const PageIcons = styled.div`
   flex-wrap: wrap;
   width: 90%;
   margin-top: 4.375rem;
-  max-width: 62.5rem;
+  max-width: 58rem;
 `;
 
 const Icons = styled.div`
