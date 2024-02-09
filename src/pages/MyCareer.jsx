@@ -81,6 +81,15 @@ const ProfileDetailsContainer = styled.div`
   padding: 0 20px; 
 `;
 
+const ProfileDetailsContainer2 = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0 20px; 
+  margin-top: 166px;
+`;
+
 const ProfileDetail = styled.div`
   display: flex;
   align-items: center;
@@ -90,6 +99,17 @@ const ProfileDetail = styled.div`
   margin-top: 10px;
   margin-left: 30px;
 `;
+
+const ProfileDetail2 = styled.div`
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 16px;
+  color: #636363;
+  margin-top: 10px;
+  margin-left: 13px;
+`;
+
 
 const ProfileEmailValue = styled.span`
   color: #5B00EF;
@@ -107,6 +127,15 @@ const ProfileName = styled.h1`
   color: black;
   margin-top: 20px; 
   margin-left: 10px;
+`;
+
+const ProfileName2 = styled.h1`
+  font-weight: 700;
+  font-size: 30px;
+  color: black;
+  margin-top: 20px; 
+  margin-left: 10px;
+  margin-bottom: 5px;
 `;
 
 const NavigateButton = styled.img`
@@ -345,11 +374,12 @@ const PositionText = styled.div`
 `;
 
 const DownloadButtonContainer = styled.div`
-  width: 1200px;
   display: flex;
-  justify-content: flex-end;
-  padding-top: 20px;
+  justify-content: ${props => props.center ? 'center' : 'flex-end'};
+  width: 1200px;
+  padding-top: 30px;
 `;
+
 
 const DownloadPDFButton = styled.button`
   width: 200px;
@@ -451,6 +481,22 @@ const ModalButtonContainer = styled.div`
   margin-top: 40px;
 `;
 
+const IDPhoto = styled.img`
+  width: 184.44px;
+  height: 237px;
+  margin-right: 20px; // 다음 요소와의 간격
+  margin-top: 50px;
+  margin-left: 50px;
+`;
+
+const ProfileSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  width: 100%; // 전체 너비를 차지하도록 설정
+`;
+
+
 
 const MyProfile = () => {
   const [profileImage, setProfileImage] = useState('./assets/MyProfile.png');
@@ -541,7 +587,7 @@ const MyCareer = () => {
       const fileName = `${fakeUserData.name}님의 커리어.pdf`;
   
       const options = {
-      margin: [10, 10, 10, 10],
+      margin: [5, 5, 5, 5],
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
@@ -592,17 +638,27 @@ const DownloadCompleteModal = () => (
       )}
       {showDownloadCompleteModal && <DownloadCompleteModal />}
     <MainContainer ref={contentRef} >
-      <Title>{isPdfDownloadMode ? '내 커리어 - PDF 내려받기' : '내 커리어'}</Title>
+      <Title style={{ marginLeft: isPdfDownloadMode ? 'calc(50% - 372px)' : 'calc(50% - 592px)' }}>{isPdfDownloadMode ? '내 커리어 - PDF 내려받기' : '내 커리어' }</Title>
       <ContentContainer>
         {!isPdfDownloadMode && <MyProfile />}
-        <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '1200px' : '792px' }}>
+        <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '757px' : '792px' }}>
+        {isPdfDownloadMode && (
+        <ProfileSection>
+          <IDPhoto src="./assets/idphoto.png" alt="ID Photo" />
+          <ProfileDetailsContainer2>
+            <ProfileName2>{fakeUserData.name}</ProfileName2>
+            <ProfileDetail2>이메일 <ProfileEmailValue>{fakeUserData.email}</ProfileEmailValue></ProfileDetail2>
+            <ProfileDetail2>휴대전화 <ProfileNumberValue>{fakeUserData.phoneNum}</ProfileNumberValue></ProfileDetail2>
+          </ProfileDetailsContainer2>
+        </ProfileSection>
+      )}
         <LanguageTitleContainer>
             <LanguageTitle>어학</LanguageTitle>
             {!isPdfDownloadMode && <EditCareerButton onClick={() => navigate('/mycareer-edit')}>편집하기</EditCareerButton>}
           </LanguageTitleContainer>
       {fakeCareerData.languages.map((language, index) => (
         <CenteredContainer key={index}>
-          <LanguageBox style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
+          <LanguageBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
             <LanguageEntry>
               <LanguageName>{language.name}</LanguageName>
               <VerticalLine />
@@ -615,7 +671,7 @@ const DownloadCompleteModal = () => (
           <CertificateTitle>자격증</CertificateTitle>
       {fakeCareerData.certificates.map((certificate, index) => (
         <CenteredContainer key={index}>
-          <CertificateBox style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
+          <CertificateBox style={{ width: isPdfDownloadMode ? '670px' : '690px' }}>
             <CertificateEntry>
               <CertificateName>{certificate.name}</CertificateName>
               <VerticalLine />
@@ -629,7 +685,7 @@ const DownloadCompleteModal = () => (
           
           <EducationTitle>학력</EducationTitle>
           <CenteredContainer>
-            <EducationBox style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
+            <EducationBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
               <MajorText>{fakeCareerData.major}</MajorText>
               <UniversityText>{fakeCareerData.university}</UniversityText>
             </EducationBox>
@@ -638,7 +694,7 @@ const DownloadCompleteModal = () => (
           <CareerTitle>경력</CareerTitle>
           {fakeCareerDetailData.map((career, index) => (
             <CenteredContainer key={index}>
-              <CareerBox2 style={{ width: isPdfDownloadMode ? '1089px' : '690px' }}>
+              <CareerBox2 style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
                 <CareerContainer>
                   <CareerInfoLeft>
                     <CareerText>{`${career.start_data} ~ ${career.end_data}`}</CareerText>
@@ -660,11 +716,11 @@ const DownloadCompleteModal = () => (
         </CareerBox>
         
       </ContentContainer>
-      <DownloadButtonContainer>
-            <DownloadPDFButton onClick={handleDownloadPDF}>
-              PDF 내려받기
-            </DownloadPDFButton>
-          </DownloadButtonContainer>
+      <DownloadButtonContainer center={isPdfDownloadMode}>
+          <DownloadPDFButton onClick={handleDownloadPDF}>
+            PDF 내려받기
+          </DownloadPDFButton>
+        </DownloadButtonContainer>
     </MainContainer>
     </>
   );
