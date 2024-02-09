@@ -11,6 +11,10 @@ const fakeCareerData = {
           name: 'OPIc',
           score: 'AL'
         },
+        {
+            name: 'TOEIC',
+            score: '900'
+          },
       ],
       certificates: [
         {
