@@ -405,7 +405,7 @@ const ModalCloseButton = styled.img`
 const ModalTitle = styled.h2`
   font-family: SUITE;
   font-weight: 700;
-  font-size: 50px;
+  font-size: 45px;
   text-align: center;
   margin-bottom: 30px;
 `;
@@ -500,6 +500,8 @@ const MyCareer = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false); 
   const contentRef = useRef(null);
+  const [showDownloadCompleteModal, setShowDownloadCompleteModal] = useState(false);
+
 
 
   const calculateDuration = (start, end) => {
@@ -554,13 +556,29 @@ const MyCareer = () => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     };
     
-    html2pdf().from(element).set(options).save();
+    html2pdf().from(element).set(options).save().then(() => {
+      // PDF 다운로드가 완료되면 완료 모달 표시
+      setShowDownloadCompleteModal(true);
+      setIsPdfDownloadMode(false); // PDF 다운로드 모드 비활성화
+    });
   }, 500);
 };
 
+const DownloadCompleteModal = () => (
+  <ModalBackground>
+    <ModalContainer>
+      <ModalCloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setShowDownloadCompleteModal(false)} />
+      <ModalTitle>다운로드 되었습니다<br></br>파일을 확인해주세요</ModalTitle>
+      <ModalButtonContainer>
+        <ModalPDFButton onClick={() => setShowDownloadCompleteModal(false)}>확인</ModalPDFButton>
+      </ModalButtonContainer>
+    </ModalContainer>
+  </ModalBackground>
+);
   return (
     <>
       {showModal && (
+        
         <ModalBackground>
           <ModalContainer>
             <ModalCloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setShowModal(false)} />
@@ -572,6 +590,7 @@ const MyCareer = () => {
           </ModalContainer>
         </ModalBackground>
       )}
+      {showDownloadCompleteModal && <DownloadCompleteModal />}
     <MainContainer ref={contentRef} >
       <Title>{isPdfDownloadMode ? '내 커리어 - PDF 내려받기' : '내 커리어'}</Title>
       <ContentContainer>

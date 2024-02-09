@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext';
 
 
 export const PageContainer = styled.div`
+  font-family: SUITE;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,15 +36,15 @@ export const CloseButton = styled.button`
 `;
 
 export const Logo = styled.img`
-  width: 200px;
+  width: 264px;
   margin-top: 90px;
   margin-bottom: 30px;
-  margin-left: 60px;
+  margin-left: 80px;
 `;
 
 export const Title = styled.h1`
-  font-family: 'Suite-Bold', sans-serif;
-  font-size: 20px;
+  font-weight: 800;
+  font-size: 25px;
   color: #333; 
   margin-top: -10px;
   margin-bottom: 30px;
@@ -51,31 +52,34 @@ export const Title = styled.h1`
 
 
 export const InputField = styled.input`
-  width: 80%;
+  width: 383px;
+  height: 86px;
   margin-bottom: 15px;
-  padding: 10px;
+  padding: 12px;
   border: none;
   outline: 2.5px solid #EFF0F4;
-  border-radius: 0; 
-  font-family: 'SUITE-Medium', sans-serif;
+  border-radius: 10px; 
+  font-family: SUITE;
+  font-weight: 500;
   height: 25px; 
-  font-size: 14px; 
+  font-size: 18px; 
   &::placeholder {
     color: #A1A1A1; 
   }
 `;
 
 export const LoginButton = styled.button`
-  width: 350px;
-  height: 52px;
+  width: 410px;
+  height: 72px;
   padding: 10px;
   background-color: #5B00EF;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 16px;
-  font-family: 'SUITE-Semibold', sans-serif;
+  font-size: 20px;
+  font-family: SUITE;
+  font-weight: 600;
   margin-top:20px;
 `;
 
@@ -90,8 +94,8 @@ export const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-size: 15px;
-  font-family: 'SUITE-Semibold', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
 `;
 
 export const Checkbox = styled.input`
@@ -103,6 +107,10 @@ export const Checkbox = styled.input`
   margin-right: 8px;
   position: relative;
   background-color: transparent; 
+
+  &:hover {
+    cursor: pointer;
+  }
 
   &:checked {
     background-color: #5B00EF;
@@ -124,28 +132,36 @@ export const Checkbox = styled.input`
 
 export const Link = styled.a`
   cursor: pointer;
-  font-family: 'SUITE-Semibold', sans-serif;
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 700;
 `;
 
 export const BlackLink = styled(Link)`
   color: #000; 
   text-decoration: none;
+  font-weight: 700;
 `;
 
 export const LinksContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 26px;
+  margin-top: 30px;
 `;
 
 export const FlexRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 89%;
-  margin-top: 8px;
+  width: 100%;
+  margin-top: 10px;
 `;
+
+//export const ErrorMsg = styled.div`
+  //font-size: 16px;
+  //font-weight: 500;
+  //color: red;
+//`;
+
 
 const Join = () => {
   const [email, setEmail] = useState('');
@@ -194,6 +210,7 @@ const navigateToFindingEmail = () => navigate('/findingemail');
         <Title>로그인</Title>
         <InputField type="email" placeholder="이메일을 입력하세요" value={email} onChange={handleEmailChange} />
         <InputField type="password" placeholder="비밀번호를 입력하세요" value={password} onChange={handlePasswordChange} />
+        {/*<ErrorMsg>* 이메일 또는 비밀번호를 다시 확인하세요</ErrorMsg>*/}
         <FlexRow>
           <CheckboxContainer>
             <Checkbox id="stayLoggedIn" type="checkbox" checked={stayLoggedIn} onChange={handleStayLoggedInChange} />
