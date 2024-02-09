@@ -26,10 +26,6 @@ const fakeCareerData = {
           score: '1급'
         },
       ],
-    introduction: {
-        title: '저는 사실 짱구입니다',
-        content: '제 엉덩이는 백만불짜리 엉덩이입니다...'
-      },
   };
   
   export default fakeCareerData;
