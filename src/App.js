@@ -29,6 +29,7 @@ import DeactivatePDF from './pages/DeactivatePDF';
 import MyCareer from './pages/MyCareer';
 import WrittenContent from './pages/WrittenContent';
 import Scrap from './pages/Scrap';
+import EditCareer from './pages/EditCareer';
 
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
+          <Route path="/mycareer-edit" element={<EditCareer />} />
           </Routes>
         </AuthProvider>
       </div>
