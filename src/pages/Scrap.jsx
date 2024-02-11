@@ -8,15 +8,36 @@ import fakeInterviewData from '../data/fakeInterviewData';
 import fakeData from '../data/fakeData';
 import fakeCoverletterData from '../data/fakeCoverletterData';
 
-
+const ITEMS_PER_PAGE = 4;
+const NOTICES_PER_PAGE = 9;
 
 const Scrap = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { toggleLogin } = useAuth();
 
-    const isCurrentPath = (path) => location.pathname === path;
+    const totalPages = Math.ceil(fakeInterviewData.length / ITEMS_PER_PAGE);
+ 
+    const [currentPage, setCurrentPage] = useState(1);
+    const indexOfLast = currentPage * ITEMS_PER_PAGE;
+    const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+    const currentInterviews = fakeInterviewData.slice(indexOfFirst, indexOfLast);
+    const currentTalks = fakeData.slice(indexOfFirst, indexOfLast);
 
+    const totalNoticePages = Math.ceil(fakeNotices.length / NOTICES_PER_PAGE);
+ 
+    const indexOfLastNotice = currentPage * NOTICES_PER_PAGE;
+    const indexOfFirstNotice = indexOfLastNotice - NOTICES_PER_PAGE;
+    const currentNotices = fakeNotices.slice(indexOfFirstNotice, indexOfLastNotice);
+
+
+    const paginate = (pageNumber) => {
+      setCurrentPage(pageNumber);
+      window.scrollTo(0, 0);
+    };
+
+    const isCurrentPath = (path) => location.pathname === path;
+    
     const handleLogout = () => {
         toggleLogin();
         navigate('/');
@@ -90,7 +111,7 @@ const Scrap = () => {
                         <Content> 
                             <Title>공고({fakeNotices.length})</Title>
                             <NoticesContent>
-                                {fakeNotices.map(notice => (
+                                {currentNotices.map(notice => (
                                     <NoticeItem key={notice.id} >
                                     <img src={notice.imageUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
                                     <div>
@@ -102,7 +123,82 @@ const Scrap = () => {
                                     </div>
                                     </NoticeItem>
                                 ))}
-                            </NoticesContent>
+                                </NoticesContent>
+                                <Pagination>
+                                        {/* 현재 페이지가 1 또는 2일 때 */}
+                                        {currentPage === 1 && totalNoticePages > 1 && (
+                                            <>
+                                            <PageNumber
+                                                onClick={() => paginate(1)}
+                                                isActive={true}
+                                            >
+                                                1
+                                            </PageNumber>
+                                            <PageNumber
+                                                onClick={() => paginate(2)}
+                                                isActive={false}
+                                            >
+                                                2
+                                            </PageNumber>
+                                            {totalNoticePages > 2 && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(3)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+
+                                        {currentPage === 2 && (
+                                            <>
+                                            <PageNumber
+                                                onClick={() => paginate(1)}
+                                                isActive={false}
+                                            >
+                                                1
+                                            </PageNumber>
+                                            <PageNumber
+                                                onClick={() => paginate(2)}
+                                                isActive={true}
+                                            >
+                                                2
+                                            </PageNumber>
+                                            {totalNoticePages > 2 && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(3)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+
+                                        {/* 현재 페이지가 3 이상일 때 */}
+                                        {currentPage > 2 && (
+                                            <>
+                                            <Arrow
+                                                src="/assets/LeftArrow.png"
+                                                onClick={() => paginate(currentPage - 1)}
+                                                alt="Previous"
+                                            />
+                                            <PageNumber
+                                                onClick={() => paginate(currentPage)}
+                                                isActive={true}
+                                            >
+                                                {currentPage}
+                                            </PageNumber>
+                                            {currentPage < totalNoticePages && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(currentPage + 1)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+                                    </Pagination>
+                            
                         </Content>   
                     )}
 
@@ -110,61 +206,285 @@ const Scrap = () => {
                         <Content> 
                             <Title>면접 후기({fakeInterviewData.length})</Title>
                             <InterviewListContainer>
-                                {data.map(item => (
-                                    <InterviewItem key={item.id}>
-                                    <div className="header">
-                                        <span className="category">{item.field}</span>
-                                        <h2 className="title">{item.company} {item.position}</h2>
+                                {currentInterviews.map(item => (
+                                <InterviewItem key={item.id}>
+                                    <div className="company-position">{item.company} | {item.position} | {item.when}</div> 
+                                    <div className="details">
+                                        <span>{item.language}</span> /
+                                        <span> 대외활동: {item.activities}</span> / 
+                                        <span> {item.certificate}</span> / 
+                                        <span> {item.education}</span> / 
+                                        <span> {item.department}</span> / 
+                                        <span> 학점: {item.grade}</span>
                                     </div>
-                                    {item.interview && ( // 여기서 interview 객체가 있는지 확인합니다.
-                                        <div className="body">
-                                        <p className="content">{item.interview.q1}</p> {/* 이제 안전하게 접근할 수 있습니다. */}
-                                        <p className="details">
-                                            댓글: {item.comments} | 스크랩: {item.scrap} | 조회수: {item.views}
-                                        </p>
-                                        </div>
-                                        )}
-                                    </InterviewItem>
+                                    <div className="scrap-views">
+                                        스크랩 {item.scrap} | 조회수 {item.views}
+                                    </div>
+                                </InterviewItem>
                                 ))}
+
+                                <Pagination>
+                                        {/* 현재 페이지가 1 또는 2일 때 */}
+                                        {currentPage === 1 && totalPages > 1 && (
+                                            <>
+                                            <PageNumber
+                                                onClick={() => paginate(1)}
+                                                isActive={true}
+                                            >
+                                                1
+                                            </PageNumber>
+                                            <PageNumber
+                                                onClick={() => paginate(2)}
+                                                isActive={false}
+                                            >
+                                                2
+                                            </PageNumber>
+                                            {totalPages > 2 && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(3)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+
+                                        {currentPage === 2 && (
+                                            <>
+                                            <PageNumber
+                                                onClick={() => paginate(1)}
+                                                isActive={false}
+                                            >
+                                                1
+                                            </PageNumber>
+                                            <PageNumber
+                                                onClick={() => paginate(2)}
+                                                isActive={true}
+                                            >
+                                                2
+                                            </PageNumber>
+                                            {totalPages > 2 && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(3)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+
+                                        {/* 현재 페이지가 3 이상일 때 */}
+                                        {currentPage > 2 && (
+                                            <>
+                                            <Arrow
+                                                src="/assets/LeftArrow.png"
+                                                onClick={() => paginate(currentPage - 1)}
+                                                alt="Previous"
+                                            />
+                                            <PageNumber
+                                                onClick={() => paginate(currentPage)}
+                                                isActive={true}
+                                            >
+                                                {currentPage}
+                                            </PageNumber>
+                                            {currentPage < totalPages && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(currentPage + 1)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+                                        </Pagination>
                             </InterviewListContainer>
                         </Content>
                     )}
 
                     {view === 'coverletter' && (
                         <Content> 
-                            <Title>합격 자소서({fakeInterviewData.length})</Title>
-                            <InterviewListContainer>
-                                {data.map(item => (
-                                    <InterviewItem key={item.id}>
-                                    <div className="header">
-                                        <span className="category">{item.field}</span>
-                                        <h2 className="title">{item.company} {item.position}</h2>
-                                    </div>
-                                    {item.interview && ( // 여기서 interview 객체가 있는지 확인합니다.
-                                        <div className="body">
-                                        <p className="content">{item.interview.q1}</p> {/* 이제 안전하게 접근할 수 있습니다. */}
-                                        <p className="details">
-                                            댓글: {item.comments} | 스크랩: {item.scrap} | 조회수: {item.views}
-                                        </p>
-                                        </div>
+                        <Title>합격 자소서({fakeInterviewData.length})</Title>
+                        <InterviewListContainer>
+                            {currentInterviews.map(item => (
+                            <InterviewItem key={item.id}>
+                                <div className="company-position">{item.company} | {item.position} | {item.when}</div> 
+                                <div className="details">
+                                    <span>{item.language}</span> /
+                                    <span> 대외활동: {item.activities}</span> / 
+                                    <span> {item.certificate}</span> / 
+                                    <span> {item.education}</span> / 
+                                    <span> {item.department}</span> / 
+                                    <span> 학점: {item.grade}</span>
+                                </div>
+                                <div className="scrap-views">
+                                    스크랩 {item.scrap} | 조회수 {item.views}
+                                </div>
+                            </InterviewItem>
+                            ))}
+
+                            <Pagination>
+                                    {/* 현재 페이지가 1 또는 2일 때 */}
+                                    {currentPage === 1 && totalPages > 1 && (
+                                        <>
+                                        <PageNumber
+                                            onClick={() => paginate(1)}
+                                            isActive={true}
+                                        >
+                                            1
+                                        </PageNumber>
+                                        <PageNumber
+                                            onClick={() => paginate(2)}
+                                            isActive={false}
+                                        >
+                                            2
+                                        </PageNumber>
+                                        {totalPages > 2 && (
+                                            <Arrow
+                                            src="/assets/RightArrow.png"
+                                            onClick={() => paginate(3)}
+                                            alt="Next"
+                                            />
                                         )}
-                                    </InterviewItem>
-                                ))}
-                            </InterviewListContainer>
-                        </Content>
+                                        </>
+                                    )}
+
+                                    {currentPage === 2 && (
+                                        <>
+                                        <PageNumber
+                                            onClick={() => paginate(1)}
+                                            isActive={false}
+                                        >
+                                            1
+                                        </PageNumber>
+                                        <PageNumber
+                                            onClick={() => paginate(2)}
+                                            isActive={true}
+                                        >
+                                            2
+                                        </PageNumber>
+                                        {totalPages > 2 && (
+                                            <Arrow
+                                            src="/assets/RightArrow.png"
+                                            onClick={() => paginate(3)}
+                                            alt="Next"
+                                            />
+                                        )}
+                                        </>
+                                    )}
+
+                                    {/* 현재 페이지가 3 이상일 때 */}
+                                    {currentPage > 2 && (
+                                        <>
+                                        <Arrow
+                                            src="/assets/LeftArrow.png"
+                                            onClick={() => paginate(currentPage - 1)}
+                                            alt="Previous"
+                                        />
+                                        <PageNumber
+                                            onClick={() => paginate(currentPage)}
+                                            isActive={true}
+                                        >
+                                            {currentPage}
+                                        </PageNumber>
+                                        {currentPage < totalPages && (
+                                            <Arrow
+                                            src="/assets/RightArrow.png"
+                                            onClick={() => paginate(currentPage + 1)}
+                                            alt="Next"
+                                            />
+                                        )}
+                                        </>
+                                    )}
+                                    </Pagination>
+                        </InterviewListContainer>
+                    </Content>
                     )}
                     
                     {view === 'talk' && (
                         <Content> 
                             <Title>톡톡 글({fakeData.length})</Title>
                             <TalkListContainer>
-                            {data.map(item => (
+                            {currentTalks.map(item => (
                                 <SearchResultItem key={item.id}>
                                 <p className="title">{item.title}</p>
                                 <p className="content">{item.content || "내용이 없습니다."}</p>
-                                <p className="response">답변: {item.answers} | 댓글: {item.comments} | 조회수: {item.views} | 좋아요: {item.likes}</p>
+                                <p className="response">답변: {item.answers} 댓글: {item.comments} 조회수: {item.views} 좋아요: {item.likes}</p>
                                 </SearchResultItem>
                             ))}
+                            <Pagination>
+                                        {/* 현재 페이지가 1 또는 2일 때 */}
+                                        {currentPage === 1 && totalPages > 1 && (
+                                            <>
+                                            <PageNumber
+                                                onClick={() => paginate(1)}
+                                                isActive={true}
+                                            >
+                                                1
+                                            </PageNumber>
+                                            <PageNumber
+                                                onClick={() => paginate(2)}
+                                                isActive={false}
+                                            >
+                                                2
+                                            </PageNumber>
+                                            {totalPages > 2 && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(3)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+
+                                        {currentPage === 2 && (
+                                            <>
+                                            <PageNumber
+                                                onClick={() => paginate(1)}
+                                                isActive={false}
+                                            >
+                                                1
+                                            </PageNumber>
+                                            <PageNumber
+                                                onClick={() => paginate(2)}
+                                                isActive={true}
+                                            >
+                                                2
+                                            </PageNumber>
+                                            {totalPages > 2 && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(3)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+
+                                        {/* 현재 페이지가 3 이상일 때 */}
+                                        {currentPage > 2 && (
+                                            <>
+                                            <Arrow
+                                                src="/assets/LeftArrow.png"
+                                                onClick={() => paginate(currentPage - 1)}
+                                                alt="Previous"
+                                            />
+                                            <PageNumber
+                                                onClick={() => paginate(currentPage)}
+                                                isActive={true}
+                                            >
+                                                {currentPage}
+                                            </PageNumber>
+                                            {currentPage < totalPages && (
+                                                <Arrow
+                                                src="/assets/RightArrow.png"
+                                                onClick={() => paginate(currentPage + 1)}
+                                                alt="Next"
+                                                />
+                                            )}
+                                            </>
+                                        )}
+                                        </Pagination>  
                             </TalkListContainer>
                         </Content>
                     )}
@@ -348,95 +668,119 @@ const NoticeViews = styled.span`
 `;
 
 const InterviewListContainer = styled.div`
-  margin-top: 1rem;
-  background-color: #fff; // 면접 후기 배경색
-  border-radius: 10px; // 모서리 둥글게
-  padding: 20px; // 패딩
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // 그림자 효과
-  overflow-y: auto; // 내용이 많을 경우 스크롤
-  max-height: 600px; // 최대 높이 설정
+    font-family: SUITE;
+    display: flex;
+    width: 50rem;
+    flex-direction: column;
+    background-color: #Eff0F4; // 배경색 변경
+    border-radius: 3%; // 모서리 둥글게
+    padding: 1.5rem; // 내부 여백
+    margin-top: 1rem; // 위 여백
 `;
 
 const InterviewItem = styled.div`
-  border-bottom: 1px solid #ececec; // 항목 사이의 구분선
-  padding: 20px 0; // 상하 패딩
-
-  &:last-child {
-    border-bottom: none; // 마지막 항목에는 구분선 없음
-  }
-
-  .header {
+    font-family: SUITE;
     display: flex;
-    align-items: center;
-    margin-bottom: 10px; // 헤더와 내용 사이의 여백
-  }
+    flex-direction: column;
+    padding: 2rem 0; // 상하 여백
+    border-bottom: 2px solid #A1A1A1; // 구분선 스타일
 
-  .category {
-    font-size: 0.875rem; // 카테고리 폰트 크기
-    background-color: #e0e0e0; // 카테고리 배경색
-    border-radius: 20px; // 카테고리 둥글게
-    padding: 5px 15px; // 카테고리 내부 여백
-    color: #555; // 카테고리 텍스트 색상
-    margin-right: 10px; // 카테고리와 제목 사이 여백
-  }
+    &:last-child {
+    border-bottom: none; // 마지막 항목 구분선 제거
+    }
 
-  .title {
-    font-weight: bold; // 제목 굵게
-    font-size: 1.25rem; // 제목 폰트 크기
-    flex-grow: 1; // 제목이 남은 공간을 모두 차지
-  }
+    .company-position {
+    font-size: 1.5625rem;
+    color: #000000; // 텍스트 색상
+    font-weight: bold; // 굵기
+    margin-bottom: 0.5rem; // 여백
+    }
 
-  .content {
-    font-size: 1rem; // 내용 폰트 크기
-    color: #666; // 내용 텍스트 색상
-    line-height: 1.5; // 줄 간격
-    margin-bottom: 10px; // 내용과 상세정보 사이 여백
-  }
+    .details {
+    font-size: 0.875rem; // 상세 정보 폰트 크기
+    color: #666; // 텍스트 색상
+    margin-bottom: 2rem;
+    }
 
-  .details {
-    font-size: 0.875rem; // 상세정보 폰트 크기
-    color: #999; // 상세정보 텍스트 색상
-  }
+    .scrap-views {
+    font-size: 0.875rem; // 상세 정보 폰트 크기
+    color: #666; // 텍스트 색상
+    }
 `;
 
         
 
 const TalkListContainer = styled.div`
-    margin-top: 1rem;
-  width: 1202px;
-  max-height: 958px;
-  background-color: #EFF0F4;
-  border-radius: 10px;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  overflow-y: auto;
+    font-family: SUITE;
+    display: flex;
+    width: 50rem;
+    flex-direction: column;
+    background-color: #Eff0F4; // 배경색 변경
+    border-radius: 3%; // 모서리 둥글게
+    padding: 1.5rem; // 내부 여백
+    margin-top: 1rem; // 위 여백
 `;
 
 const SearchResultItem = styled.div`
-  border-bottom: 1px solid #ddd;
+  border-bottom: 2px solid #E2E2E2;
 
   padding: 20px 0;
 
   .title, .content, .response {
     margin: 5px 0;
-    padding-left: 70px;
-    padding-right: 70px;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 
   .title {
-    font-family: 'SUITE-ExtraBold', sans-serif;
-    font-size: 24px;
+    font-family: SUITE;
+    font-Weight: 700;
+    font-size: 1.5625rem;
+    color: #000000;
   }
   .content{
-    margin-top: 10px;
-    font-family: 'SUITE-SemiBold', sans-serif;
-    font-size: 19px;
+    margin-top: 1rem;
+    font-family: SUITE;
+    font-size: 1.2rem;
     color: #A1A1A1;
   }
   .response {
-    font-family: 'SUITE-Bold', sans-serif;
-    font-size: 16px;
-    margin-top: 10px;
+    font-family: SUITE;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 1rem;
     color: #636363;
   }
+`;
+
+const Pagination = styled.div`
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+`;
+
+const PageNumber = styled.span`
+  font-family: SUITE;
+  font-size: 1.25rem;
+  margin: 0 0.1rem;
+  cursor: pointer;
+  font-weight: ${({ isActive }) => (isActive ? "700" : "400")};
+  ${({ isArrow }) => isArrow && `pointer-events: none;`}
+  border-radius: 50%; // 원형 모양
+  background-color: ${({ isActive }) => (isActive ? "#E0E0E0" : "transparent")}; // 선택된 페이지에 대한 배경색
+  display: inline-block;
+  text-align: center;
+  min-width: 2rem; // 최소 너비 설정
+  height: 2rem; // 높이 설정
+  line-height: 2rem; // 텍스트를 수직 중앙으로 정렬
+`;
+
+const Arrow = styled.img`
+  width: 7px;
+  height: 15px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
 `;
