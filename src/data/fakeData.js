@@ -9,7 +9,7 @@ const fakeData = [
     { id: 7, title: "가짜질문글 점메추 해주세여 흐흐", content: "제육제외.", answers: 4, comments: 3, views: 120, likes: 40, date: "2023-01-07 16:45:00" },
     { id: 8, title: "가짜질문글 인터폰 힘내세요", content: "네이버 카카오 인터폰 레츠공.", answers: 6, comments: 7, views: 110, likes: 60, date: "2023-01-08 17:30:00" },
     { id: 9, title: "가짜질문글 졸리다졸려졸려", content: "돈보다는 마음이 내게는 더 와닿아.", answers: 8, comments: 6, views: 250, likes: 70, date: "2023-01-09 18:15:00" },
-    { id: 10, title: "가짜질문글 마지막 가짜질문글~", content: "날 안아줬던 너의 심장은 절대 안잊어 난 말랐다 허나 내 마음만큼은 살쪄", answers: 20, comments: 3, views: 26, likes: 29, date: "2024-01-21 04:36:33"}
+    { id: 10, title: "가짜질문글 마지막 가짜질문글~", content: "날 안아줬던 너의 심장은 절대 안잊어 난 말랐다 허나 내 마음만큼은 살쪄", answers: 20, comments: 3, views: 26, likes: 29, date: "2024-01-21 04:36:33"},
 ]  
 
 export default fakeData;

@@ -1,7 +1,7 @@
 // SettingsPage.jsx
-import React from 'react';
+import React, {useState} from 'react';
 import styled from 'styled-components';
-import { useNavigate, useLocation  } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
 
@@ -17,6 +17,18 @@ const SettingsPage = () => {
     navigate('/');
   };
   
+  const [profileImage, setProfileImage] = useState('./assets/MyProfile.png');
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <PageContainer>
@@ -40,7 +52,18 @@ const SettingsPage = () => {
 
       <Content>
         <ProfileSection>
-          <ProfileImage src="./assets/SettingProfile.png" alt="Profile" />
+          <ProfileImage src={profileImage} alt="Profile" />
+          <EditButtonContainer>
+            <label htmlFor="profile-upload">
+              <EditButton src="./assets/Edit1.png" alt="Edit" />
+            </label>
+          </EditButtonContainer>
+          <FileInput
+            id="profile-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
           <NameAndNickname>
             <NameContainer onClick={() => navigate('/profile-edit')}>
               <Name>User 님</Name>
@@ -49,6 +72,7 @@ const SettingsPage = () => {
             <Nickname>닉네임</Nickname>
           </NameAndNickname>
         </ProfileSection>
+
         <OptionSection>
           <Section>
             <SectionTitle>MY</SectionTitle>
@@ -165,9 +189,19 @@ const Content = styled.div`
   left: 7.8rem;
 `;
 
+const EditButtonContainer = styled.div`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer; 
+  margin-right: -3rem;
+`;
+
 const ProfileSection = styled.section`
   display: flex;
+  position: relative;
   align-items: center;
+  justify-content: start;
   margin-left: 6rem;
   padding-bottom: 2rem; // 섹션 사이 간격
 `;
@@ -177,6 +211,19 @@ const ProfileImage = styled.img`
   height: 7.375rem;
   flex-shrink: 0;
   margin-right: 1rem;
+  border-radius: 50%;
+`;
+
+const EditButton = styled.img`
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  margin-left: 5.3rem;
+  cursor: pointer;
+`;
+
+const FileInput = styled.input`
+  display: none;
 `;
 
 
