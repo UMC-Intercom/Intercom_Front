@@ -29,6 +29,8 @@ import DeactivatePDF from './pages/DeactivatePDF';
 import MyCareer from './pages/MyCareer';
 import WrittenContent from './pages/WrittenContent';
 import Scrap from './pages/Scrap';
+import FindingPassword from './pages/FindingPassword';
+import SettingPassword from './pages/SettingPassword';
 
 
 function App() {
@@ -55,6 +57,7 @@ function App() {
           <Route path="/findingemail" element={<FindingEmail />} /> 
           <Route path="/findedemail" element={<FindedEmail />} />  
           <Route path="/unfindedemail" element={<UnfindedEmail />} /> 
+          <Route path="/findingPassword" element={<FindingPassword />} />
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/deactivate-account0" element={<Deactivate0 />} />
           <Route path="/deactivate-account1" element={<Deactivate1 />} />
@@ -70,6 +73,7 @@ function App() {
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
+          <Route path="/settingPwd" element={<SettingPassword />} />
           </Routes>
         </AuthProvider>
       </div>

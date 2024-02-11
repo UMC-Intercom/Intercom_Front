@@ -201,6 +201,7 @@ const Join = () => {
 
 const navigateToSignUp = () => navigate('/signup');
 const navigateToFindingEmail = () => navigate('/findingemail');
+const navigateToFindingPassword = () => navigate('/findingPassword');
 
 
   return (
@@ -216,7 +217,7 @@ const navigateToFindingEmail = () => navigate('/findingemail');
             <Checkbox id="stayLoggedIn" type="checkbox" checked={stayLoggedIn} onChange={handleStayLoggedInChange} />
             <CheckboxLabel htmlFor="stayLoggedIn">로그인 유지</CheckboxLabel>
           </CheckboxContainer>
-          <Link style={{ color: '#636363', textDecoration: 'underline', fontSize: '15px', marginRight: '8px'}} onClick={() => console.log('비밀번호 찾기')}>
+          <Link onClick={navigateToFindingPassword} style={{ color: '#636363', textDecoration: 'underline', fontSize: '15px', marginRight: '8px'}} >
             비밀번호 찾기
           </Link>
         </FlexRow>

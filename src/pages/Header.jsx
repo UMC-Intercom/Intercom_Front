@@ -58,7 +58,7 @@ const Header = () => {
         <Logo src="./assets/Logo.png" alt="IntercomLogo" onClick={() => handlePageChange('/home')}/>
         <PageLists>
           <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
-          <Pages active={activePage === '/saved-notices'} onClick={() => handlePageChange('/saved-notices')}>저장한 공고</Pages>
+          <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>저장한 공고</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
           <Pages active={activePage === '/mycareer'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
           <Pages active={activePage === '/cover-letters'} onClick={() => handlePageChange('/cover-letters')}>합격 자소서</Pages>
