@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import fakeUsersData from '../data/fakeUsersData';
+import axios from "axios";
 
 //이메일 유효성
 const validateEmail = (email) => {
@@ -175,29 +176,45 @@ useEffect(() => {
   }
 }, [isFullAgreement]);
 
+// 생년월일 YYYY-MM-DD 형식으로 포맷팅 (날짜는 다 YYYY-MM-DD 형식으로 전달)
+const formatDate = (year, month, day) => {
+  const formattedMonth = String(month).padStart(2, '0');
+  const formattedDay = String(day).padStart(2, '0');
+  return `${year}-${formattedMonth}-${formattedDay}`;
+};
+
 const onSubmit = (e) => {
   e.preventDefault();
 
-  // 로컬 스토리지에 가입 정보 추가
   const user = {
     email,
     password,  
-    name, 
-    nickName,
-    phoneNum,
+    name,
+    // 전달할 값과 DB에 저장되는 이름과 같지 않다면
+    // DB에 저장되는 이름: 프론트에서 전달하는 변수 이름
+    nickname: nickName,
+    birthday: formatDate(birthYear, birthMonth, birthDay),
+    phone: phoneNum,
     gender,
-    birthYear,
-    birthMonth,
-    birthDay,
-    isRequiredConsent1,
-    isRequiredConsent2
   };
 
-  // 로컬 스토리지에 가입 정보 저장
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  localStorage.setItem('users', JSON.stringify([...users, user]));
+  axios.post('http://localhost:8080/users/signup', user, {
+    withCredentials: true   // config
+    }).then(response => {
+        const userNickname = response.data;
+        console.log("** userNickname: ", response.data);
 
-  navigateToSignUp2();
+        // 회원가입 성공시 처리
+        alert('회원가입 성공');
+
+        // userNickname 아래 페이지로 넘겨서 정보 보낼 때 같이 전달 plz
+        // 2단계 api는 구현 안 된 상태라 하고 연동 예정
+        navigateToSignUp2();
+      })
+      .catch(error => {
+        console.error('회원가입 실패:', error);
+        alert('회원가입 실패');
+      });
 }
 
   return (
