@@ -274,9 +274,9 @@ const onSubmit = (e) => {
 
         <InputWrap>
         <Label>성별</Label>
-        <input type='radio' name='gender' value='female' onChange={(e) => setGender(e.target.value)} checked={gender === 'female'} />여자
-        <input type='radio' name='gender' value='male' onChange={(e) => setGender(e.target.value)} checked={gender === 'male'} />남자
-        <input type='radio' name='gender' value='none-selected' onChange={(e) => setGender(e.target.value)} checked={gender === 'none-selected'} />선택 안 함
+        <RadioInput type='radio' name='gender' value='female' onChange={(e) => setGender(e.target.value)} checked={gender === 'female'} />여자
+        <RadioInput type='radio' name='gender' value='male' onChange={(e) => setGender(e.target.value)} checked={gender === 'male'} />남자
+        <RadioInput type='radio' name='gender' value='none-selected' onChange={(e) => setGender(e.target.value)} checked={gender === 'none-selected'} />선택 안 함
         </InputWrap>
 
         <InputWrap>
@@ -311,17 +311,17 @@ const onSubmit = (e) => {
         <Terms>
         <InputWrap>
           <Label>이용약관동의</Label>
-          <InputField type="checkbox" id="fullagreement" name="fullagreement" onChange={handleFullAgreementChange} checked={isFullAgreement} />
+          <RadioInput type="checkbox" id="fullagreement" name="fullagreement" onChange={handleFullAgreementChange} checked={isFullAgreement} />
           <FullAgreement for="scales">전체 동의합니다.</FullAgreement>
         </InputWrap>
 
         <InputWrap>
-        <InputField type="checkbox" id="requiredconsent1" name="requiredconsent1" onChange={handleRequiredConsent1Change} checked={isFullAgreement || isRequiredConsent1} />
+        <RadioInput type="checkbox" id="requiredconsent1" name="requiredconsent1" onChange={handleRequiredConsent1Change} checked={isFullAgreement || isRequiredConsent1} />
         <RequiredConsent for="scales">이용약관 동의 (필수)</RequiredConsent>
         </InputWrap>
 
         <InputWrap>
-        <InputField type="checkbox" id="requiredconsent2" name="requiredconsent2" onChange={handleRequiredConsent2Change} checked={isFullAgreement || isRequiredConsent2} />
+        <RadioInput type="checkbox" id="requiredconsent2" name="requiredconsent2" onChange={handleRequiredConsent2Change} checked={isFullAgreement || isRequiredConsent2} />
         <RequiredConsent for="scales">개인정보 수집 이용 동의 (필수)</RequiredConsent>
         </InputWrap>
         </Terms>
@@ -465,3 +465,46 @@ cursor: pointer;
 }
 `;
 
+const RadioLabel = styled.label`
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 2rem;
+    margin-right: 5rem; // 각 라디오 버튼 사이 간격
+
+    & input {
+        appearance: none; // 기본 스타일 제거
+        -webkit-appearance: none; // Safari를 위한 기본 스타일 제거
+        border: 1rem solid #E2E2E2;
+        border-radius: 50%; // 원형 테두리
+        width: 1em; // 너비
+        height: 1em; // 높이
+        margin-right: 0.4em; // 텍스트와의 간격
+
+    &:checked {
+        background-color: #5B00EF; // 선택 시 보라색으로 채움
+        border: 1rem solid #5B00EF; // 선택 시 보라색 테두리
+        position: relative; // 가상 요소를 위한 포지셔닝 컨텍스트
+      }
+  
+      &:checked::after {
+        content: ''; // 가상 요소에는 내용이 없음
+        position: absolute; // 부모 요소(input) 기준으로 절대 위치
+        top: 50%; // 상위 요소의 정중앙
+        left: 50%; // 상위 요소의 정중앙
+        transform: translate(-50%, -50%); // 정확한 중앙에 위치
+        width: 1rem; // 내부 원의 너비
+        height: 1rem; // 내부 원의 높이
+        border-radius: 50%; // 원형
+        background: #fff; // 내부 원의 배경색은 흰색
+      }
+  }
+  
+`;
+
+const RadioInput = ({ className, label, ...props }) => (
+  <RadioLabel className={className}>
+    <input type="radio" {...props} />
+    {label}
+  </RadioLabel>
+);

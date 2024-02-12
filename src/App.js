@@ -14,9 +14,9 @@ import SignUp3 from './pages/SignUp3';
 import SignUp4 from './pages/SignUp4'; 
 import OnBoarding1 from './pages/OnBoarding1'; 
 import OnBoarding2 from './pages/OnBoarding2'; 
-import FindingEmail from './pages/FindingEmail'; //추가
-import FindedEmail from './pages/FindedEmail'; //추가
-import UnfindedEmail from './pages/UnfindedEmail'; //추가
+import FindingEmail from './pages/FindingEmail'; 
+import FindedEmail from './pages/FindedEmail'; 
+import UnfindedEmail from './pages/UnfindedEmail'; 
 import SettingsPage from './pages/SettingsPage';
 import ProfileEdit from './pages/ProfileEdit';
 import Deactivate0 from './pages/Deactivate0';
@@ -29,7 +29,10 @@ import DeactivatePDF from './pages/DeactivatePDF';
 import MyCareer from './pages/MyCareer';
 import WrittenContent from './pages/WrittenContent';
 import Scrap from './pages/Scrap';
-
+import CoverLetterInput from './pages/CoverLetterInput';
+import CoverLetterInput2 from './pages/CoverLetterInput2';
+import CoverLetterHome from './pages/CoverLetterHome';
+import CoverLetterInput3 from './pages/CoverLetterInput3';
 
 function App() {
   return (
@@ -70,6 +73,11 @@ function App() {
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
+
+          <Route path="/cover-letters" element={<CoverLetterHome />} />
+          <Route path="/cover-letters-input" element={<CoverLetterInput />} />
+          <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />
+          <Route path="/cover-letters-input3" element={<CoverLetterInput3 />} />
           </Routes>
         </AuthProvider>
       </div>
