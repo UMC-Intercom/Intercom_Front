@@ -570,7 +570,7 @@ const MyCareer = () => {
 
   const handleEdit = () => {
     setShowModal(false);
-    navigate('/mycareer-edit');
+    navigate('/mycareer');
   };
 
   const handleModalCloseAndNavigate = () => {
