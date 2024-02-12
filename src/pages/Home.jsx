@@ -44,16 +44,11 @@ const Home = () => {
              style={{width: "4.125rem", height: "5rem", marginBottom: "1.25rem"}} />
              <span>면접 후기</span>
           </Icons>
-          <Icons onClick={() => handlePageChange('/news')}>
-            <img src="/assets/News.png" alt="News"
-             style={{width: "4rem", height: "4rem", marginBottom: "2.25rem"}} />
-             <span>취업 뉴스</span>
-          </Icons>
         </PageIcons>
       </MenuBox>
       <BannerImg>
         <img src="/assets/Banner.png" alt="Banner" 
-        style={{width: "75rem", height: "17rem"}} />
+        style={{width: "75rem"}} />
       </BannerImg>
       <PopularNoticesBox>
         <span style={{fontSize: "1.563rem", fontWeight: "800"}}>실시간 인기 공고</span>
@@ -85,7 +80,7 @@ export default Home;
 
 const PopularNoticesBox = styled.div`
   width: 75rem;
-  margin: 3.125rem auto;
+  margin: auto;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
@@ -156,7 +151,7 @@ const PageIcons = styled.div`
   flex-wrap: wrap;
   width: 90%;
   margin-top: 4.375rem;
-  max-width: 62.5rem;
+  max-width: 58rem;
 `;
 
 const Icons = styled.div`
