@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ReactQuill, { Quill } from 'react-quill'; //npm install react-quill 필수
 import 'react-quill/dist/quill.snow.css'; // Quill 에디터의 스타일시트
 import { useNavigate } from 'react-router-dom';
+import CurrentEmployCheckingModal from './CurrentEmployCheckingModal';
 
 const categories = [
   { id: 1, name: '영업/고객상담' },
@@ -27,6 +28,33 @@ const categories = [
   const maxContentLength = 500;
   const quillRef = useRef(null);
   const [posts, setPosts] = useState([]); // 글 목록 상태 추가
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVerified, setIsVerified] = useState(false); // 현직자 인증 상태
+  const [hasDeferredModal, setHasDeferredModal] = useState(false);
+  const [imageUrls, setImageUrls] = useState([]);
+
+
+
+
+
+//현직자인증모달띄우기
+const handleShowModal = () => {
+  setIsModalOpen(true);
+};
+const handleCloseModal = () => {
+  setIsVerified(true); // 현직자 인증을 건너뛸 수 있게 isVerified 상태를 true로 설정
+  setHasDeferredModal(true); // 모달을 다시 띄우지 않도록 처리
+  localStorage.setItem('hasDeferredModal', 'true'); // 상태를 로컬 스토리지에 저장
+  setIsModalOpen(false); // 모달 닫기
+};
+useEffect(() => {
+  // 컴포넌트가 마운트될 때 로컬 스토리지에서 hasDeferredModal 상태를 불러옴
+  const storedHasDeferredModal = localStorage.getItem('hasDeferredModal');
+  if (storedHasDeferredModal) {
+    setHasDeferredModal(storedHasDeferredModal === 'true');
+  }
+}, []);
+
 
   const handleGoBack = () => {
     navigate(-1); // 뒤로가기 기능 실행
@@ -52,6 +80,7 @@ const categories = [
       });
     }
   }, []);
+
   const handleImageUpload = () => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
@@ -71,7 +100,6 @@ const categories = [
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
   
-          // 이미지 사이즈 조정 로직
           const MAX_WIDTH = 400;
           let width = img.width;
           let height = img.height;
@@ -87,14 +115,21 @@ const categories = [
   
           const resizedImgDataUrl = canvas.toDataURL('image/jpeg');
   
-          // 조정된 이미지를 Quill 에디터에 삽입
+          // 에디터에 이미지 삽입
           const quill = quillRef.current.getEditor();
           const range = quill.getSelection(true);
           quill.insertEmbed(range.index, 'image', resizedImgDataUrl);
           quill.setSelection(range.index + 1);
+  
+          // 이미지 Data URL을 상태에 저장
+          handleImageUploadSuccess(resizedImgDataUrl);
         };
       };
     };
+  };
+
+  const handleImageUploadSuccess = (dataUrl) => {
+    setImageUrls((prevUrls) => [...prevUrls, dataUrl]);
   };
   
   const handleTitleChange = (e) => {
@@ -103,31 +138,158 @@ const categories = [
     }  };
    
 
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newPost = { title, content, categories: selectedCategories };
-    setPosts([...posts, newPost]); // 글 목록 상태 업데이트
-    // 나머지 로직...
-  };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+    
+      if (title.trim() === '' || content.trim() === '') {
+        alert('모든 문항을 채워주세요!');
+        return;
+      }
+      submitPost();
+      /* 현직자 인증시 수정
+      if (!isVerified && !hasDeferredModal) {
+        handleShowModal();
+        return;
+      }
+    
+      // 현직자 인증이 되어 있다면, 질문 제출 로직을 실행
+      if (isVerified) {
+        submitPost();
+      }*/
+    };
+
+const submitPost = async () => {
+  navigate('/post-success');
+
+  /*
+  // FormData 객체 생성
+  const formData = new FormData();
+
+  // 제목, 내용, 카테고리를 FormData에 추가
+  formData.append('title', title);
+  formData.append('content', content);
+  selectedCategories.forEach((id, index) => {
+    // 'categories[]'는 서버가 배열을 받을 수 있도록 하는 필드명입니다. 서버 요구에 따라 변경이 필요할 수 있습니다.
+    formData.append(`categories[${index}]`, categories.find(c => c.id === id).name);
+  });
+
+  // imageUrls 배열에서 각 Data URL을 파일로 변환하고 FormData에 추가
+  imageUrls.forEach((dataUrl, index) => {
+    // Data URL을 Blob으로 변환
+    const blob = dataURLtoBlob(dataUrl);
+    // Blob을 File 객체로 변환 (두 번째 인자는 파일 이름, 여기서는 예시로 'image-{index}.jpg' 사용)
+    const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
+    // 'images[]'는 서버가 이미지 배열을 받을 수 있도록 하는 필드명입니다. 서버 요구에 따라 변경이 필요할 수 있습니다.
+    formData.append('images[]', file);
+  });
+
+  // FormData를 사용하여 서버에 요청 보내기
+  try {
+    const response = await fetch('http://localhost:8080/talks', {
+      method: 'POST',
+      body: formData,
+      // FormData를 사용할 때 'Content-Type' 헤더를 설정하지 않아야 브라우저가 올바른 boundary 값을 설정할 수 있습니다.
+    });
+
+    if (response.ok) {
+      // 제출 성공 시, 제출 완료 페이지로 이동
+      navigate('/post-success');
+    } else {
+      // 제출 실패 처리
+      console.error("글 저장에 실패했습니다.");
+    }
+  } catch (error) {
+    console.error("글 저장 중 에러가 발생했습니다:", error);
+  }*/
+};
+// Data URL을 Blob으로 변환하는 함수
+function dataURLtoBlob(dataUrl) {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  
+  while(n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new Blob([u8arr], { type: mime });
+}
+  
+    
+    // 현직자 인증
+    useEffect(() => {
+      // 사용자 인증 여부를 확인하는 함수
+      const checkUserVerification = async () => {
+        try {
+          // 서버 인증 API 엔드포인트로 GET 요청을 보냄
+          const response = await fetch('http://localhost:8080/api/verify', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('userToken')}`, // 사용자 토큰을 헤더에 포함
+            },
+          });
+    
+          if (response.ok) {
+            const data = await response.json();
+            setIsVerified(data.isVerified); // 서버로부터 받은 인증 여부를 상태에 설정
+          } else {
+            console.error('Failed to verify user');
+            // 인증 확인 실패 처리, 필요한 경우
+          }
+        } catch (error) {
+          console.error('Error checking user verification:', error);
+        }
+      };
+    
+      checkUserVerification();
+    }, []);
+    
+
 
   //카테고리
 
     // 선택된 카테고리들을 저장할 상태 (배열)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState([]);
-  
+    const [selectedCategoryNames, setSelectedCategoryNames] = useState([]);   
+   
     const handleDropdownToggle = () => {
       setIsDropdownOpen(!isDropdownOpen);
     };
   
-    const handleCategoryChange = (categoryId) => {
-      setSelectedCategories((prev) =>
-        prev.includes(categoryId)
-          ? prev.filter((id) => id !== categoryId)
-          : [...prev, categoryId]
-      );
+     // 카테고리 선택 핸들러
+     const handleCategoryChange = (categoryId) => {
+      setSelectedCategories((prevSelectedCategories) => {
+        const isSelected = prevSelectedCategories.includes(categoryId);
+        if (isSelected) {
+          // 카테고리 선택 해제 시, 해당 카테고리 ID 및 이름 제거
+          const updatedCategories = prevSelectedCategories.filter(id => id !== categoryId);
+          const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
+          setSelectedCategoryNames(updatedCategoryNames);
+          return updatedCategories;
+        } else {
+          // 카테고리 선택 시, 해당 카테고리 ID 추가 및 이름 업데이트
+          const updatedCategories = [...prevSelectedCategories, categoryId];
+          const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
+          setSelectedCategoryNames(updatedCategoryNames);
+          return updatedCategories;
+        }
+      });
     };
 
+   // 선택된 카테고리 이름을 표시하는 문자열 생성
+    let selectedCategoriesHeader = '카테고리 선택';
+    if (selectedCategoryNames.length > 0) {
+    if (selectedCategoryNames.length <= 2) {
+      // 2개 이하 선택 시 모든 카테고리 이름 나열
+      selectedCategoriesHeader = selectedCategoryNames.join(', ');
+    } else {
+      // 3개 이상 선택 시 첫 2개 나열 후 나머지는 "외 N개"로 표시
+      selectedCategoriesHeader = `${selectedCategoryNames.slice(0, 2).join(', ')} 외 ${selectedCategoryNames.length - 2}개`;
+    }
+  }
     const handleSave = () => {
       const temporaryData = { title, content };
       localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
@@ -139,6 +301,7 @@ const categories = [
       alert("작성이 취소되고 글이 삭제되었습니다.");
       navigate(-1);  
     };
+
     useEffect(() => {
       const params = new URLSearchParams(window.location.search);
       const fromTalkTalk = params.get('from') === 'talktalk';
@@ -190,7 +353,7 @@ const categories = [
 
       <DropdownContainer>
         <DropdownHeader onClick={handleDropdownToggle}>
-          카테고리 선택
+        {selectedCategoriesHeader}
           <DropdownIndicator isOpen={isDropdownOpen}></DropdownIndicator>
         </DropdownHeader>
         {isDropdownOpen && (
@@ -216,6 +379,13 @@ const categories = [
           <SubmitButton type="submit">질문 등록</SubmitButton>
         </ButtonContainer>
       </Form>
+      {isModalOpen && (
+  <CurrentEmployCheckingModal
+    isOpen={isModalOpen}
+    onClose={handleCloseModal} // "나중에 하기" 버튼 클릭 시 호출될 함수
+  />
+)}
+
     </PageContainer>
   );
 };
