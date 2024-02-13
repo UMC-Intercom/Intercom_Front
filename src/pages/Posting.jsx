@@ -4,6 +4,8 @@ import ReactQuill, { Quill } from 'react-quill'; //npm install react-quill 필�
 import 'react-quill/dist/quill.snow.css'; // Quill 에디터의 스타일시트
 import { useNavigate } from 'react-router-dom';
 import CurrentEmployCheckingModal from './CurrentEmployCheckingModal';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const categories = [
   { id: 1, name: '영업/고객상담' },
@@ -32,6 +34,7 @@ const categories = [
   const [isVerified, setIsVerified] = useState(false); // 현직자 인증 상태
   const [hasDeferredModal, setHasDeferredModal] = useState(false);
   const [imageUrls, setImageUrls] = useState([]);
+  const [tempSavedPostId, setTempSavedPostId] = useState(null);
 
 
 
@@ -81,7 +84,8 @@ useEffect(() => {
     }
   }, []);
 
-  const handleImageUpload = () => {
+  const handleImageUpload = (e) => {
+    e.stopPropagation(); 
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
@@ -133,75 +137,54 @@ useEffect(() => {
   };
   
   const handleTitleChange = (e) => {
+    e.preventDefault();
     if (e.target.value.length <= maxTitleLength) {
       setTitle(e.target.value);
     }  };
    
 
     const handleSubmit = async (e) => {
-      e.preventDefault();
-    
-      if (title.trim() === '' || content.trim() === '') {
-        alert('모든 문항을 채워주세요!');
-        return;
-      }
-      submitPost();
-      /* 현직자 인증시 수정
-      if (!isVerified && !hasDeferredModal) {
-        handleShowModal();
+      e.preventDefault()
+      // 필수 입력값 검증
+      if (!title.trim() || !content.trim()) {
+        alert('제목과 내용을 입력해주세요.');
         return;
       }
     
-      // 현직자 인증이 되어 있다면, 질문 제출 로직을 실행
-      if (isVerified) {
-        submitPost();
-      }*/
-    };
+      // FormData 객체 생성 및 필드 추가
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('category', selectedCategories.join(', ')); // 배열을 문자열로 변환하여 추가
+       // 임시저장된 글의 id가 있는 경우에만 id를 FormData에 추가
+      if (tempSavedPostId) {
+       formData.append('id', tempSavedPostId);
+     }
 
-const submitPost = async () => {
-  navigate('/post-success');
-
-  /*
-  // FormData 객체 생성
-  const formData = new FormData();
-
-  // 제목, 내용, 카테고리를 FormData에 추가
-  formData.append('title', title);
-  formData.append('content', content);
-  selectedCategories.forEach((id, index) => {
-    // 'categories[]'는 서버가 배열을 받을 수 있도록 하는 필드명입니다. 서버 요구에 따라 변경이 필요할 수 있습니다.
-    formData.append(`categories[${index}]`, categories.find(c => c.id === id).name);
-  });
-
-  // imageUrls 배열에서 각 Data URL을 파일로 변환하고 FormData에 추가
-  imageUrls.forEach((dataUrl, index) => {
-    // Data URL을 Blob으로 변환
-    const blob = dataURLtoBlob(dataUrl);
-    // Blob을 File 객체로 변환 (두 번째 인자는 파일 이름, 여기서는 예시로 'image-{index}.jpg' 사용)
-    const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
-    // 'images[]'는 서버가 이미지 배열을 받을 수 있도록 하는 필드명입니다. 서버 요구에 따라 변경이 필요할 수 있습니다.
-    formData.append('images[]', file);
-  });
-
-  // FormData를 사용하여 서버에 요청 보내기
-  try {
-    const response = await fetch('http://localhost:8080/talks', {
-      method: 'POST',
-      body: formData,
-      // FormData를 사용할 때 'Content-Type' 헤더를 설정하지 않아야 브라우저가 올바른 boundary 값을 설정할 수 있습니다.
+     imageUrls.forEach((url, index) => {
+      const blob = dataURLtoBlob(url); // Data URL을 Blob 객체로 변환
+      const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' }); // Blob을 File 객체로 변환
+      formData.append('images[]', file); // 'images[]'는 서버가 이미지 배열을 받을 수 있도록 하는 필드명입니다. 필요에 따라 변경하세요.
     });
-
-    if (response.ok) {
-      // 제출 성공 시, 제출 완료 페이지로 이동
-      navigate('/post-success');
+     try {
+       const response = await axios.post('http://localhost:8080/talks', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+         },
+    });
+    
+    if (response.status === 200 || response.status === 201) {
+      alert('글이 성공적으로 등록되었습니다.');
+      navigate('/some-success-page'); // 성공 시 리디렉션할 페이지
     } else {
-      // 제출 실패 처리
-      console.error("글 저장에 실패했습니다.");
+      throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
     }
   } catch (error) {
-    console.error("글 저장 중 에러가 발생했습니다:", error);
-  }*/
+    console.error('글 등록 중 오류 발생:', error);
+    alert('글 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+  }
 };
+    
 // Data URL을 Blob으로 변환하는 함수
 function dataURLtoBlob(dataUrl) {
   const arr = dataUrl.split(',');
@@ -290,34 +273,69 @@ function dataURLtoBlob(dataUrl) {
       selectedCategoriesHeader = `${selectedCategoryNames.slice(0, 2).join(', ')} 외 ${selectedCategoryNames.length - 2}개`;
     }
   }
-    const handleSave = () => {
-      const temporaryData = { title, content };
-      localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
+  const [showTempSaveAlert, setShowTempSaveAlert] = useState(false);
+
+  const handleSave = () => {
+    const temporaryData = { title, content };
+    localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
+    setShowTempSaveAlert(true); // 사용자가 임시저장을 요청했음을 나타냄
+  };
+  
+  useEffect(() => {
+    if (showTempSaveAlert) {
       alert("임시저장 되었습니다.");
-    };
+      setShowTempSaveAlert(false); // 알림을 표시한 후 다시 false로 설정
+    }
+  }, [showTempSaveAlert]);
+  
   
     const handleCancel = () => {
       localStorage.removeItem(TEMP_DATA_KEY);
       alert("작성이 취소되고 글이 삭제되었습니다.");
       navigate(-1);  
     };
+//임시저장 불러오면서 아이디 같이 넘겨주야댐
 
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      const fromTalkTalk = params.get('from') === 'talktalk';
-    
-      if (fromTalkTalk) {
-        const savedData = localStorage.getItem(TEMP_DATA_KEY);
-        if (savedData) {
-          const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
-          if (shouldLoadData) {
-            const { title: savedTitle, content: savedContent } = JSON.parse(savedData);
-            setTitle(savedTitle);
-            setContent(savedContent);
-          }
+const location = useLocation();
+
+useEffect(() => {
+  // 포스트 작성 페이지의 경로가 '/post-create'라고 가정합니다.
+  if (location.pathname === '/posting') {
+    const params = new URLSearchParams(window.location.search);
+    const fromTalkTalk = params.get('from') === 'talktalk';
+
+    if (fromTalkTalk) {
+      const savedData = localStorage.getItem(TEMP_DATA_KEY);
+      if (savedData) {
+        const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
+        if (shouldLoadData) {
+          const { id: tempSavedPostId, title: savedTitle, content: savedContent } = JSON.parse(savedData);
+          setTempSavedPostId(tempSavedPostId);
+          setTitle(savedTitle);
+          setContent(savedContent);
         }
       }
-    }, []);
+    }
+  }
+}, [location.pathname]);
+
+/*  const TEMP_DATA_KEY = "temporaryData";
+
+  useEffect(() => {
+    // 글쓰기 페이지로 이동하는 경우에만 실행
+    if (location.pathname === '/post-create') {
+      const savedData = localStorage.getItem(TEMP_DATA_KEY);
+      if (savedData) {
+        // 임시 저장된 글이 있는 경우, 사용자에게 확인 메시지 표시
+        const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
+        if (shouldLoadData) {
+          // 사용자가 '예'를 선택한 경우, 글쓰기 페이지로 이동하고 임시 저장된 데이터를 불러옵니다.
+          navigate('/post-create', { state: { savedData: JSON.parse(savedData) } });
+        }
+      }
+    }
+  }, [location, navigate]);
+ */
     
     
   return (
@@ -343,7 +361,7 @@ function dataURLtoBlob(dataUrl) {
                value={content}
                onChange={setContent}
             />
-<ImageButton onClick={handleImageUpload}>
+<ImageButton  type="button" onClick={handleImageUpload}> {/*폼안에있으므로 버튼형식 확실히 해야 인식 잘댐 */}
   <img src="./assets/Group26.png" alt="이미지 아이콘" /> 
   이미지 첨부하기
 </ImageButton>
@@ -372,8 +390,8 @@ function dataURLtoBlob(dataUrl) {
       </DropdownContainer>
         </ContentContainer>
         <SaveCancelButtonContainer>
-        <Button onClick={handleCancel}>작성 취소</Button>
-        <Button onClick={handleSave}>임시저장</Button>
+        <Button  type="button" onClick={handleCancel}>작성 취소</Button>
+        <Button  type="button" onClick={handleSave}>임시저장</Button>
         </SaveCancelButtonContainer>
         <ButtonContainer>
           <SubmitButton type="submit">질문 등록</SubmitButton>
