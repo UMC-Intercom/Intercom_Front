@@ -4,6 +4,12 @@ import { useNavigate } from 'react-router-dom';
 
 export default function CoverLetterInput3() {
 
+  const [questionNumber, setQuestionNumber] = useState(1); // 문항 번호 상태
+
+  const addQuestion = () => {
+    setQuestionNumber(prevNumber => prevNumber + 1); // 문항 번호 업데이트
+  };
+
   return (
     <SettingTitle>
       <Container>
@@ -12,11 +18,24 @@ export default function CoverLetterInput3() {
         <Text>Step 3</Text>
         <SubtitleWrap>
           <SubTitle>자소서 문항과 답변을 입력해주세요</SubTitle>
-          <AddContentWrap>
+          <AddContentWrap onClick={addQuestion}>
             문항 추가하기
             <PlusImage src='./assets/plus.png' />
           </AddContentWrap>
           </SubtitleWrap>
+
+          {[...Array(questionNumber)].map((_, index) => (
+        <QuestionWrap>
+          <QuestionBox>
+            <QuestionNumber>
+              문항{index + 1}
+            </QuestionNumber>
+            <Question type='text' placeholder='내용을 입력해주세요' />
+            <Detail type='text' placeholder='답변을 입력해주세요' />
+          </QuestionBox>
+        </QuestionWrap>
+        ))}
+
         </Form>
         <SubmitButton type="submit">등록하기</SubmitButton>
       </Container>
@@ -25,6 +44,106 @@ export default function CoverLetterInput3() {
 }
 
 const SettingTitle = styled.div``;
+
+const QuestionWrap = styled.div`
+margin-left: 43px;
+margin-bottom: 35px;
+
+box-sizing: border-box;
+width: 1116px;
+height: 514px;
+left: 400px;
+top: 447px;
+
+border: 3px solid #A1A1A1;
+border-radius: 10px;
+
+`
+
+const QuestionBox = styled.div`
+margin-left: 66px;
+margin-top: 44px;
+`
+
+const QuestionNumber = styled.div`
+width: 95px;
+height: 37px;
+left: 466px;
+top: 491px;
+
+/* T1 */
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 37px;
+
+color: #000000;
+
+margin-bottom: 21px;
+
+`
+const Question = styled.input`
+box-sizing: border-box;
+
+width: 991px;
+height: 60px;
+left: 466px;
+top: 549px;
+
+border: 2px solid #5B00EF;
+border-radius: 10px;
+
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 25px;
+padding-left: 21px;
+
+&::placeholder {
+  /* B3 */
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 30px;
+  /* or 150% */
+  
+  color: #A1A1A1;
+
+}
+
+margin-bottom: 22px;
+`
+
+const Detail = styled.textarea`
+  box-sizing: border-box;
+  width: 991px;
+  height: 287px;
+  left: 466px;
+  top: 631px;
+  border: 2px solid #A1A1A1;
+  border-radius: 10px;
+  padding-top: 18px; /* Adjust the padding-top value as needed */
+  padding-left: 21px; /* 여기 참고 */
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 25px;
+  margin-bottom: 43px;
+
+  &::placeholder {
+    font-family: 'SUITE';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 30px;
+    color: #A1A1A1;
+  }
+`;
+
 
 const SubtitleWrap = styled.div`
   display: flex;
@@ -53,6 +172,7 @@ const AddContentWrap = styled.div`
   font-size: 20px;
   line-height: 25px;
   color: #A1A1A1;
+  cursor: pointer;
 `;
 
 
@@ -111,12 +231,14 @@ const Container = styled.div`
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  width: 1200px;
-  height: 669px;
+  width: 1200px; /* 폭 고정 */
+  max-height: 754px; /* 최대 높이 지정 */
+  overflow-y: auto; /* 세로 스크롤 추가 */
   background: none;
   border: 3px solid #e2e2e2;
   border-radius: 0.625rem;
 `;
+
 
 const SubTitle = styled.div`;
 font-family: 'SUITE';

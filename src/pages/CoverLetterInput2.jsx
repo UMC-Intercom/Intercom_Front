@@ -20,9 +20,9 @@ export default function CoverLetterInput2() {
     };
 
     const [grade, setGrade] = useState('');
-const handleGradeChange = (event) => {
-    setGrade(event.target.value);
-};
+    const handleGradeChange = (event) => {
+        setGrade(event.target.value);
+    };
 
     return (
         <SettingTitle>
@@ -62,41 +62,46 @@ const handleGradeChange = (event) => {
                             <LicensePlusImage src='./assets/miniplus.png' onClick={handleAddLicenseField} />
                         </InputWrap>
                     ))}
-                    
-                    <InputWrap>
-                            <MajorLabel >학력</MajorLabel>
-                            <InputField placeholder='학교명' type="text" />
-                            <PassSearch>
-                                <PassSearchIcon src='./assets/passSearch.png' />
-                                <PassSearchText>검색하기</PassSearchText>
-                            </PassSearch>
-                            <InputField placeholder='학과명' type="text" />
-                            <PassSearch>
-                                <PassSearchIcon src='./assets/passSearch.png' />
-                                <PassSearchText>검색하기</PassSearchText>
-                            </PassSearch>
-                        </InputWrap>
 
-                        <InputWrap>
-        <Label>학점</Label>
-        <GradeInput
-            type="text"
-            placeholder="학점"
-        />
-        <Slash>/</Slash>
-        <GradeSelect
-            defaultValue={grade}
-            onChange={handleGradeChange}
-        >
-            <option value="" disabled selected>기준 학점</option>
-            <option value="4.0">4.0</option>
-            <option value="4.3">4.3</option>
-            <option value="4.5">4.5</option>
-            <option value="5.0">5.0</option>
-            <option value="7.0">7.0</option>
-            <option value="100">100</option>
-        </GradeSelect>
-    </InputWrap>
+                    <InputWrap>
+                        <MajorLabel >학력</MajorLabel>
+                        <InputField placeholder='학교명' type="text" />
+                        <PassSearch>
+                            <PassSearchIcon src='./assets/passSearch.png' />
+                            <PassSearchText>검색하기</PassSearchText>
+                        </PassSearch>
+                        <InputField placeholder='학과명' type="text" />
+                        <PassSearch>
+                            <PassSearchIcon src='./assets/passSearch.png' />
+                            <PassSearchText>검색하기</PassSearchText>
+                        </PassSearch>
+                    </InputWrap>
+
+                    <InputWrap>
+                        <Label>학점</Label>
+                        <GradeInput
+                            type="text"
+                            placeholder="학점"
+                        />
+                        <Slash>/</Slash>
+                        <GradeSelect
+                            defaultValue={grade}
+                            onChange={handleGradeChange}
+                        >
+                            <option value="" disabled selected>기준 학점</option>
+                            <option value="4.0">4.0</option>
+                            <option value="4.3">4.3</option>
+                            <option value="4.5">4.5</option>
+                            <option value="5.0">5.0</option>
+                            <option value="7.0">7.0</option>
+                            <option value="100">100</option>
+                        </GradeSelect>
+                    </InputWrap>
+
+                    <InputWrap style={ {marginBottom: '57px' }}>
+                        <Label >대외 활동</Label>
+                        <ExternalInputField type="text" placeholder='관련 설명 입력하기'/>
+                    </InputWrap>
 
 
                 </Form>
@@ -257,6 +262,36 @@ const InputField = styled.input`
     font-weight: 700;
     font-size: 20px;
     line-height: 25px;
+    padding-left: 21px;
+
+    &::placeholder {
+        color: #A1A1A1;
+        font-family: 'SUITE';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 25px;
+    }
+`;
+
+const ExternalInputField = styled.input`
+    width: 650px;
+    height: 56px;
+    left: 502px;
+    top: 427px;
+    border: 3px solid #E2E2E2;
+    border-radius: 10px;
+    color: #000;
+    padding-left: 21px;
+    
+    &:focus {
+        border-color: #7a42f4;
+    }
+    font-family: 'SUITE';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 25px;
     &::placeholder {
         color: #A1A1A1;
         font-family: 'SUITE';
@@ -332,7 +367,7 @@ const GradeInput = styled.input`
   color: #636363;
 
   &::placeholder {
-    color: #BDBDBD;
+    color: #A1A1A1;
   }
 
   &:focus {
