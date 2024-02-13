@@ -10,7 +10,9 @@ const navigateToPass2 = () => navigate('/cover-letters-input2');
   return (
     <SettingTitle>
       <Container>
+        <TitleWrap>
       <Title>합격 자소서 입력하기</Title>
+      </TitleWrap>
         <Form>
           <Text>Step 1</Text>
           <SubTitle>지원 기업과 직무, 합격 연도를 입력해주세요</SubTitle>
@@ -37,8 +39,8 @@ const navigateToPass2 = () => navigate('/cover-letters-input2');
 
           <InputWrap>
             <Label>합격 연도</Label>
-            <Select name="passYear"></Select>년
-            <Select name="passMonth"></Select>월
+            <Select name="passYear">년</Select>
+            <Select name="passMonth">월</Select>
           </InputWrap>
 
           <InputWrap>
@@ -62,9 +64,9 @@ const navigateToPass2 = () => navigate('/cover-letters-input2');
 
           <InputWrap>
             <Label>생년월일</Label>
-            <Select name="birthYear"></Select>년
-            <Select name="birthMonth"></Select>월
-            <Select name="birthDay"></Select>일
+            <Select name="birthYear">년</Select>
+            <Select name="birthMonth">월</Select>
+            <Select name="birthDay">일</Select>
           </InputWrap>
         </Form>
         <SubmitButton type="submit" onClick={navigateToPass2}>다음</SubmitButton>
@@ -105,27 +107,20 @@ const PassSearchIcon = styled.img`
 
 `;
 
-const Title = styled.div`
+const Title = styled.p`
   font-family: SUITE;
   font-size: 1.5625rem; 
   font-weight: 600;
-  margin-left: 43px; /* 왼쪽 정렬 */
-  margin-top: 4rem;
-  margin-bottom: 1rem;
   color: #636363;
-  max-width: 80%; 
-  transition: all 0.3s ease-in-out; 
-
-  @media (max-width: 768px) {
-    font-size: 1.25rem; 
-    margin-top: 2rem; 
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1rem; 
-    margin-top: 1.5rem; 
-  }
+  margin: 0; /* 기본 마진 제거 */
 `;
+
+const TitleWrap = styled.div`
+  width: 1200px;
+  text-align: left;
+  margin-left: 43px; /* 왼쪽으로 이동 */
+`;
+
 
 const Container = styled.div`
   display: flex;
@@ -182,6 +177,8 @@ const InputWrap = styled.div`
   font-family: SUITE;
   font-size: 1rem;
   font-weight: 700;
+  font-size: 1.25rem;
+  
 `;
 
 const Label = styled.label`
@@ -223,6 +220,14 @@ const RadioLabel = styled.label`
     margin-left: 2rem;
     margin-right: 5rem; // 각 라디오 버튼 사이 간격
 
+    font-family: 'SUITE';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 25px;
+    /* identical to box height */
+    color: #636363;
+
     & input {
         appearance: none; // 기본 스타일 제거
         -webkit-appearance: none; // Safari를 위한 기본 스타일 제거
@@ -250,8 +255,8 @@ const RadioLabel = styled.label`
         background: #fff; // 내부 원의 배경색은 흰색
       }
   }
-  
 `;
+
 
 const RadioInput = ({ className, label, ...props }) => (
   <RadioLabel className={className}>
@@ -261,9 +266,6 @@ const RadioInput = ({ className, label, ...props }) => (
 );
 
 const Select = styled.select`
-    font-family: SUITE;
-    font-size: 1rem;
-    font-weight: 700;
     width: 7rem;
     padding: 1rem 1rem;
     border: 3px solid #e2e2e2;
@@ -271,6 +273,14 @@ const Select = styled.select`
     background-color: white;
     margin-right: 1rem;
     margin-left: 2rem;
+
+    font-family: 'SUITE';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 25px;
+    /* identical to box height */
+    color: #636363;
 `;
 
 const SubmitButton = styled.button`
