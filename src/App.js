@@ -74,8 +74,8 @@ function App() {
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
 
-          <Route path="/cover-letters" element={<CoverLetterHome />} />
-          <Route path="/cover-letters-input" element={<CoverLetterInput />} />
+          <Route path="/cover-letters" element={<CoverLetterInput />} />
+          <Route path="/cover-letters-home" element={<CoverLetterHome />} />
           <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />
           <Route path="/cover-letters-input3" element={<CoverLetterInput3 />} />
           </Routes>

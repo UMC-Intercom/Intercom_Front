@@ -1,291 +1,252 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import fakeCoverletterData from '../data/fakeSearchCoverLetterData';
 
-export default function CoverLetterInput() {
+export default function CoverLetterHome() {
+  const navigate = useNavigate();
+  const navigateToInput = () => navigate('/cover-letters');
+  const [sortByDateActive, setSortByDateActive] = useState(true);
+  const [sortByLikesActive, setSortByLikesActive] = useState(false);
+  const [sortedData, setSortedData] = useState(fakeCoverletterData);
 
-const navigate = useNavigate();
-const navigateToPass2 = () => navigate('/cover-letters-input2');
+  const handleSortByDate = () => {
+    setSortByDateActive(true);
+    setSortByLikesActive(false);
+    const sortedByDate = [...fakeCoverletterData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    setSortedData(sortedByDate);
+  };
+
+  const handleSortByLikes = () => {
+    setSortByDateActive(false);
+    setSortByLikesActive(true);
+    const sortedByLikes = [...fakeCoverletterData].sort((a, b) => b.scrap - a.scrap);
+    setSortedData(sortedByLikes);
+  };
 
   return (
-    <SettingTitle>
-      <Container>
-      <Title>합격 자소서 입력하기</Title>
-        <Form>
-          <Text>Step 1</Text>
-          <SubTitle>지원 기업과 직무, 합격 연도를 입력해주세요</SubTitle>
-          
-          <InputWrap>
-            <Label>지원 회사</Label>
-            <InputField type="text"/>
-            <PassSearch>
-            <PassSearchIcon src='./assets/passSearch.png'/>
-    <PassSearchText>검색하기</PassSearchText>
-    
-  </PassSearch>
-          </InputWrap>
+    <PageContainer>
+      <SearchBox>
+        <SearchText>합격 자소서 검색하기</SearchText>
+        <SearchInput>
+          <InputField type="text" id="company" placeholder="기업명" />
+          <InputField type="text" id="position" placeholder="직무" />
+          <SearchButton>검색</SearchButton>
+        </SearchInput>
+      </SearchBox>
 
-          <InputWrap>
-            <Label>지원 부서 및 직무</Label>
-            <InputField type="text" />
-            <PassSearch>
-            <PassSearchIcon src='./assets/passSearch.png'/>
-    <PassSearchText>검색하기</PassSearchText>
-    
-  </PassSearch>
-          </InputWrap>
+      <WritingContainer>
+        <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
+        <WritingBox onClick={navigateToInput}>
+          합격 자소서를 남겨보세요
+        </WritingBox>
+      </WritingContainer>
 
-          <InputWrap>
-            <Label>합격 연도</Label>
-            <Select name="passYear"></Select>년
-            <Select name="passMonth"></Select>월
-          </InputWrap>
+      <SearchResultWrap>
+        <SearchResultVar>
+          <SearchResultText>
+          검색결과 ({fakeCoverletterData.length})
+          </SearchResultText>
 
-          <InputWrap>
-            <Label>성별</Label>
-            <RadioInput
-              name="gender"
-              value="male"
-              label="남자"
-            />
-            <RadioInput
-              name="gender"
-              value="female"
-              label="여자"
-            />
-            <RadioInput
-              name="gender"
-              value="none"
-              label="선택 안 함"
-            />
-          </InputWrap>
+          <SortButtonsContainer>
+            <SortButton onClick={handleSortByDate} active={sortByDateActive}>
+              <ButtonImage src={sortByDateActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+              최근 작성순
+            </SortButton>
+            <SortButton onClick={handleSortByLikes} active={sortByLikesActive}>
+              <ButtonImage src={sortByLikesActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+              스크랩 많은 순
+            </SortButton>
+          </SortButtonsContainer>
+        </SearchResultVar>
 
-          <InputWrap>
-            <Label>생년월일</Label>
-            <Select name="birthYear"></Select>년
-            <Select name="birthMonth"></Select>월
-            <Select name="birthDay"></Select>일
-          </InputWrap>
-        </Form>
-        <SubmitButton type="submit" onClick={navigateToPass2}>다음</SubmitButton>
-      </Container>
-    </SettingTitle>
-  )
+        {sortedData.map((coverLetter, index) => (
+          <SearchResultBox key={index}>
+            <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
+            <Information2>
+              토익: {coverLetter.english}, 오픽: {coverLetter.opic} / {coverLetter.activity} / 컴퓨터활용능력: {coverLetter.certification} / {coverLetter.major} / 학점 {coverLetter.gpa}
+            </Information2>
+            <Information3>
+              {coverLetter.contents}
+            </Information3>
+          </SearchResultBox>
+        ))}
+      </SearchResultWrap>
+    </PageContainer>
+  );
 }
 
-const SettingTitle = styled.div``;
-
-const Text = styled.p`
+const SearchResultWrap = styled.div`
+margin-top: 64px;
+`;
+const SearchResultVar = styled.div`
+  width: 1198px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #636363;
+`;
+const SearchResultText = styled.p`
   font-family: 'SUITE';
   font-style: normal;
   font-weight: 800;
-  font-size: 20px;
-  line-height: 25px;
-  color: #5B00EF;
-  margin-top: 50px;
-  margin-left: 45px;
-`;
-
-const PassSearch = styled.div`
-  font-family: 'SUITE';
-  font-style: normal;
-  font-weight: 700;
-  font-size: 20px;
+  font-size: 25px;
+  line-height: 31px;
   color: #636363;
-  display: flex;
-  align-items: center; /* 세로 중앙 정렬 */
-  cursor: pointer;
+  flex-grow: 1;
 `;
-
-const PassSearchText = styled.div`
-margin-left: 10px;
+const SearchResultBox = styled.div`
+width: 1185px;
+height: 165px;
+margin-top: 30px;
+border-bottom: 2px solid #E2E2E2;
+padding-bottom: 16px;
 `;
-
-const PassSearchIcon = styled.img`
-
-`;
-
-const Title = styled.div`
-  font-family: SUITE;
-  font-size: 1.5625rem; 
-  font-weight: 600;
-  margin-left: 43px; /* 왼쪽 정렬 */
-  margin-top: 4rem;
-  margin-bottom: 1rem;
-  color: #636363;
-  max-width: 80%; 
-  transition: all 0.3s ease-in-out; 
-
-  @media (max-width: 768px) {
-    font-size: 1.25rem; 
-    margin-top: 2rem; 
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1rem; 
-    margin-top: 1.5rem; 
-  }
-`;
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem;
-  margin-bottom: 3rem;
-
-  @media (max-width: 1024px) {
-    width: 80%; 
-    padding: 4rem; 
-  }
-  
-  @media (max-width: 768px) {
-    width: 90%; 
-    padding: 3rem; 
-  }
-  
-  @media (max-width: 480px) {
-    width: 95%; 
-    padding: 2rem; 
-  }
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  width: 1200px;
-  height: 669px;
-  background: none;
-  border: 3px solid #e2e2e2;
-  border-radius: 0.625rem;
-`;
-
-const SubTitle = styled.div`;
-  text-align: left;
-  margin-left: 43px;
-  margin-bottom: 42px;
-
-  font-family: 'SUITE';
+const Information1 = styled.div`
+font-family: 'SUITE';
 font-style: normal;
-font-weight: 700;
-font-size: 30px;
-line-height: 37px;
+font-weight: 800;
+font-size: 25px;
+line-height: 31px;
+margin-bottom: 12px;
+
+color: #000000;
+`;
+const Information2 = styled.div`
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 600;
+font-size: 20px;
+line-height: 30px;
+/* or 150% */
+margin-bottom: 3px;
 
 color: #636363;
 `;
+const Information3 = styled.div`
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 600;
+font-size: 20px;
+line-height: 30px;
+/* or 150% */
 
-const InputWrap = styled.div`
+color: #A1A1A1;
+`;
+
+const SortButtonsContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 28px; /* 변경된 부분 */
-  font-family: SUITE;
-  font-size: 1rem;
-  font-weight: 700;
 `;
 
-const Label = styled.label`
-  font-family: SUITE;
-  font-size: 1.25rem;
-  font-weight: 700;   
-  min-width: 10rem;
-  margin-left: 43px;
-  color: #000;
-  width: auto;
-  &:after {
-    content: "*";
-    color: #FF0000;
-  }
+const SortButton = styled.button`
+background-color: white;
+  font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 17px;
+line-height: 21px;
+border: none;
+height: 25px;
+
+color: ${({ active }) => (active ? '#000000' : '#A1A1A1')};
 `;
 
-const InputField = styled.input`
-  font-family: SUITE;
-  font-size: 1.25rem;
-  font-weight: 700;
-  width: 30rem;
-  height: 1.5rem;
-  margin-left: 2rem;
-  margin-right: 25px;
-  padding: 1rem 1.5rem;
-  border: 3px solid #e2e2e2;
-  border-radius: 0.625rem;
-  color: #000;
-  &:focus {
-    border-color: #7a42f4;
-  }
+const ButtonImage = styled.img`
+  margin-right: 0.5rem;
 `;
 
-
-const RadioLabel = styled.label`
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    margin-left: 2rem;
-    margin-right: 5rem; // 각 라디오 버튼 사이 간격
-
-    & input {
-        appearance: none; // 기본 스타일 제거
-        -webkit-appearance: none; // Safari를 위한 기본 스타일 제거
-        border: 1rem solid #E2E2E2;
-        border-radius: 50%; // 원형 테두리
-        width: 1em; // 너비
-        height: 1em; // 높이
-        margin-right: 0.4em; // 텍스트와의 간격
-
-    &:checked {
-        background-color: #5B00EF; // 선택 시 보라색으로 채움
-        border: 1rem solid #5B00EF; // 선택 시 보라색 테두리
-        position: relative; // 가상 요소를 위한 포지셔닝 컨텍스트
-      }
-  
-      &:checked::after {
-        content: ''; // 가상 요소에는 내용이 없음
-        position: absolute; // 부모 요소(input) 기준으로 절대 위치
-        top: 50%; // 상위 요소의 정중앙
-        left: 50%; // 상위 요소의 정중앙
-        transform: translate(-50%, -50%); // 정확한 중앙에 위치
-        width: 1rem; // 내부 원의 너비
-        height: 1rem; // 내부 원의 높이
-        border-radius: 50%; // 원형
-        background: #fff; // 내부 원의 배경색은 흰색
-      }
-  }
-  
+const SearchBox = styled.div`
+  width: 74.9375rem;  
+  height: 15.5625rem;
+  background-color: #5B00EF;
+  border-radius: 0.5rem;
+  margin-top: 4.0625rem;
+  margin-bottom: 3.9375rem;
 `;
 
-const RadioInput = ({ className, label, ...props }) => (
-  <RadioLabel className={className}>
-    <input type="radio" {...props} />
-    {label}
-  </RadioLabel>
-);
-
-const Select = styled.select`
-    font-family: SUITE;
-    font-size: 1rem;
-    font-weight: 700;
-    width: 7rem;
-    padding: 1rem 1rem;
-    border: 3px solid #e2e2e2;
-    border-radius: 0.625rem;
-    background-color: white;
-    margin-right: 1rem;
-    margin-left: 2rem;
-`;
-
-const SubmitButton = styled.button`
-  width: 588px;
-  height: 72px;
-  background: #5B00EF;
-  border-radius: 10px;
+const SearchText = styled.p`
   font-family: 'SUITE';
   font-style: normal;
   font-weight: 700;
-  font-size: 20px;
-  line-height: 25px;
-  /* identical to box height */
-  text-align: center;
-  color: #FFFFFF;
-  margin-top: 108px;
+  font-size: 3.125rem;
+  line-height: 3.875rem;
+  color: #E5FF7D;
+  margin-top: 2.4375rem;
+  margin-bottom: 2.1875rem;
+  margin-left: 4.875rem;
+`;
+
+const SearchInput = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 4.875rem;
+`;
+
+const InputField = styled.input`
+  width: 17.625rem;
+  height: 4.5rem;
+  border: 0.1875rem solid #FFFFFF;
+  border-radius: 1rem;
+  background-color: #5B00EF;
+  color: #A1A1A1;
+  font-size: 1.5625rem;
+  margin-right: 1.25rem;
+  padding-left: 1.75rem;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.5625rem;
+  line-height: 2.375rem;
+`;
+
+const SearchButton = styled.button`
+  width: 8.25rem;
+  height: 4.5rem;
+  background-color: #E5FF7D; 
+  border: none;
+  border-radius: 1rem;
+  color: #5B00EF;
+  font-size: 1.25rem;
   cursor: pointer;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.5625rem;
+  line-height: 2.375rem;
+  text-align: center;
+`;
+
+const WritingContainer = styled.div`
+  align-items: center;
+  background-color: #FFF;
+  display: flex;
+  width:74.9375rem;
+  height: 5rem;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+const WritingBox = styled.div`
+  align-items: center;
+  background-color: #E2E2E2;
+  border-radius: 1.3rem;
+  box-sizing: border-box;
+  color: #A1A1A1;
+  display: flex;
+  font-size: 1.5625rem;
+  font-weight: 800;
+  justify-content: left;
+  margin-left: 1.5rem;
+  padding-left: 2.69rem;
+  width: 68.25rem;
+  height: 5rem;
+`;
+
+const PageContainer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
