@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "./AuthContext";
 import fakeNotices from '../data/fakeNotices';
 
 
@@ -12,10 +13,14 @@ const Home = () => {
     const totalPages = Math.ceil(fakeNotices.length / ITEMS_PER_PAGE);
  
     const [currentPage, setCurrentPage] = useState(1);
+    const { isLoggedIn } = useAuth();
 
     const handlePageChange = (path) => {
-      navigate(path);
-      setActivePage(path);
+      if ((path === '/scrap' || path === '/mycareer') && !isLoggedIn) {
+        navigate('/join');
+      } else {
+        navigate(path);
+      }
     };
 
     const indexOfLastNotice = currentPage * ITEMS_PER_PAGE;
