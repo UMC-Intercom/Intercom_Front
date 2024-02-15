@@ -1,25 +1,43 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import config from '../path/config';
 
 const SettingPassword = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(''); // 이메일 상태 추가
   const [confirmPassword, setConfirmPassword] = useState('');
   const [checkPwd1, setCheckPwd1] = useState(false);
   const [checkPwd2, setCheckPwd2] = useState(false);
   const [checkPwd3, setCheckPwd3] = useState(false);
 
-  const handleSubmit = (e) => {
+  // SettingPassword 컴포넌트에서
+const location = useLocation();
+const emailFromPreviousPage = location.state?.email; // 이메일 값 받아오기
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password === confirmPassword) {
-      // 비밀번호 업데이트 로직
-      navigate('/');
-    } else {
-      alert('비밀번호가 일치하지 않습니다.');
-    }
-  };
+        try {
+          const response = await axios.put(`${config.API_URL}/users/reset-password`, {
+            email: emailFromPreviousPage, // 이메일 상태 사용
+            password: password,
+          });
+          // 요청 성공 후 처리
+          alert('비밀번호를 재설정하였습니다');
+          navigate('/'); // 예를 들어, 홈으로 리다이렉션
+        } catch (error) {
+          // 요청 실패 시 처리
+          console.error('비밀번호 재설정 실패:', error);
+          // 에러 처리 로직 (예: 사용자에게 에러 메시지 표시)
+        }
+      } else {
+        alert('비밀번호가 일치하지 않습니다.');
+      }
+    };
 
 //비밀번호 유효성 체크 세개를 위한 함수
 // 1) 소문자포함여부, 글자수는 8~20자   
