@@ -137,46 +137,48 @@ useEffect(() => {
       setTitle(e.target.value);
     }  };
    
+// 제출 및 현직자 인증
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    //제출 및 현직자이증
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-    
-      // 필수 입력값 검증
-      if (!title.trim() || !content.trim()) {
-        alert('제목과 내용을 입력해주세요.');
-        return;
+  // 필수 입력값 검증
+  if (!title.trim() || !content.trim()) {
+    alert('제목과 내용을 입력해주세요.');
+    return;
+  }
+
+  const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+
+  try {
+    await axios.get('http://localhost:8080/talks/check-mentor', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
+      },
+    });
+
+    // 인증된 경우, 글 작성 로직 실행
+    postSubmission();
+  } catch (error) {
+    if (error.response) {
+      const responseData = error.response.data; // 서버 응답 데이터에 접근
+      const { status, error: errorMessage } = responseData; // 응답 데이터에서 status와 error 추출
+
+      if (status === 403 && error === "Forbidden") {
+        // 인증되지 않은 경우, 인증 모달 표시
+        setIsModalOpen(true);
+      } else {
+        // 기타 에러 처리
+        console.error('Error during mentor check:', errorMessage);
+        alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
-    
-      try {
-        await axios.get('http://localhost:8080/talks/check-mentor', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('userToken')}`,
-          },
-        });
-      
-        // 인증된 경우, 글 작성 로직 실행
-        postSubmission();
-      } catch (error) {
-        if (error.response) {
-          const responseData = error.response.data; // 서버 응답 데이터에 접근
-          const { status, error: errorMessage } = responseData; // 응답 데이터에서 status와 error 추출
-      
-          if (status === 403 && errorMessage === "Forbidden") {
-            // 인증되지 않은 경우, 인증 모달 표시
-            setIsModalOpen(true);
-          } else {
-            // 기타 에러 처리
-            console.error('Error during mentor check:', errorMessage);
-            alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
-          }
-        } else {
-          // 응답 오류 객체가 없는 경우의 처리
-          console.error('Error during mentor check:', error);
-          alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
-        }
-      }
-    }      
+    } else {
+      // 응답 오류 객체가 없는 경우의 처리
+      console.error('Error during mentor check:', error);
+      alert('응답오류 객체가 없음');
+    }
+  }
+};
+
 //찐제출
     const postSubmission = async () => {
       // FormData 객체 생성 및 필드 추가
