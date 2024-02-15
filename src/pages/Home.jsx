@@ -228,6 +228,7 @@ const Main = styled.div`
 `;
 
 const MenuBox = styled.div`
+  font-family: SUITE;
   display: flex;
   justify-content: center;
   align-items: center;

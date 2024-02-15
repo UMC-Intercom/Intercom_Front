@@ -1,23 +1,55 @@
 // SettingsPage.jsx
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-
+import axios from 'axios';
+import config from '../path/config';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toggleLogin } = useAuth();
+  const { isLoggedIn } = useAuth();
+  const [username, setUsername] = useState('사용자');
+  const [usernickname, setUsernickname] = useState('닉네임');
 
   const isCurrentPath = (path) => location.pathname === path;
 
-  const handleLogout = () => {
-    toggleLogin();
-    navigate('/');
-  };
-  
+  useEffect(() => {
+    // 로컬 스토리지에서 사용자 이름을 가져와 상태에 저장
+    const storedUsername = localStorage.getItem('userName') || '사용자';
+    setUsername(storedUsername);
+    const storedUsernickname = localStorage.getItem('userNickname') || '닉네임';
+    setUsernickname(storedUsernickname);
+    const storedImageUrl = localStorage.getItem('profileImageUrl') || './assets/MyProfile.png';
+    setProfileImage(storedImageUrl);
+  }, [isLoggedIn]);
+
+
   const [profileImage, setProfileImage] = useState('./assets/MyProfile.png');
+
+  const handleFileUpload = (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    axios.post(`${config.API_URL}/users/default-profile`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 인증 토큰 추가
+      },
+    })
+    .then((response) => {
+      const uploadedImageUrl = response.data; // Adjust according to actual response structure
+      localStorage.setItem('profileImageUrl', uploadedImageUrl);
+      setProfileImage(uploadedImageUrl);
+    })
+    .catch((error) => {
+      // 업로드 실패 시 처리: 사용자에게 에러 메시지 표시
+      alert('이미지 업로드에 실패했습니다.');
+      console.error('업로드 실패:', error);
+    });
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -27,8 +59,28 @@ const SettingsPage = () => {
         setProfileImage(reader.result);
       };
       reader.readAsDataURL(file);
+
+      handleFileUpload(file);
     }
   };
+
+  
+  const handleLogout = () => {
+    // 로컬 스토리지에서 액세스 토큰 삭제
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userNickname');
+    localStorage.removeItem('profileImageUrl');
+    localStorage.setItem('isLoggedIn', 'false'); // 로그인 상태를 false로 설정
+
+    // 로그인 상태 업데이트
+    toggleLogin();
+
+    // 로그인 페이지 또는 홈으로 리다이렉트
+    navigate('/'); // 또는 navigate('/') 등 원하는 경로로 변경하세요.
+  };
+
+  
 
   return (
     <PageContainer>
@@ -66,10 +118,10 @@ const SettingsPage = () => {
           />
           <NameAndNickname>
             <NameContainer onClick={() => navigate('/profile-edit')}>
-              <Name>User 님</Name>
+              <Name>{username} 님</Name>
               <VectorImage src="./assets/Vector2.png" alt="Vector" />
             </NameContainer>
-            <Nickname>닉네임</Nickname>
+            <Nickname>{usernickname}</Nickname>
           </NameAndNickname>
         </ProfileSection>
 

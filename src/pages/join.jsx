@@ -3,6 +3,7 @@ import { useNavigate ,useLocation  } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from './AuthContext';
 import axios from "axios";
+import config from '../path/config';
 
 
 export const PageContainer = styled.div`
@@ -185,7 +186,7 @@ const Join = () => {
     // 형식: axios.post(url, data, config)
     // data는 서버에 보낼 데이터, config는 아래 코드 + 토큰 정보까지 추가해서 보내면 됨
     axios
-        .post("http://localhost:8080/users/login", {  // url
+        .post(`${config.API_URL}/users/login`, {  // url
           email: email,           // data
           password: password
         }, {
@@ -195,10 +196,28 @@ const Join = () => {
           console.log("**data: ", res.data);  // 데이터 출력해보고
 
           // 필요한 정보 로컬스토리지에 저장
+          localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('accessToken', res.data.token);
           localStorage.setItem('userName', res.data.name);
           localStorage.setItem('userNickname', res.data.nickname);
+          // defaultProfile이 null이 아닐 때만 URL을 저장하고, 그렇지 않으면 기본 이미지 경로를 저장
+          // 여기서 프로필 이미지 URL을 가져오는 GET 요청을 추가
+          return axios.get(`${config.API_URL}/users/default-profile`, {
+            headers: { 'Authorization': `Bearer ${res.data.token}` }
+            });
+          // toggleLogin();
 
+          // alert("로그인 성공");
+          // navigate(from, { replace: true });
+        })
+        .then((profileRes) => {
+          // 프로필 이미지 URL을 저장
+          const profileImageUrl = profileRes.data ? profileRes.data : './assets/MyProfile.png';
+          localStorage.setItem('profileImageUrl', profileImageUrl);
+    
+          // 로그인 상태 업데이트
+          toggleLogin();
+    
           alert("로그인 성공");
           navigate(from, { replace: true });
         })

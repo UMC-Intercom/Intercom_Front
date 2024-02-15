@@ -1,19 +1,35 @@
 // SettingsSidebar.jsx
 import React, { useState, useEffect, useRef} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from './AuthContext';
 
 
 const SettingsSidebar = ({ $isVisible, onClose }) => {
+  const [activePage, setActivePage] = useState("/home");
   const sidebarRef = useRef();
   const [hoveredItem, setHoveredItem] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toggleLogin } = useAuth();
+  const { isLoggedIn } = useAuth();
+  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: './assets/MyProfile.png'});
+
 
   const handleLogout = () => {
-    toggleLogin(); // 로그인 상태를 토글하여 로그아웃 처리
-    onClose(); // 사이드바를 닫습니다.
+    // 로컬 스토리지에서 액세스 토큰 삭제
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userNickname');
+    localStorage.removeItem('profileImageUrl');
+    localStorage.setItem('isLoggedIn', 'false'); // 로그인 상태를 false로 설정
+
+    // 로그인 상태 업데이트
+    toggleLogin();
+
+    // 로그인 페이지 또는 홈으로 리다이렉트
+    navigate('/'); // 또는 navigate('/') 등 원하는 경로로 변경하세요.
+    onClose(); // 사이드바 닫기
   };
 
   const handleSettingsClick = () => {
@@ -26,6 +42,49 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
     onClose();
   };
 
+  useEffect(() => {
+    setActivePage(location.pathname);
+
+    // 로컬 스토리지에서 로그인 상태 확인
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (loggedIn !== isLoggedIn) {
+      toggleLogin(); // 로컬 스토리지와 상태를 동기화
+    }
+
+    // 로컬 스토리지에서 사용자 이름을 가져와 상태에 저장
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+      setUserProfile({ name: userName });
+    }
+
+     // 로컬 스토리지에서 프로필 이미지 URL을 가져와 상태에 저장
+     const profileImageUrl = localStorage.getItem('profileImageUrl');
+     if (profileImageUrl) {
+       setUserProfile(prevState => ({
+         ...prevState,
+         profileImageUrl
+       }));
+     }
+
+  }, [location.pathname, isLoggedIn, toggleLogin]);
+
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'profileImageUrl') {
+        setUserProfile(prevState => ({
+          ...prevState,
+          profileImageUrl: e.newValue
+        }));
+      }
+    };
+  
+    window.addEventListener('storage', handleStorageChange);
+  
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
 
   useEffect(() => {
@@ -50,8 +109,8 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
   return (
     <SidebarContainer ref={sidebarRef} $isVisible={$isVisible}>
       <SidebarItem>
-        <ProfileIcon src="./assets/Profile.png" alt="Profile" />
-        <Username>사용자 님</Username>
+        <ProfileIcon src={userProfile.profileImageUrl} alt="Profile" />
+        <Username>{userProfile.name} 님</Username>
         <Line />
       </SidebarItem>
       <MenuItem onMouseEnter={() => setHoveredItem('scraps')}
