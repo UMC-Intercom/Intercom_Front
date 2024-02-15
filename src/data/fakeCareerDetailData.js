@@ -16,7 +16,6 @@ const fakeCareerDetailData = [
     salary: '1억 8000만원',
     job: '모바일 디자인. UX UI 기획',
   },
-  
 ];
   
   export default fakeCareerDetailData;

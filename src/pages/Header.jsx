@@ -10,14 +10,56 @@ import NotificationModal from "./NotificationModal";
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
   const { isLoggedIn, toggleLogin } = useAuth();
-  const [userProfile, setUserProfile] = useState({ name: "사용자"});
+  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: './assets/MyProfile.png'});
   
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     setActivePage(location.pathname);
-  }, [location.pathname]);
+
+    // 로컬 스토리지에서 로그인 상태 확인
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (loggedIn !== isLoggedIn) {
+      toggleLogin(); // 로컬 스토리지와 상태를 동기화
+    }
+
+    // 로컬 스토리지에서 사용자 이름을 가져와 상태에 저장
+    const userName = localStorage.getItem('userName');
+    if (userName) {
+      setUserProfile({ name: userName });
+    }
+
+     // 로컬 스토리지에서 프로필 이미지 URL을 가져와 상태에 저장
+     const profileImageUrl = localStorage.getItem('profileImageUrl');
+     if (profileImageUrl) {
+       setUserProfile(prevState => ({
+         ...prevState,
+         profileImageUrl
+       }));
+     }
+
+  }, [location.pathname, isLoggedIn, toggleLogin]);
+
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'profileImageUrl') {
+        setUserProfile(prevState => ({
+          ...prevState,
+          profileImageUrl: e.newValue
+        }));
+      }
+    };
+  
+    window.addEventListener('storage', handleStorageChange);
+  
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  
 
   const handlePageChange = (path) => {
     navigate(path);
@@ -58,12 +100,11 @@ const Header = () => {
         <Logo src="./assets/Logo.png" alt="IntercomLogo" onClick={() => handlePageChange('/home')}/>
         <PageLists>
           <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
-          <Pages active={activePage === '/saved-notices'} onClick={() => handlePageChange('/saved-notices')}>저장한 공고</Pages>
+          <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>저장한 공고</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
-          <Pages active={activePage === '/my-career'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
+          <Pages active={activePage === '/mycareer'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
           <Pages active={activePage === '/cover-letters'} onClick={() => handlePageChange('/cover-letters')}>합격 자소서</Pages>
           <Pages active={activePage === '/interviews'} onClick={() => handlePageChange('/interviews')}>면접 후기</Pages>
-          <Pages active={activePage === '/news'} onClick={() => handlePageChange('/news')}>취업 뉴스</Pages>
         </PageLists>
         <ButtonBox>
         <SearchButton 
@@ -78,7 +119,7 @@ const Header = () => {
               alt = "Notification Image"/>
               <ProfileBox onClick={toggleSettingsSidebar}>
               <ProfileImage 
-              src="./assets/Profile.png" 
+              src={userProfile.profileImageUrl}
               alt="Profile" />
               <UserName>
                 {userProfile.name} 님

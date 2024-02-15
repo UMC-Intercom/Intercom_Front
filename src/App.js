@@ -29,6 +29,9 @@ import DeactivatePDF from './pages/DeactivatePDF';
 import MyCareer from './pages/MyCareer';
 import WrittenContent from './pages/WrittenContent';
 import Scrap from './pages/Scrap';
+import EditCareer from './pages/EditCareer';
+import FindingPassword from './pages/FindingPassword';
+import SettingPassword from './pages/SettingPassword';
 import PostSuccessPage from './pages/PostSuccessPage';
 
 
@@ -71,6 +74,9 @@ function App() {
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
+          <Route path="/mycareer-edit" element={<EditCareer />} />
+          <Route path="/findingPassword" element={<FindingPassword />} />
+          <Route path="/settingPwd" element={<SettingPassword />} />
           <Route path="/post-success" element={<PostSuccessPage/>} />
           </Routes>
         </AuthProvider>

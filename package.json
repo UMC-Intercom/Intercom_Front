@@ -8,6 +8,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.7",
+    "html2pdf.js": "^0.10.1",
     "date-fns": "^3.3.1",
     "modal": "^1.2.0",
     "query-string": "^8.2.0",
@@ -20,6 +21,7 @@
     "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
     "react-select": "^5.8.0",
+    "stream-http": "^3.2.0",
     "styled-components": "^6.1.8",
     "web-vitals": "^2.1.4"
   },
@@ -29,6 +31,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "proxy": "http://localhost:8080",
   "eslintConfig": {
     "extends": [
       "react-app",
