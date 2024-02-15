@@ -44,12 +44,7 @@ const categories = [
 const handleShowModal = () => {
   setIsModalOpen(true);
 };
-const handleCloseModal = () => {
-  setIsVerified(true); // 현직자 인증을 건너뛸 수 있게 isVerified 상태를 true로 설정
-  setHasDeferredModal(true); // 모달을 다시 띄우지 않도록 처리
-  localStorage.setItem('hasDeferredModal', 'true'); // 상태를 로컬 스토리지에 저장
-  setIsModalOpen(false); // 모달 닫기
-};
+
 useEffect(() => {
   // 컴포넌트가 마운트될 때 로컬 스토리지에서 hasDeferredModal 상태를 불러옴
   const storedHasDeferredModal = localStorage.getItem('hasDeferredModal');
@@ -143,47 +138,87 @@ useEffect(() => {
     }  };
    
 
+    //제출 및 현직자이증
     const handleSubmit = async (e) => {
-      e.preventDefault()
+      e.preventDefault();
+    
       // 필수 입력값 검증
       if (!title.trim() || !content.trim()) {
         alert('제목과 내용을 입력해주세요.');
         return;
       }
     
+      try {
+        await axios.get('http://localhost:8080/talks/check-mentor', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('userToken')}`,
+          },
+        });
+      
+        // 인증된 경우, 글 작성 로직 실행
+        postSubmission();
+      } catch (error) {
+        if (error.response) {
+          const responseData = error.response.data; // 서버 응답 데이터에 접근
+          const { status, error: errorMessage } = responseData; // 응답 데이터에서 status와 error 추출
+      
+          if (status === 403 && errorMessage === "Forbidden") {
+            // 인증되지 않은 경우, 인증 모달 표시
+            setIsModalOpen(true);
+          } else {
+            // 기타 에러 처리
+            console.error('Error during mentor check:', errorMessage);
+            alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
+          }
+        } else {
+          // 응답 오류 객체가 없는 경우의 처리
+          console.error('Error during mentor check:', error);
+          alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+      }
+    }      
+//찐제출
+    const postSubmission = async () => {
       // FormData 객체 생성 및 필드 추가
       const formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
-      formData.append('category', selectedCategories.join(', ')); // 배열을 문자열로 변환하여 추가
-       // 임시저장된 글의 id가 있는 경우에만 id를 FormData에 추가
-      if (tempSavedPostId) {
-       formData.append('id', tempSavedPostId);
-     }
-
-     imageUrls.forEach((url, index) => {
-      const blob = dataURLtoBlob(url); // Data URL을 Blob 객체로 변환
-      const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' }); // Blob을 File 객체로 변환
-      formData.append('images[]', file); // 'images[]'는 서버가 이미지 배열을 받을 수 있도록 하는 필드명입니다. 필요에 따라 변경하세요.
-    });
-     try {
-       const response = await axios.post('http://localhost:8080/talks', formData, {
+      // 이미지 파일 및 기타 필요한 데이터 추가
+      imageUrls.forEach((url, index) => {
+        const blob = dataURLtoBlob(url);
+        const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
+        formData.append('images[]', file);
+      });
+    
+      try {
+        const response = await axios.post('http://localhost:8080/talks', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
-         },
-    });
+          },
+        });
     
-    if (response.status === 200 || response.status === 201) {
-      alert('글이 성공적으로 등록되었습니다.');
-      navigate('/some-success-page'); // 성공 시 리디렉션할 페이지
-    } else {
-      throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
-    }
-  } catch (error) {
-    console.error('글 등록 중 오류 발생:', error);
-    alert('글 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
-  }
-};
+        if (response.status === 200 || response.status === 201) {
+          alert('글이 성공적으로 등록되었습니다.');
+          navigate('/success-page'); // 성공 시 리디렉션할 페이지 경로
+        } else {
+          throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
+        }
+      } catch (error) {
+        console.error('글 등록 중 오류 발생:', error);
+        alert('글 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    };
+
+
+    const handleCloseModal = () => {
+      setIsVerified(true); // 인증을 건너뛰고 글 작성을 계속할 수 있도록 상태 변경
+      setIsModalOpen(false); // 모달 닫기
+      postSubmission(); // 현직자 인증을 건너뛰고 글 작성 로직 실행
+    };
+
+
+
+
     
 // Data URL을 Blob으로 변환하는 함수
 function dataURLtoBlob(dataUrl) {
@@ -192,45 +227,14 @@ function dataURLtoBlob(dataUrl) {
   const bstr = atob(arr[1]);
   let n = bstr.length;
   const u8arr = new Uint8Array(n);
-  
+
   while(n--) {
     u8arr[n] = bstr.charCodeAt(n);
   }
 
-  return new Blob([u8arr], { type: mime });
+  return new Blob([u8arr], {type: mime});
 }
-  
     
-    // 현직자 인증
-    useEffect(() => {
-      // 사용자 인증 여부를 확인하는 함수
-      const checkUserVerification = async () => {
-        try {
-          // 서버 인증 API 엔드포인트로 GET 요청을 보냄
-          const response = await fetch('http://localhost:8080/api/verify', {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('userToken')}`, // 사용자 토큰을 헤더에 포함
-            },
-          });
-    
-          if (response.ok) {
-            const data = await response.json();
-            setIsVerified(data.isVerified); // 서버로부터 받은 인증 여부를 상태에 설정
-          } else {
-            console.error('Failed to verify user');
-            // 인증 확인 실패 처리, 필요한 경우
-          }
-        } catch (error) {
-          console.error('Error checking user verification:', error);
-        }
-      };
-    
-      checkUserVerification();
-    }, []);
-    
-
-
   //카테고리
 
     // 선택된 카테고리들을 저장할 상태 (배열)
