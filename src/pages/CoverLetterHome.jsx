@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import fakeCoverletterData from '../data/fakeSearchCoverLetterData';
+import CoinUseQuestionModal from './CoinUseQuestionModal';
 
 export default function CoverLetterHome() {
   const navigate = useNavigate();
@@ -9,6 +10,25 @@ export default function CoverLetterHome() {
   const [sortByDateActive, setSortByDateActive] = useState(true);
   const [sortByLikesActive, setSortByLikesActive] = useState(false);
   const [sortedData, setSortedData] = useState(fakeCoverletterData);
+  const [searchQuery, setSearchQuery] = useState({
+    company: '',
+    position: ''
+  });
+
+  const [selectedItem, setSelectedItem] = useState(null); // 추가: 모달에 전달할 선택된 항목의 상태
+  const [isModalOpen, setIsModalOpen] = useState(false); // 추가: 모달 열림 여부를 추적하는 상태
+
+  // 추가: 검색 결과를 클릭했을 때 모달 열기
+  const handleResultClick = (item) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  // 추가: 모달 닫기 핸들러
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
 
   const handleSortByDate = () => {
     setSortByDateActive(true);
@@ -24,14 +44,33 @@ export default function CoverLetterHome() {
     setSortedData(sortedByLikes);
   };
 
+  const handleSearchInputChange = (event) => {
+    const { id, value } = event.target;
+    setSearchQuery({ ...searchQuery, [id]: value });
+  };
+
+  const handleSearch = () => {
+    let filteredData = fakeCoverletterData;
+
+    if (searchQuery.company.trim() !== '') {
+      filteredData = filteredData.filter(item => item.company.toLowerCase().includes(searchQuery.company.toLowerCase()));
+    }
+
+    if (searchQuery.position.trim() !== '') {
+      filteredData = filteredData.filter(item => item.department.toLowerCase().includes(searchQuery.position.toLowerCase()));
+    }
+
+    setSortedData(filteredData);
+  };
+
   return (
     <PageContainer>
       <SearchBox>
         <SearchText>합격 자소서 검색하기</SearchText>
         <SearchInput>
-          <InputField type="text" id="company" placeholder="기업명" />
-          <InputField type="text" id="position" placeholder="직무" />
-          <SearchButton>검색</SearchButton>
+          <InputField type="text" id="company" placeholder="기업명" onChange={handleSearchInputChange} />
+          <InputField type="text" id="position" placeholder="직무" onChange={handleSearchInputChange} />
+          <SearchButton onClick={handleSearch}>검색</SearchButton>
         </SearchInput>
       </SearchBox>
 
@@ -43,25 +82,28 @@ export default function CoverLetterHome() {
       </WritingContainer>
 
       <SearchResultWrap>
-        <SearchResultVar>
-          <SearchResultText>
-          검색결과 ({fakeCoverletterData.length})
-          </SearchResultText>
+        {sortedData.length > 0 && (
+          <SearchResultVar>
+            <SearchResultText>
+              검색결과 ({sortedData.length})
+            </SearchResultText>
 
-          <SortButtonsContainer>
-            <SortButton onClick={handleSortByDate} active={sortByDateActive}>
-              <ButtonImage src={sortByDateActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
-              최근 작성순
-            </SortButton>
-            <SortButton onClick={handleSortByLikes} active={sortByLikesActive}>
-              <ButtonImage src={sortByLikesActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
-              스크랩 많은 순
-            </SortButton>
-          </SortButtonsContainer>
-        </SearchResultVar>
+            <SortButtonsContainer>
+              <SortButton onClick={handleSortByDate} active={sortByDateActive}>
+                <ButtonImage src={sortByDateActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+                최근 작성순
+              </SortButton>
+              <SortButton onClick={handleSortByLikes} active={sortByLikesActive}>
+                <ButtonImage src={sortByLikesActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+                스크랩 많은 순
+              </SortButton>
+            </SortButtonsContainer>
+          </SearchResultVar>
+        )}
 
         {sortedData.map((coverLetter, index) => (
-          <SearchResultBox key={index}>
+          // 추가: 각 검색 결과를 클릭했을 때 모달 열리도록 이벤트 핸들러 추가
+          <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
             <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
             <Information2>
               토익: {coverLetter.english}, 오픽: {coverLetter.opic} / {coverLetter.activity} / 컴퓨터활용능력: {coverLetter.certification} / {coverLetter.major} / 학점 {coverLetter.gpa}
@@ -72,6 +114,9 @@ export default function CoverLetterHome() {
           </SearchResultBox>
         ))}
       </SearchResultWrap>
+
+      {/* 추가: 모달 컴포넌트 렌더링 */}
+      <CoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
     </PageContainer>
   );
 }
@@ -202,10 +247,10 @@ const InputField = styled.input`
 `;
 
 const SearchButton = styled.button`
-  width: 8.25rem;
-  height: 4.5rem;
+  width: 132px;
+  height: 78px; /*수정필요*/
   background-color: #E5FF7D; 
-  border: none;
+  border: 0.1875rem solid #E5FF7D;
   border-radius: 1rem;
   color: #5B00EF;
   font-size: 1.25rem;
