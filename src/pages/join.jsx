@@ -200,6 +200,11 @@ const Join = () => {
           localStorage.setItem('accessToken', res.data.token);
           localStorage.setItem('userName', res.data.name);
           localStorage.setItem('userNickname', res.data.nickname);
+          // 면접 후기, 합격 자소서 작성 시 기본 입력값으로 사용
+          localStorage.setItem('userGender', res.data.gender);
+          localStorage.setItem('userBirthday', res.data.birthday);
+          // 톡톡 접속 시 프로필 이미지로 사용
+          localStorage.setItem('userProfile', res.data.defaultProfile);
           // defaultProfile이 null이 아닐 때만 URL을 저장하고, 그렇지 않으면 기본 이미지 경로를 저장
           // 여기서 프로필 이미지 URL을 가져오는 GET 요청을 추가
           return axios.get(`${config.API_URL}/users/default-profile`, {
