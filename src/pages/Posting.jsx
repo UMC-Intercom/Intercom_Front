@@ -70,67 +70,50 @@ useEffect(() => {
   }, [content]);
 
   //이미지
+// 이미지 업로드를 처리하는 함수
+const handleImageUpload = () => {
+  const input = document.createElement('input');
+  input.setAttribute('type', 'file');
+  input.setAttribute('accept', 'image/*');
+  input.click();
+
+  input.onchange = async () => {
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('image', file); // 서버에서 이미지 파일을 참조하는 키
+
+    try {
+      // 서버로 이미지 파일을 업로드하고, 업로드된 이미지의 URL을 받습니다.
+      const response = await axios.post('서버의 이미지 업로드 엔드포인트', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // FormData를 사용할 때 필요한 헤더
+        },
+      });
+      const imageUrl = response.data.imageUrl; // 업로드된 이미지의 URL
+
+      // 에디터에 이미지 삽입
+      const quill = quillRef.current.getEditor();
+      const range = quill.getSelection(true);
+      quill.insertEmbed(range.index, 'image', imageUrl);
+      quill.setSelection(range.index + 1);
+      
+      setImageUrls((prev) => [...prev, imageUrl]);
+
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+    }
+  };
+};
+
   useEffect(() => {
     const quill = quillRef.current;
     if (quill) {
-      quill.getEditor().getModule('toolbar').addHandler('image', () => {
-        handleImageUpload();
-      });
+      const toolbar = quill.getEditor().getModule('toolbar');
+      toolbar.addHandler('image', handleImageUpload);
     }
   }, []);
+  
 
-  const handleImageUpload = (e) => {
-    e.stopPropagation(); 
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
-  
-    input.onchange = async () => {
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-  
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target.result;
-  
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-  
-          const MAX_WIDTH = 400;
-          let width = img.width;
-          let height = img.height;
-  
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-  
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-  
-          const resizedImgDataUrl = canvas.toDataURL('image/jpeg');
-  
-          // 에디터에 이미지 삽입
-          const quill = quillRef.current.getEditor();
-          const range = quill.getSelection(true);
-          quill.insertEmbed(range.index, 'image', resizedImgDataUrl);
-          quill.setSelection(range.index + 1);
-  
-          // 이미지 Data URL을 상태에 저장
-          handleImageUploadSuccess(resizedImgDataUrl);
-        };
-      };
-    };
-  };
-
-  const handleImageUploadSuccess = (dataUrl) => {
-    setImageUrls((prevUrls) => [...prevUrls, dataUrl]);
-  };
-  
   const handleTitleChange = (e) => {
     e.preventDefault();
     if (e.target.value.length <= maxTitleLength) {
@@ -141,38 +124,35 @@ useEffect(() => {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  // 필수 입력값 검증
   if (!title.trim() || !content.trim()) {
     alert('제목과 내용을 입력해주세요.');
     return;
   }
 
-  const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
-
+  const accessToken = localStorage.getItem('accessToken'); 
   try {
     await axios.get('http://localhost:8080/talks/check-mentor', {
       headers: {
-        'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
+        'Authorization': `Bearer ${accessToken}`, 
       },
     });
 
-    // 인증된 경우, 글 작성 로직 실행
+    // 현직자 인증된 경우
     postSubmission();
   } catch (error) {
     if (error.response) {
-      const responseData = error.response.data; // 서버 응답 데이터에 접근
-      const { status, error: errorMessage } = responseData; // 응답 데이터에서 status와 error 추출
-
+      const responseData = error.response.data;
+      const { status, error: errorMessage } = responseData; 
       if (status === 403 && error === "Forbidden") {
-        // 인증되지 않은 경우, 인증 모달 표시
+        // 현직자 인증 되지 않은 경우
         setIsModalOpen(true);
       } else {
-        // 기타 에러 처리
+        // 기타 
+        console.log(error.response);
         console.error('Error during mentor check:', errorMessage);
         alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
-    } else {
-      // 응답 오류 객체가 없는 경우의 처리
+    } else { //응답없을때
       console.error('Error during mentor check:', error);
       alert('응답오류 객체가 없음');
     }
@@ -185,11 +165,13 @@ const handleSubmit = async (e) => {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
+      formData.append('category', categories);
+
       // 이미지 파일 및 기타 필요한 데이터 추가
       imageUrls.forEach((url, index) => {
         const blob = dataURLtoBlob(url);
         const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
-        formData.append('images[]', file);
+        formData.append('images', file);
       });
     
       try {

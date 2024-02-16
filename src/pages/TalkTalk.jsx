@@ -333,29 +333,40 @@ width: 20rem;
 `;
 
 const SearchResultItem = styled.div`
-border-bottom: 1px solid #ddd;
-height: 9.6875rem;
-margin-left: 4.88rem;
-width: 65.25rem;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem; // 내부 여백 추가
+  max-height: 9.6875rem; // 최대 높이 설정
+  margin-left: 4.88rem;
+  width: 65.25rem;
+  overflow: hidden; // 넘치는 내용 숨김
 
-.title {
-  color: #000;
-  font-size: 1.5625rem;
-  font-weight: 800;
-  margin-bottom: 0.56rem;
-}
+  .title {
+    color: #000;
+    font-size: 1.5625rem;
+    font-weight: 800;
+    margin-bottom: 0.56rem;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-.content {
-  color: #A1A1A1;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
+  .content {
+    color: #A1A1A1;
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: -webkit-box; 
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+  }
 
-.response {
-  color: #636363;
-  font-size: 1.0625rem;
-  font-weight: 700;
-}
+  .response {
+    color: #636363;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+  }
 `;
 
 const TalkListContainer = styled.div`
