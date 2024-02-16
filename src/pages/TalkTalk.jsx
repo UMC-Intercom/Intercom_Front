@@ -71,8 +71,8 @@ const Talktalk = () => {
 
 useEffect(() => {
   if (isLoggedIn) {
-      
-     setUserProfile({ imageUrl: '사용자_프로필_이미지_URL'});
+    const profile = localStorage.getItem('userProfile');
+    setUserProfile(profile);
   }
 }, [isLoggedIn]);
 
@@ -179,7 +179,7 @@ const WritingArea = () => {
   if (isLoggedIn) {
     return (
       <WritingContainer onClick={handleGoPosting}>
-        <img src="./assets/TalkTalkUserProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
+        <img src= {userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px' }} />
         <WritingBox>
           질문을 남겨 보세요.
         </WritingBox>
