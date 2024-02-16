@@ -33,6 +33,7 @@ import CoverLetterInput from './pages/CoverLetterInput';
 import CoverLetterInput2 from './pages/CoverLetterInput2';
 import CoverLetterHome from './pages/CoverLetterHome';
 import CoverLetterInput3 from './pages/CoverLetterInput3';
+import CoverLetterResult from './pages/CoverLetterResult';
 
 function App() {
   return (
@@ -78,6 +79,7 @@ function App() {
           <Route path="/cover-letters-home" element={<CoverLetterHome />} />
           <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />
           <Route path="/cover-letters-input3" element={<CoverLetterInput3 />} />
+          <Route path="/cover-letters-result" element={<CoverLetterResult />} />
           </Routes>
         </AuthProvider>
       </div>

@@ -2,19 +2,19 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const CoinUseModal = ({ isOpen}) => {
-    const navigate = useNavigate();
-    const navigateToCoverLetterResult = () => navigate('/cover-letters-result');
+const PostModal = ({ isOpen, onClose}) => {
+  const navigate = useNavigate();
+  const navigateCoverLetterHome = () => navigate('/cover-letters-home');
     return (
         <>
             {isOpen && (
                 <ModalOverlay>
                     <ModalContainer>
                         <ModalContent>
-                            <ModalText>10코인을 사용했어요</ModalText>
-                            <Coin>잔여코인 n개</Coin> 
+                            <ModalText>+30 코인</ModalText>
+                            <Coin>합격 자소서를 작성하고 30코인을 받았어요!</Coin> 
                             <ModalButtons>
-                                <CancelButton onClick={navigateToCoverLetterResult}>확인</CancelButton>
+                                <CancelButton onClick={navigateCoverLetterHome}>확인</CancelButton>
                             </ModalButtons>
                         </ModalContent>
                     </ModalContainer>
@@ -30,7 +30,7 @@ const ModalOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0); /* 배경색 투명하게 설정 */
+  background-color: rgba(0, 0, 0, 0); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -49,6 +49,7 @@ const ModalContainer = styled.div`
 `;
 
 const ModalContent = styled.div`
+  padding: 20px;
   text-align: center;
 `;
 
@@ -74,7 +75,7 @@ line-height: 38px;
 text-align: center;
 
 color: #636363;
-margin-bottom:55px;
+margin-bottom:138px;
 `;
 
 const Button = styled.button`
@@ -108,4 +109,4 @@ const CancelButton = styled(Button)`
 `;
 
 
-export default CoinUseModal;
+export default PostModal;

@@ -149,25 +149,15 @@ const PassSearchIcon = styled.img`
 `;
 
 const Title = styled.div`
-    font-family: SUITE;
-    font-size: 1.5625rem;
-    font-weight: 600;
-    margin-left: 43px; /* 왼쪽 정렬 */
-    margin-top: 4rem;
-    margin-bottom: 1rem;
-    color: #636363;
-    max-width: 80%;
-    transition: all 0.3s ease-in-out;
-
-    @media (max-width: 768px) {
-        font-size: 1.25rem;
-        margin-top: 2rem;
-    }
-
-    @media (max-width: 480px) {
-        font-size: 1rem;
-        margin-top: 1.5rem;
-    }
+font-family: SUITE;
+font-size: 1.5625rem;
+font-weight: 600;
+margin-top: 4rem;
+margin-bottom: 1rem;
+color: #636363;
+transition: all 0.3s ease-in-out;
+width: 1200px;
+text-align: left;
 `;
 
 const Container = styled.div`

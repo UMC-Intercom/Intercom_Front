@@ -1,44 +1,53 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import PostQuestionModal from './PostQuestionModal';
 
 export default function CoverLetterInput3() {
-
   const [questionNumber, setQuestionNumber] = useState(1); // 문항 번호 상태
+  const [postModalOpen, setPostModalOpen] = useState(false); // PostQuestionModal 열림 상태
 
   const addQuestion = () => {
     setQuestionNumber(prevNumber => prevNumber + 1); // 문항 번호 업데이트
   };
 
+  const handleConfirm = () => {
+    setPostModalOpen(true); // PostQuestionModal 열기
+  };
+
+  const handleClose = () => {
+    setPostModalOpen(false); // PostQuestionModal 닫기
+  };
+
   return (
     <SettingTitle>
       <Container>
-      <Title>합격 자소서 입력하기</Title>
+        <Title>합격 자소서 입력하기</Title>
         <Form>
-        <Text>Step 3</Text>
-        <SubtitleWrap>
-          <SubTitle>자소서 문항과 답변을 입력해주세요</SubTitle>
-          <AddContentWrap onClick={addQuestion}>
-            문항 추가하기
-            <PlusImage src='./assets/plus.png' />
-          </AddContentWrap>
+          <Text>Step 3</Text>
+          <SubtitleWrap>
+            <SubTitle>자소서 문항과 답변을 입력해주세요</SubTitle>
+            <AddContentWrap onClick={addQuestion}>
+              문항 추가하기
+              <PlusImage src='./assets/plus.png' />
+            </AddContentWrap>
           </SubtitleWrap>
 
           {[...Array(questionNumber)].map((_, index) => (
-        <QuestionWrap>
-          <QuestionBox>
-            <QuestionNumber>
-              문항{index + 1}
-            </QuestionNumber>
-            <Question type='text' placeholder='내용을 입력해주세요' />
-            <Detail type='text' placeholder='답변을 입력해주세요' />
-          </QuestionBox>
-        </QuestionWrap>
-        ))}
+            <QuestionWrap key={index}>
+              <QuestionBox>
+                <QuestionNumber>
+                  문항{index + 1}
+                </QuestionNumber>
+                <Question type='text' placeholder='내용을 입력해주세요' />
+                <Detail type='text' placeholder='답변을 입력해주세요' />
+              </QuestionBox>
+            </QuestionWrap>
+          ))}
 
         </Form>
-        <SubmitButton type="submit">등록하기</SubmitButton>
+        <SubmitButton type="button" onClick={handleConfirm}>등록하기</SubmitButton>
       </Container>
+      <PostQuestionModal isOpen={postModalOpen} onClose={handleClose} />
     </SettingTitle>
   )
 }
@@ -183,25 +192,15 @@ margin-right: 49.59px;
 
 
 const Title = styled.div`
-  font-family: SUITE;
-  font-size: 1.5625rem; 
-  font-weight: 600;
-  margin-left: 43px; /* 왼쪽 정렬 */
-  margin-top: 4rem;
-  margin-bottom: 1rem;
-  color: #636363;
-  max-width: 80%; 
-  transition: all 0.3s ease-in-out; 
-
-  @media (max-width: 768px) {
-    font-size: 1.25rem; 
-    margin-top: 2rem; 
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1rem; 
-    margin-top: 1.5rem; 
-  }
+font-family: SUITE;
+font-size: 1.5625rem;
+font-weight: 600;
+margin-top: 4rem;
+margin-bottom: 1rem;
+color: #636363;
+transition: all 0.3s ease-in-out;
+width: 1200px;
+text-align: left;
 `;
 
 const Container = styled.div`

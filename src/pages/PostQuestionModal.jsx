@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import CoinUseModal from './CoinUseModal';
+import PostModal from './PostModal';
 
-const CoinUseQuestionModal = ({ isOpen, onClose }) => {
-    const [coinUseModalOpen, setCoinUseModalOpen] = useState(false);
+const PostQuestionModal = ({ isOpen, onClose }) => {
+    const [postModalOpen, setPostModalOpen] = useState(false);
 
     const handleConfirm = () => {
-        setCoinUseModalOpen(true);
+        setPostModalOpen(true);
     };
 
     const handleClose = () => {
         onClose();
-        setCoinUseModalOpen(false);
+        setPostModalOpen(false);
     };
 
     return (
@@ -21,23 +21,21 @@ const CoinUseQuestionModal = ({ isOpen, onClose }) => {
                     <ModalOverlay>
                         <ModalContainer>
                             <ModalContent>
-                                <ModalText>10코인을 사용하여<br/>글을 열람 할까요?</ModalText>
+                                <ModalText>글을 등록할까요?</ModalText>
+                                <Coin>합격 자소서와 면접후기는 등록 후 수정이 어려워요</Coin> 
                                 <ModalButtons>
-                                    <CancelButton onClick={onClose}>취소</CancelButton>
-                                    <ConfirmButton onClick={handleConfirm}>사용하기</ConfirmButton>
+                                    <CancelButton onClick={onClose}>돌아가기</CancelButton>
+                                    <ConfirmButton onClick={handleConfirm}>등록하기</ConfirmButton>
                                 </ModalButtons>
                             </ModalContent>
                         </ModalContainer>
                     </ModalOverlay>
-                    <CoinUseModal isOpen={coinUseModalOpen} onClose={handleClose} />
+                    <PostModal isOpen={postModalOpen} onClose={handleClose} />
                 </>
             )}
         </>
     );
 };
-
-// 나머지 코드는 동일합니다.
-
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -45,7 +43,7 @@ const ModalOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0); /* 배경색 투명하게 설정 */
+  background-color: rgba(0, 0, 0, 0.5); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -54,13 +52,13 @@ const ModalOverlay = styled.div`
 const ModalContainer = styled.div`
   width: 834px;
   height: 581px;
+  border: 1px solid #A1A1A1;
   background-color: white;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 1px solid #A1A1A1;
 `;
 
 const ModalContent = styled.div`
@@ -77,7 +75,20 @@ line-height: 62px;
 text-align: center;
 
 color: #000000;
-margin-bottom:135px;
+margin-bottom: 21px;
+`;
+
+const Coin = styled.p`
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 600;
+font-size: 25px;
+line-height: 38px;
+/* identical to box height, or 150% */
+text-align: center;
+
+color: #636363;
+margin-bottom: 138px;
 `;
 
 const Button = styled.button`
@@ -126,4 +137,4 @@ const ConfirmButton = styled(Button)`
 `;
 
 
-export default CoinUseQuestionModal;
+export default PostQuestionModal;

@@ -126,22 +126,12 @@ const Title = styled.div`
   font-family: SUITE;
   font-size: 1.5625rem;
   font-weight: 600;
-  margin-left: 43px; /* 왼쪽 정렬 */
   margin-top: 4rem;
   margin-bottom: 1rem;
   color: #636363;
-  max-width: 80%;
   transition: all 0.3s ease-in-out;
-
-  @media (max-width: 768px) {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1rem;
-    margin-top: 1.5rem;
-  }
+  width: 1200px;
+  text-align: left;
 `;
 
 const Container = styled.div`
@@ -239,6 +229,16 @@ const RadioLabel = styled.label`
   margin-left: 2rem;
   margin-right: 5rem; // 각 라디오 버튼 사이 간격
 
+  /* B2 */
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 25px;
+/* identical to box height */
+
+color: #636363;
+
   & input {
     appearance: none; // 기본 스타일 제거
     -webkit-appearance: none; // Safari를 위한 기본 스타일 제거
@@ -286,6 +286,16 @@ const Select = styled.select`
   background-color: white;
   margin-right: 1rem;
   margin-left: 2rem;
+
+  /* B2 */
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 25px;
+/* identical to box height */
+
+color: #636363;
 `;
 
 const SubmitButton = styled.button`
