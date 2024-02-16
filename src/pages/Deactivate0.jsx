@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import fakeUserData from '../data/fakeUserData'; // fakeUserData의 경로를 확인해주세요.
+import axios from 'axios';
 
 const Deactivate0 = () => {
   const navigate = useNavigate();
@@ -10,9 +10,7 @@ const Deactivate0 = () => {
   const [passwordShown, setPasswordShown] = useState(false);
 
   const handlePasswordChange = (e) => {
-    const inputPassword = e.target.value;
-    setPassword(inputPassword);
-    setIsPasswordCorrect(inputPassword === fakeUserData.newPassword);
+    setPassword(e.target.value);
   };
 
 
@@ -20,11 +18,29 @@ const Deactivate0 = () => {
     setPasswordShown(!passwordShown);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isPasswordCorrect) {
-      navigate('/deactivate-account1'); // 비밀번호가 맞으면 다음 페이지로 이동합니다.
-    } else {
+
+     // 인증 토큰을 로컬 스토리지에서 가져옵니다.
+    const token = localStorage.getItem('accessToken');
+
+    try {
+      // 비밀번호 인증 요청 보내기
+      await axios.post('/users/withdraw/validate', {
+        password: password,
+      }, {
+        headers: {
+          // 요청 헤더에 인증 토큰 포함
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // 비밀번호 인증 성공
+      setIsPasswordCorrect(true);
+      navigate('/deactivate-account1'); // 비밀번호가 맞으면 다음 페이지로 이동
+    } catch (error) {
+      // 비밀번호 인증 실패
+      setIsPasswordCorrect(false);
       alert('비밀번호가 일치하지 않습니다.');
     }
   };
@@ -43,7 +59,7 @@ const Deactivate0 = () => {
         />
         <EyeIcon src="./assets/Eyeicon.png" onClick={togglePasswordVisibility} />
         </InputWrapper>
-        <NextButton type="submit" disabled={!isPasswordCorrect}>다음</NextButton>
+        <NextButton type="submit" disabled={!password}>다음</NextButton>
       </Form>
       
     </DeactivateContainer>
