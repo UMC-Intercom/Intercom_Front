@@ -95,7 +95,7 @@ const navigate = useNavigate();
             지금 인증할까요?</p>
         </ModalHeader>
         <ButtonWrapper>
-          <CloseButton onClick={onClose}>나중에 하기</CloseButton> // onClose 함수 호출
+          <CloseButton onClick={onClose}>나중에 하기</CloseButton>   {/*onClose 함수 호출*/}
           <NextButton onClick={handleNext}>인증하기</NextButton>
         </ButtonWrapper>
         </ModalContent>
