@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import ReactQuill, { Quill } from 'react-quill'; //npm install react-quill 필수
 import 'react-quill/dist/quill.snow.css'; // Quill 에디터의 스타일시트
 import { useNavigate } from 'react-router-dom';
+import CurrentEmployCheckingModal from './CurrentEmployCheckingModal';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const categories = [
   { id: 1, name: '영업/고객상담' },
@@ -27,6 +30,29 @@ const categories = [
   const maxContentLength = 500;
   const quillRef = useRef(null);
   const [posts, setPosts] = useState([]); // 글 목록 상태 추가
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVerified, setIsVerified] = useState(false); // 현직자 인증 상태
+  const [hasDeferredModal, setHasDeferredModal] = useState(false);
+  const [imageUrls, setImageUrls] = useState([]);
+  const [tempSavedPostId, setTempSavedPostId] = useState(null);
+
+
+
+
+
+//현직자인증모달띄우기
+const handleShowModal = () => {
+  setIsModalOpen(true);
+};
+
+useEffect(() => {
+  // 컴포넌트가 마운트될 때 로컬 스토리지에서 hasDeferredModal 상태를 불러옴
+  const storedHasDeferredModal = localStorage.getItem('hasDeferredModal');
+  if (storedHasDeferredModal) {
+    setHasDeferredModal(storedHasDeferredModal === 'true');
+  }
+}, []);
+
 
   const handleGoBack = () => {
     navigate(-1); // 뒤로가기 기능 실행
@@ -52,7 +78,9 @@ const categories = [
       });
     }
   }, []);
-  const handleImageUpload = () => {
+
+  const handleImageUpload = (e) => {
+    e.stopPropagation(); 
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
@@ -71,7 +99,6 @@ const categories = [
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
   
-          // 이미지 사이즈 조정 로직
           const MAX_WIDTH = 400;
           let width = img.width;
           let height = img.height;
@@ -87,74 +114,248 @@ const categories = [
   
           const resizedImgDataUrl = canvas.toDataURL('image/jpeg');
   
-          // 조정된 이미지를 Quill 에디터에 삽입
+          // 에디터에 이미지 삽입
           const quill = quillRef.current.getEditor();
           const range = quill.getSelection(true);
           quill.insertEmbed(range.index, 'image', resizedImgDataUrl);
           quill.setSelection(range.index + 1);
+  
+          // 이미지 Data URL을 상태에 저장
+          handleImageUploadSuccess(resizedImgDataUrl);
         };
       };
     };
   };
+
+  const handleImageUploadSuccess = (dataUrl) => {
+    setImageUrls((prevUrls) => [...prevUrls, dataUrl]);
+  };
   
   const handleTitleChange = (e) => {
+    e.preventDefault();
     if (e.target.value.length <= maxTitleLength) {
       setTitle(e.target.value);
     }  };
-   
 
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newPost = { title, content, categories: selectedCategories };
-    setPosts([...posts, newPost]); // 글 목록 상태 업데이트
-    // 나머지 로직...
-  };
+   const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
 
+// 제출 및 현직자 인증
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // 필수 입력값 검증
+  if (!title.trim() || !content.trim()) {
+    alert('제목과 내용을 입력해주세요.');
+    return;
+  }
+
+  try {
+    const response = await axios.get('http://localhost:8080/talks/check-mentor', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
+      },
+    });
+
+    const field = response.data;  // 현직자의 경우 분야 반환
+    console.log("** res: ", field)
+
+
+    if (field !== "") {
+      // 인증된 경우, 글 작성 로직 실행
+      postSubmission();
+    }
+    else {
+      // 인증 안 된 경우 현직자 인증 모달 표시
+      setIsModalOpen(true);
+    }
+  } catch (error) {
+    if (error.response) {
+      const responseData = error.response.data; // 서버 응답 데이터에 접근
+      const { status, error: errorMessage } = responseData; // 응답 데이터에서 status와 error 추출
+
+      console.error('Error during mentor check:', errorMessage);
+      alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
+
+      // if (status === 403 && error === "Forbidden") {
+      //   // 인증되지 않은 경우, 인증 모달 표시
+      //   setIsModalOpen(true);
+      // } else {
+      //   // 기타 에러 처리
+      //   console.error('Error during mentor check:', errorMessage);
+      //   alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      // }
+    } else {
+      // 응답 오류 객체가 없는 경우의 처리
+      console.error('Error during mentor check:', error);
+      alert('응답오류 객체가 없음');
+    }
+  }
+};
+
+//찐제출
+    const postSubmission = async () => {
+      // FormData 객체 생성 및 필드 추가
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      // 이미지 파일 및 기타 필요한 데이터 추가
+      imageUrls.forEach((url, index) => {
+        const blob = dataURLtoBlob(url);
+        const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
+        formData.append('images[]', file);
+      });
+
+      try {
+        const response = await axios.post('http://localhost:8080/talks', formData, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+    
+        if (response.status === 200 || response.status === 201) {
+          alert('글이 성공적으로 등록되었습니다.');
+          navigate('/success-page'); // 성공 시 리디렉션할 페이지 경로
+        } else {
+          throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
+        }
+      } catch (error) {
+        console.error('글 등록 중 오류 발생:', error);
+        alert('글 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    };
+
+
+    const handleCloseModal = () => {
+      setIsVerified(true); // 인증을 건너뛰고 글 작성을 계속할 수 있도록 상태 변경
+      setIsModalOpen(false); // 모달 닫기
+      postSubmission(); // 현직자 인증을 건너뛰고 글 작성 로직 실행
+    };
+
+
+
+
+    
+// Data URL을 Blob으로 변환하는 함수
+function dataURLtoBlob(dataUrl) {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while(n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new Blob([u8arr], {type: mime});
+}
+    
   //카테고리
 
     // 선택된 카테고리들을 저장할 상태 (배열)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState([]);
-  
+    const [selectedCategoryNames, setSelectedCategoryNames] = useState([]);   
+   
     const handleDropdownToggle = () => {
       setIsDropdownOpen(!isDropdownOpen);
     };
   
-    const handleCategoryChange = (categoryId) => {
-      setSelectedCategories((prev) =>
-        prev.includes(categoryId)
-          ? prev.filter((id) => id !== categoryId)
-          : [...prev, categoryId]
-      );
+     // 카테고리 선택 핸들러
+     const handleCategoryChange = (categoryId) => {
+      setSelectedCategories((prevSelectedCategories) => {
+        const isSelected = prevSelectedCategories.includes(categoryId);
+        if (isSelected) {
+          // 카테고리 선택 해제 시, 해당 카테고리 ID 및 이름 제거
+          const updatedCategories = prevSelectedCategories.filter(id => id !== categoryId);
+          const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
+          setSelectedCategoryNames(updatedCategoryNames);
+          return updatedCategories;
+        } else {
+          // 카테고리 선택 시, 해당 카테고리 ID 추가 및 이름 업데이트
+          const updatedCategories = [...prevSelectedCategories, categoryId];
+          const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
+          setSelectedCategoryNames(updatedCategoryNames);
+          return updatedCategories;
+        }
+      });
     };
 
-    const handleSave = () => {
-      const temporaryData = { title, content };
-      localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
+   // 선택된 카테고리 이름을 표시하는 문자열 생성
+    let selectedCategoriesHeader = '카테고리 선택';
+    if (selectedCategoryNames.length > 0) {
+    if (selectedCategoryNames.length <= 2) {
+      // 2개 이하 선택 시 모든 카테고리 이름 나열
+      selectedCategoriesHeader = selectedCategoryNames.join(', ');
+    } else {
+      // 3개 이상 선택 시 첫 2개 나열 후 나머지는 "외 N개"로 표시
+      selectedCategoriesHeader = `${selectedCategoryNames.slice(0, 2).join(', ')} 외 ${selectedCategoryNames.length - 2}개`;
+    }
+  }
+  const [showTempSaveAlert, setShowTempSaveAlert] = useState(false);
+
+  const handleSave = () => {
+    const temporaryData = { title, content };
+    localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
+    setShowTempSaveAlert(true); // 사용자가 임시저장을 요청했음을 나타냄
+  };
+  
+  useEffect(() => {
+    if (showTempSaveAlert) {
       alert("임시저장 되었습니다.");
-    };
+      setShowTempSaveAlert(false); // 알림을 표시한 후 다시 false로 설정
+    }
+  }, [showTempSaveAlert]);
+  
   
     const handleCancel = () => {
       localStorage.removeItem(TEMP_DATA_KEY);
       alert("작성이 취소되고 글이 삭제되었습니다.");
       navigate(-1);  
     };
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      const fromTalkTalk = params.get('from') === 'talktalk';
-    
-      if (fromTalkTalk) {
-        const savedData = localStorage.getItem(TEMP_DATA_KEY);
-        if (savedData) {
-          const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
-          if (shouldLoadData) {
-            const { title: savedTitle, content: savedContent } = JSON.parse(savedData);
-            setTitle(savedTitle);
-            setContent(savedContent);
-          }
+//임시저장 불러오면서 아이디 같이 넘겨주야댐
+
+const location = useLocation();
+
+useEffect(() => {
+  // 포스트 작성 페이지의 경로가 '/post-create'라고 가정합니다.
+  if (location.pathname === '/posting') {
+    const params = new URLSearchParams(window.location.search);
+    const fromTalkTalk = params.get('from') === 'talktalk';
+
+    if (fromTalkTalk) {
+      const savedData = localStorage.getItem(TEMP_DATA_KEY);
+      if (savedData) {
+        const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
+        if (shouldLoadData) {
+          const { id: tempSavedPostId, title: savedTitle, content: savedContent } = JSON.parse(savedData);
+          setTempSavedPostId(tempSavedPostId);
+          setTitle(savedTitle);
+          setContent(savedContent);
         }
       }
-    }, []);
+    }
+  }
+}, [location.pathname]);
+
+/*  const TEMP_DATA_KEY = "temporaryData";
+
+  useEffect(() => {
+    // 글쓰기 페이지로 이동하는 경우에만 실행
+    if (location.pathname === '/post-create') {
+      const savedData = localStorage.getItem(TEMP_DATA_KEY);
+      if (savedData) {
+        // 임시 저장된 글이 있는 경우, 사용자에게 확인 메시지 표시
+        const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
+        if (shouldLoadData) {
+          // 사용자가 '예'를 선택한 경우, 글쓰기 페이지로 이동하고 임시 저장된 데이터를 불러옵니다.
+          navigate('/post-create', { state: { savedData: JSON.parse(savedData) } });
+        }
+      }
+    }
+  }, [location, navigate]);
+ */
     
     
   return (
@@ -180,7 +381,7 @@ const categories = [
                value={content}
                onChange={setContent}
             />
-<ImageButton onClick={handleImageUpload}>
+<ImageButton  type="button" onClick={handleImageUpload}> {/*폼안에있으므로 버튼형식 확실히 해야 인식 잘댐 */}
   <img src="./assets/Group26.png" alt="이미지 아이콘" /> 
   이미지 첨부하기
 </ImageButton>
@@ -190,7 +391,7 @@ const categories = [
 
       <DropdownContainer>
         <DropdownHeader onClick={handleDropdownToggle}>
-          카테고리 선택
+        {selectedCategoriesHeader}
           <DropdownIndicator isOpen={isDropdownOpen}></DropdownIndicator>
         </DropdownHeader>
         {isDropdownOpen && (
@@ -209,13 +410,20 @@ const categories = [
       </DropdownContainer>
         </ContentContainer>
         <SaveCancelButtonContainer>
-        <Button onClick={handleCancel}>작성 취소</Button>
-        <Button onClick={handleSave}>임시저장</Button>
+        <Button  type="button" onClick={handleCancel}>작성 취소</Button>
+        <Button  type="button" onClick={handleSave}>임시저장</Button>
         </SaveCancelButtonContainer>
         <ButtonContainer>
           <SubmitButton type="submit">질문 등록</SubmitButton>
         </ButtonContainer>
       </Form>
+      {isModalOpen && (
+  <CurrentEmployCheckingModal
+    isOpen={isModalOpen}
+    onClose={handleCloseModal} // "나중에 하기" 버튼 클릭 시 호출될 함수
+  />
+)}
+
     </PageContainer>
   );
 };

@@ -32,6 +32,7 @@ import Scrap from './pages/Scrap';
 import EditCareer from './pages/EditCareer';
 import FindingPassword from './pages/FindingPassword';
 import SettingPassword from './pages/SettingPassword';
+import PostSuccessPage from './pages/PostSuccessPage';
 
 
 function App() {
@@ -44,7 +45,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
           <Route path="/talktalk" element={<TalkTalk />} />
-          <Route path="/post/:postId" element={<PostPage />} />
+          <Route path="/talks/:postId" element={<PostPage />} />
           <Route path ="/posting" element={<Posting/>} />  
           <Route path="/search-results" element={<SearchResults />} />
           <Route path="/signup" element={<SignUp />} /> 
@@ -76,6 +77,7 @@ function App() {
           <Route path="/mycareer-edit" element={<EditCareer />} />
           <Route path="/findingPassword" element={<FindingPassword />} />
           <Route path="/settingPwd" element={<SettingPassword />} />
+          <Route path="/post-success" element={<PostSuccessPage/>} />
           </Routes>
         </AuthProvider>
       </div>
