@@ -6,12 +6,30 @@ import Comment from './Comment'; // Comment 컴포넌트를 임포트합니다.
 const TalkComment = ({ postId }) => {
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState('');
+  const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
 
   // 댓글 목록을 서버에서 조회하는 함수를 useEffect 밖으로 이동
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/posts/${postId}/comments`);
-      setComments(response.data); // 서버로부터 받은 댓글 목록으로 상태 업데이트
+      const response = await axios.get(`http://localhost:8080/comments/talk/${postId}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      const commentsWithReplies = response.data.reduce((acc, comment) => {
+        if (comment.parentId === null) {
+          return [...acc, { ...comment, replies: [] }];
+        } else {
+          const parentIndex = acc.findIndex((c) => c.id === comment.parentId);
+          acc[parentIndex].replies.push(comment);
+          return acc;
+        }
+      }, []);
+
+      setComments(commentsWithReplies);
+
+      ///setComments(response.data); // 서버로부터 받은 댓글 목록으로 상태 업데이트
     } catch (error) {
       console.error('댓글을 불러오는 데 실패했습니다.', error);
     }
@@ -28,12 +46,17 @@ const TalkComment = ({ postId }) => {
   const submitComment = async () => {
     if (commentInput.trim() !== '') {
       try {
-        await axios.post(`http://localhost:8080/posts/${postId}/comments`, {
+        await axios.post(`http://localhost:8080/comments`, {
+          talkId : postId,
           content: commentInput,
-          // 여기에 추가적인 데이터를 포함할 수 있습니다.
+        }, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
         });
 
         setCommentInput(''); // 입력 필드 초기화
+        alert('댓글이 등록되었습니다.');
         fetchComments(); // 댓글 목록 새로고침
       } catch (error) {
         console.error('댓글 등록에 실패했습니다.', error);
@@ -53,8 +76,13 @@ const TalkComment = ({ postId }) => {
         <SubmitButton onClick={submitComment}>등록하기</SubmitButton>
       </CommentInputContainer>
       <CommentsContainer>
-        {comments.map((comment, index) => (
-          <Comment key={index} comment={comment} />
+        {comments.map((comment) => (
+            <React.Fragment key={comment.id}>
+              <Comment comment={comment} postId={postId} fetchComments={fetchComments} />
+              {comment.replies.map((reply) => (
+                  <Comment key={reply.id} comment={reply} postId={postId} />
+              ))}
+            </React.Fragment>
         ))}
       </CommentsContainer>
     </CommentSectionContainer>
@@ -106,4 +134,6 @@ height: 45px;
 `;
 
 const CommentsContainer = styled.div`
+  padding-left: 150px;
+  width: 900px;
 `;

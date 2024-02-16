@@ -139,8 +139,6 @@ const handleSubmit = async (e) => {
     });
 
     const field = response.data;  // 현직자의 경우 분야 반환
-    console.log("** res: ", field)
-
 
     if (field !== "") {
       // 인증된 경우, 글 작성 로직 실행
@@ -402,7 +400,7 @@ useEffect(() => {
         </ButtonContainer>
       </Form>
       {isModalOpen && (
-  <CurrentEmployCheckingModal
+  <isModalOpen
     isOpen={isModalOpen}
     onClose={handleCloseModal} // "나중에 하기" 버튼 클릭 시 호출될 함수
   />

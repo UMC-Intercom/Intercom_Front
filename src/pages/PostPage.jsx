@@ -49,7 +49,7 @@ const PostPage = () => {
                     <EditImage src="../assets/Group73.png" alt="Profile"/>
               </EditButton>}
                 </TitleWrapper>
-                <Content>{post.content}</Content>
+                <Content dangerouslySetInnerHTML={{ __html: post.content }} />
                 <PostingInfoContainer>
                 <ProfileImage src={post.imageUrls && post.imageUrls.length > 0 ? post.imageUrls[0] : defaultProfileImg} alt="Profile" />
                     <User>{post.writer}</User>
@@ -59,7 +59,7 @@ const PostPage = () => {
                 {renderedCategories}
                 </Categories>
                             </PostContainer>
-            <TalkComment />
+            <TalkComment postId={post.id}/>
         </PageContainer>
     );
 };
