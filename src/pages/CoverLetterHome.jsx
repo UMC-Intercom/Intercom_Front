@@ -15,16 +15,14 @@ export default function CoverLetterHome() {
     position: ''
   });
 
-  const [selectedItem, setSelectedItem] = useState(null); // 추가: 모달에 전달할 선택된 항목의 상태
-  const [isModalOpen, setIsModalOpen] = useState(false); // 추가: 모달 열림 여부를 추적하는 상태
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 추가: 검색 결과를 클릭했을 때 모달 열기
   const handleResultClick = (item) => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
 
-  // 추가: 모달 닫기 핸들러
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -102,104 +100,34 @@ export default function CoverLetterHome() {
         )}
 
         {sortedData.map((coverLetter, index) => (
-          // 추가: 각 검색 결과를 클릭했을 때 모달 열리도록 이벤트 핸들러 추가
           <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
-            <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
-            <Information2>
-              토익: {coverLetter.english}, 오픽: {coverLetter.opic} / {coverLetter.activity} / 컴퓨터활용능력: {coverLetter.certification} / {coverLetter.major} / 학점 {coverLetter.gpa}
-            </Information2>
-            <Information3>
-              {coverLetter.contents}
-            </Information3>
+            <InformationContainer>
+              <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
+              <Information2>
+                토익: {coverLetter.english}, 오픽: {coverLetter.opic} / {coverLetter.activity} / 컴퓨터활용능력: {coverLetter.certification} / {coverLetter.major} / 학점 {coverLetter.gpa}
+              </Information2>
+              <Information3>
+                {coverLetter.contents}
+              </Information3>
+            </InformationContainer>
+            <ScrapIconWrap>
+              <ScrapIcon src="./assets/scrap.png" />
+              <ScrapCount>{coverLetter.scrap}</ScrapCount>
+            </ScrapIconWrap>
           </SearchResultBox>
         ))}
       </SearchResultWrap>
 
-      {/* 추가: 모달 컴포넌트 렌더링 */}
       <CoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
     </PageContainer>
   );
 }
 
-const SearchResultWrap = styled.div`
-margin-top: 64px;
-`;
-const SearchResultVar = styled.div`
-  width: 1198px;
-  display: flex;
-  justify-content: space-between;
+const PageContainer = styled.div`
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 2px solid #636363;
-`;
-const SearchResultText = styled.p`
-  font-family: 'SUITE';
-  font-style: normal;
-  font-weight: 800;
-  font-size: 25px;
-  line-height: 31px;
-  color: #636363;
-  flex-grow: 1;
-`;
-const SearchResultBox = styled.div`
-width: 1185px;
-height: 165px;
-margin-top: 30px;
-border-bottom: 2px solid #E2E2E2;
-padding-bottom: 16px;
-`;
-const Information1 = styled.div`
-font-family: 'SUITE';
-font-style: normal;
-font-weight: 800;
-font-size: 25px;
-line-height: 31px;
-margin-bottom: 12px;
-
-color: #000000;
-`;
-const Information2 = styled.div`
-font-family: 'SUITE';
-font-style: normal;
-font-weight: 600;
-font-size: 20px;
-line-height: 30px;
-/* or 150% */
-margin-bottom: 3px;
-
-color: #636363;
-`;
-const Information3 = styled.div`
-font-family: 'SUITE';
-font-style: normal;
-font-weight: 600;
-font-size: 20px;
-line-height: 30px;
-/* or 150% */
-
-color: #A1A1A1;
-`;
-
-const SortButtonsContainer = styled.div`
   display: flex;
-  align-items: center;
-`;
-
-const SortButton = styled.button`
-background-color: white;
-  font-family: 'SUITE';
-font-style: normal;
-font-weight: 700;
-font-size: 17px;
-line-height: 21px;
-border: none;
-height: 25px;
-
-color: ${({ active }) => (active ? '#000000' : '#A1A1A1')};
-`;
-
-const ButtonImage = styled.img`
-  margin-right: 0.5rem;
+  flex-direction: column;
+  justify-content: center;
 `;
 
 const SearchBox = styled.div`
@@ -248,7 +176,7 @@ const InputField = styled.input`
 
 const SearchButton = styled.button`
   width: 132px;
-  height: 78px; /*수정필요*/
+  height: 78px;
   background-color: #E5FF7D; 
   border: 0.1875rem solid #E5FF7D;
   border-radius: 1rem;
@@ -289,9 +217,111 @@ const WritingBox = styled.div`
   height: 5rem;
 `;
 
-const PageContainer = styled.div`
+const SearchResultWrap = styled.div`
+  margin-top: 64px;
+`;
+
+const SearchResultVar = styled.div`
+  width: 1198px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #636363;
+`;
+
+const SearchResultText = styled.p`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 25px;
+  line-height: 31px;
+  color: #636363;
+  flex-grow: 1;
+`;
+
+const SortButtonsContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const SortButton = styled.button`
+  background-color: white;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 21px;
+  border: none;
+  height: 25px;
+  color: ${({ active }) => (active ? '#000000' : '#A1A1A1')};
+`;
+
+const ButtonImage = styled.img`
+  margin-right: 0.5rem;
+`;
+
+const SearchResultBox = styled.div`
+  display: flex;
+  width: calc(1198px); 
+  height: 165px;
+  margin-top: 30px;
+  border-bottom: 2px solid #E2E2E2;
+  padding-bottom: 16px;
+`;
+
+const InformationContainer = styled.div`
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+`;
+
+const Information1 = styled.div`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 25px;
+  line-height: 31px;
+  margin-bottom: 12px;
+  color: #000000;
+`;
+
+const Information2 = styled.div`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 3px;
+  color: #636363;
+`;
+
+const Information3 = styled.div`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 30px;
+  color: #A1A1A1;
+`;
+
+const ScrapIconWrap = styled.div`
+  width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  margin-left:37px;
+`;
+
+const ScrapIcon = styled.img`
+  margin-bottom: 4px;
+`;
+
+const ScrapCount = styled.div`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  color: #A1A1A1;
 `;
