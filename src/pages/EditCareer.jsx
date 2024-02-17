@@ -7,6 +7,9 @@ import majors from '../data/majors'; // 학과 데이터
 import jobSkills from '../data/skillsData';
 import axios from 'axios';
 import config from '../path/config';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 
 const EditCareerPage = styled.div`
   display: flex;
@@ -460,13 +463,85 @@ const ActivityDescription = styled.input`
 
 `;
 
-const Count = styled.span`
+const ActivityTitle = styled.input`
+  width: 215px;
+  height: 50px;
+  margin-right: 3rem;
+  padding: 10px;
+  border: 3px solid #E2E2E2;
+  border-radius: 10px;
   font-family: SUITE;
   font-weight: 700;
-  font-size: 17px;
+  font-size: 1.1rem;
   color: #636363;
-  margin-left: 10px;
+  cursor: default;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #BDBDBD;
+  }
+
 `;
+
+const InputFieldRow = styled.div`
+  margin-left: 3.4375rem;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1.75rem;
+`;
+
+
+const StyledDatePicker = styled(DatePicker)`
+  height: 50px;
+  width: 158px;
+  border: 3px solid #E2E2E2;
+  border-radius: 10px;
+  padding: 0.625rem;
+  font-family: SUITE;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #636363; 
+  margin-right: 10px; 
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+const DateInputContainer = styled.div`
+  margin-right: 10px; // Adjust spacing as needed
+  margin-left: 15px;
+`;
+
+const Tilde = styled.span`
+  font-size: 30px;
+  color: #A1A1A1;
+`;
+
+
+const AddButtonContainer = styled.div`
+  display: flex;
+  margin-left: 900px; 
+`;
+
+const AddButton4 = styled.img`
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  align-self: center; // 추가 버튼을 위로 정렬
+  margin-left: 10px; 
+  margin-top: -50px;
+`;
+
 
 const SkillBox = styled.div`
   width: auto;
@@ -695,6 +770,23 @@ const AddButton3 = styled.img`
 
 
 const EditCareer = () => {
+  const [activities, setActivities] = useState([
+    { title: '', startDate: null, endDate: null, description: '' },
+  ]);
+
+  // 새로운 대외활동 정보 추가
+  const addActivity = () => {
+    setActivities([...activities, { title: '', startDate: null, endDate: null, description: '' }]);
+  };
+
+  // 대외활동 정보 업데이트
+  const updateActivity = (index, field, value) => {
+    const updatedActivities = activities.map((activity, i) =>
+      i === index ? { ...activity, [field]: value } : activity
+    );
+    setActivities(updatedActivities);
+  };
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -706,7 +798,6 @@ const EditCareer = () => {
   const [searchTermMajor, setSearchTermMajor] = useState('');
   const [schoolInputs, setSchoolInputs] = useState([{ name: "" }]);
   const [majorInputs, setMajorInputs] = useState([{ name: "" }]);
-  const [showEducationSection, setShowEducationSection] = useState(true);
   const [grade, setGrade] = useState("");
   const [graduate, setGraduate] = useState("");
   const [activityDescription, setActivityDescription] = useState('');
@@ -728,32 +819,58 @@ const EditCareer = () => {
   });
 
   const handleSave = async () => {
-    // 서버에 전송할 데이터 객체 구성
+
+    const formatDate = (date) => {
+      if (!date) return ''; // date가 null이거나 정의되지 않았다면, 빈 문자열 반환
+    
+      const d = new Date(date);
+      let month = '' + (d.getMonth() + 1), // getMonth()는 0에서 시작하므로 1을 더해줍니다.
+          year = d.getFullYear();
+    
+      // 한 자리수 월을 두 자리수로 포매팅
+      if (month.length < 2) month = '0' + month;
+    
+      return [year, month].join('-');
+    };
+    
+
     const payload = {
       english: languageInputs.map(input => input.name).join(", "),
       score: languageInputs.map(input => input.score).join(", "),
       certification: certificateInputs.map(input => input.name).join(", "),
       university: schoolInputs[0].name,
       major: majorInputs[0].name,
-      gpa: grade + "/" + graduate, // 예제에 따라 GPA와 졸업여부를 결합
-      activity: activityDescription, // 이 부분은 문자열로 변경됨
+      gpa: `${grade}/${graduate}`, // 'grade'와 'graduate' 상태를 기반으로 문자열 조합
+      activity: activities.map(activity => ({
+        name: activity.title,
+        startDate: activity.startDate ? formatDate(activity.startDate) : "", // 'formatDate'는 날짜를 'YYYY-MM' 형식으로 변환하는 함수라고 가정
+        endDate: activity.endDate ? formatDate(activity.endDate) : "",
+        description: activity.description
+      })),
       skill: selectedSkills.join(", "),
       link: links.join(", "),
+      // 'careerProfile'와 'noCareer'는 사용자 입력 기반으로 설정해야 할 수 있으나, 여기서는 예시로 두었습니다.
+      careerProfile: "https://example.com/profile.jpeg",
+      noCareer: false
     };
-  
-    try {
-      const response = await axios.post(`${config.API_URL}/careers`, payload, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 필요한 인증 헤더가 있다면 추가
-          'Content-Type': 'application/json', // JSON 형태로 데이터를 전송한다고 서버에 알림
-        },
-      });
+    
+    // 서버에 POST 요청 보내기
+    axios.post(`${config.API_URL}/careers`, payload, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
       console.log("서버 응답:", response.data);
-      alert('저장되었습니다.'); // 성공 메시지
-    } catch (error) {
+      alert('저장되었습니다.');
+    })
+    .catch(error => {
       console.error("서버로 데이터 저장 중 오류 발생:", error);
-      alert('저장에 실패했습니다.'); // 오류 메시지
-    }
+      alert('저장에 실패했습니다.');
+    });
+    
+   
   };
   
   // 스펙 모달에서 체크박스 선택을 처리하는 함수
@@ -902,31 +1019,68 @@ const renderSection = (sectionName) => {
           <SectionDivider />
         </EducationSectionContainer>
       );
-    case '대외활동':
-      if (!sectionsVisible['대외활동']) return null;
-      return (
-        <ActivitySectionContainer>
-        <LanguageTitleContainer>
-          <LanguageTitle>대외 활동</LanguageTitle>
-          <DeleteButton src="./assets/editclose.png" onClick={() => handleDeleteSection('대외활동')}/>
-        </LanguageTitleContainer>
-        <InputFieldContainer style={{ justifyContent: 'start' }}>
-          <ActivityDescription
-            placeholder="활동 설명 입력하기"
-            value={activityDescription}
-            onChange={handleActivityDescriptionChange}
-          />
-          <Count>{`(${charCount}/50자)`}</Count>
-        </InputFieldContainer>
-        <SectionDivider />
-      </ActivitySectionContainer>
-      );
+      case '대외활동':
+        if (!sectionsVisible['대외활동']) return null;
+        return (
+          <ActivitySectionContainer>
+            <LanguageTitleContainer>
+              <LanguageTitle>대외 활동</LanguageTitle>
+              <DeleteButton src="./assets/editclose.png" onClick={() => handleDeleteSection('대외활동')} />
+            </LanguageTitleContainer>
+            {activities.map((activity, index) => (
+              <div key={index}>
+                <InputFieldRow>
+                  <ActivityTitle
+                    placeholder="제목"
+                    value={activity.title}
+                    onChange={(e) => updateActivity(index, 'title', e.target.value)}
+                  />
+                  <GradeLabel>활동기간</GradeLabel>
+                  <DateInputContainer>
+                    <StyledDatePicker
+                      selected={activity.startDate}
+                      onChange={(date) => updateActivity(index, 'startDate', date)}
+                      selectsStart
+                      startDate={activity.startDate}
+                      endDate={activity.endDate}
+                      placeholderText="시작 날짜"
+                    />
+                  </DateInputContainer>
+                  <Tilde>~</Tilde>
+                  <DateInputContainer>
+                    <StyledDatePicker
+                      selected={activity.endDate}
+                      onChange={(date) => updateActivity(index, 'endDate', date)}
+                      selectsEnd
+                      startDate={activity.startDate}
+                      endDate={activity.endDate}
+                      minDate={activity.startDate}
+                      placeholderText="종료 날짜"
+                    />
+                  </DateInputContainer>
+                </InputFieldRow>
+                <InputFieldContainer style={{ justifyContent: 'start' }}>
+                  <ActivityDescription
+                    placeholder="활동 설명 입력하기"
+                    value={activity.description}
+                    onChange={(e) => updateActivity(index, 'description', e.target.value)}
+                  />
+                </InputFieldContainer>
+              </div>
+            ))}
+          <AddButtonContainer>
+            <AddButton4 src="./assets/addbtn.png" onClick={addActivity} alt="대외활동 추가" />
+          </AddButtonContainer>
+            <SectionDivider />
+          </ActivitySectionContainer>
+        );
+      
     case '보유스킬':
       if (!sectionsVisible['보유스킬']) return null;
       return (
         <SkillSectionContainer>
         <LanguageTitleContainer>
-          <LanguageTitle>보유 스킬</LanguageTitle>
+          <LanguageTitle>보유 스펙</LanguageTitle>
           <DeleteButton src="./assets/editclose.png" />
         </LanguageTitleContainer>
         <SkillsContainerWrapper>
