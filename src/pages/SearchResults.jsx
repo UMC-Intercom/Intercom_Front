@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import axios from 'axios'; 
 import styled from 'styled-components';
 import Select, { components } from 'react-select';
 import { useLocation } from "react-router-dom";
@@ -373,7 +374,6 @@ const SearchResults = () => {
     });
   };
 
-  
 
   return (
     <div>
@@ -419,27 +419,27 @@ const SearchResults = () => {
         </SearchBarWrapper>
 
         <PopularNoticesBox>
-            <SearchResultTextWrapper>
-                <SearchResultText>검색 결과</SearchResultText>
-                <ResultCount>({searchResults.length})</ResultCount>
-            </SearchResultTextWrapper>
+                <SearchResultTextWrapper>
+                    <SearchResultText>검색 결과</SearchResultText>
+                    <ResultCount>({searchResults.length})</ResultCount>
+                </SearchResultTextWrapper>
 
-            <ContentsBox>
-                <Content>
-                    {fakeNotices.map(notice => (
-                        <NoticeItem key={notice.id}>
-                            <img src={notice.imageUrl} alt={notice.title} style={{marginBottom:"20px"}}/>
-                            <div>
-                                <Title>[{notice.title}]</Title>
-                                <Information>{notice.information}</Information>
-                                <br /><br />
-                                <Deadline>D-{notice.deadline}</Deadline> <Views>조회 {notice.views}</Views>
-                            </div>
-                        </NoticeItem>
-                    ))}
-                </Content>
-            </ContentsBox>
-        </PopularNoticesBox>
+                <ContentsBox>
+                    <Content>
+                        {searchResults.map(result => (
+                            <NoticeItem key={result.id}>
+                                <img src={result.imageUrl} alt={result.title} style={{ marginBottom: "20px" }} />
+                                <div>
+                                    <Title>[{result.title}]</Title>
+                                    <Information>{result.information}</Information>
+                                    <br /><br />
+                                    <Deadline>D-{result.deadline}</Deadline> <Views>조회 {result.views}</Views>
+                                </div>
+                            </NoticeItem>
+                        ))}
+                    </Content>
+                </ContentsBox>
+            </PopularNoticesBox>
 
         {isModalOpen && <SearchModal onClose={() => setIsModalOpen(false)} />}
     </div>

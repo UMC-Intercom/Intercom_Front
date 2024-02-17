@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Select, { components } from 'react-select';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ModalContainer = styled.div`
     position: fixed;
@@ -259,22 +260,31 @@ const NoOptionsMessage = props => (
     </components.NoOptionsMessage>
 );
 
-const SearchModal = ({ onClose }) => {
+const SearchModal = ({ onClose, setSearchResults}) => {
     const [selectedJobs, setSelectedJobs] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState([]);
     const [searchInput, setSearchInput] = useState('');
     const navigate = useNavigate();
 
-    const handleSearch = () => {
-        navigate('/search-results', {
-            state: {
-                selectedJobs,
-                selectedLocation,
-                searchInput
-            }
-        });
-        onClose();
+    const handleSearch = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/jobs/search', {
+                params: {
+                    jobMidCode: selectedJobs.map(job => job.value).join(','),
+                    location: selectedLocation.map(loc => loc.value).join(','),
+                    keyword: searchInput,
+                    page: 1
+                }
+            });
+            console.log(response.data);
+            setSearchResults(response.data); // 검색 결과를 전달
+            navigate('/search-results');
+            onClose();
+        } catch (error) {
+            console.error('Error searching for jobs:', error);
+        }
     };
+    
 
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
