@@ -205,7 +205,7 @@ const locationOptions = [
     { value: '전남', label: '전남' },
     { value: '경북', label: '경북' },
     { value: '경남', label: '경남' },
-    { value: '경남', label: '제주' },
+    { value: '제주', label: '제주' },
 ];
 
 const CustomValue = styled.div`
