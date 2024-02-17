@@ -14,9 +14,9 @@ import SignUp3 from './pages/SignUp3';
 import SignUp4 from './pages/SignUp4'; 
 import OnBoarding1 from './pages/OnBoarding1'; 
 import OnBoarding2 from './pages/OnBoarding2'; 
-import FindingEmail from './pages/FindingEmail'; //추가
-import FindedEmail from './pages/FindedEmail'; //추가
-import UnfindedEmail from './pages/UnfindedEmail'; //추가
+import FindingEmail from './pages/FindingEmail'; 
+import FindedEmail from './pages/FindedEmail'; 
+import UnfindedEmail from './pages/UnfindedEmail'; 
 import SettingsPage from './pages/SettingsPage';
 import ProfileEdit from './pages/ProfileEdit';
 import Deactivate0 from './pages/Deactivate0';
@@ -29,6 +29,16 @@ import DeactivatePDF from './pages/DeactivatePDF';
 import MyCareer from './pages/MyCareer';
 import WrittenContent from './pages/WrittenContent';
 import Scrap from './pages/Scrap';
+import CoverLetterInput from './pages/CoverLetterInput';
+import CoverLetterInput2 from './pages/CoverLetterInput2';
+import CoverLetterHome from './pages/CoverLetterHome';
+import CoverLetterInput3 from './pages/CoverLetterInput3';
+import CoverLetterResult from './pages/CoverLetterResult';
+import InterviewHome from './pages/InterviewHome';
+import InterviewResult from './pages/InterviewResult';
+import InterviewInput1 from './pages/InterviewInput1';
+import InterviewInput2 from './pages/InterviewInput2';
+import InterviewInput3 from './pages/InterviewInput3';
 import EditCareer from './pages/EditCareer';
 import FindingPassword from './pages/FindingPassword';
 import SettingPassword from './pages/SettingPassword';
@@ -74,10 +84,18 @@ function App() {
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
-          <Route path="/mycareer-edit" element={<EditCareer />} />
-          <Route path="/findingPassword" element={<FindingPassword />} />
-          <Route path="/settingPwd" element={<SettingPassword />} />
-          <Route path="/post-success" element={<PostSuccessPage/>} />
+
+          <Route path="/cover-letters" element={<CoverLetterInput />} />
+          <Route path="/cover-letters-home" element={<CoverLetterHome />} />
+          <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />
+          <Route path="/cover-letters-input3" element={<CoverLetterInput3 />} />
+          <Route path="/cover-letters-result" element={<CoverLetterResult />} />
+
+          <Route path="/interviews" element={<InterviewHome />} />
+          <Route path="/interviews-result" element={<InterviewResult />} />
+          <Route path="/interviews-input1" element={<InterviewInput1 />} />
+          <Route path="/interviews-input2" element={<InterviewInput2 />} />
+          <Route path="/interviews-input3" element={<InterviewInput3 />} />
           </Routes>
         </AuthProvider>
       </div>

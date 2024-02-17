@@ -103,7 +103,7 @@ const Header = () => {
           <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>저장한 공고</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
           <Pages active={activePage === '/mycareer'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
-          <Pages active={activePage === '/cover-letters'} onClick={() => handlePageChange('/cover-letters')}>합격 자소서</Pages>
+          <Pages active={activePage === '/cover-letters-home'} onClick={() => handlePageChange('/cover-letters-home')}>합격 자소서</Pages>
           <Pages active={activePage === '/interviews'} onClick={() => handlePageChange('/interviews')}>면접 후기</Pages>
         </PageLists>
         <ButtonBox>
