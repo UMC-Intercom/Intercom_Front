@@ -19,18 +19,30 @@ export default function CoverLetterInput() {
     gpa: '',
     activity: '',
     certifications: [],
-    english: '', 
+    english: '',
     score: '',
     titles: [],
-    contents: []
+    contents: [],
+    birthYear: '',
+    birthMonth: '',
+    birthDay: ''
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+    if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
+      const birthday = `${formData.birthYear}-${formData.birthMonth}-${formData.birthDay}`;
+      setFormData(prevData => ({
+        ...prevData,
+        birthday: birthday,
+        [name]: value
+      }));
+    } else {
+      setFormData(prevData => ({
+        ...prevData,
+        [name]: value
+      }));
+    }
   };
 
   const navigateToPass2 = () => navigate('/cover-letters-input2', { state: formData });
@@ -136,6 +148,7 @@ export default function CoverLetterInput() {
     </SettingTitle>
   );
 }
+
 
 const SettingTitle = styled.div``;
 
