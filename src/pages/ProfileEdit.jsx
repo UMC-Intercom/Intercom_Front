@@ -222,23 +222,23 @@ const handleInputChange = useCallback((e) => {
             <Label>성별</Label>
                 <RadioInput
                     name="gender"
-                    value="MALE"
+                    value="male"
                     onChange={handleInputChange}
-                    checked={user.gender === 'MALE'}
+                    checked={user.gender === "male"}
                     label="남자"
                 />
                 <RadioInput
                     name="gender"
-                    value="FEMALE"
+                    value="female"
                     onChange={handleInputChange}
-                    checked={user.gender === 'FEMALE'}
+                    checked={user.gender === "female"}
                     label="여자"
                 />
                 <RadioInput
                     name="gender"
-                    value="NONE"
+                    value="no-selected"
                     onChange={handleInputChange}
-                    checked={user.gender === 'NONE'}
+                    checked={user.gender === "no-selected"}
                     label="선택 안 함"
                 />
             </InputWrap>
