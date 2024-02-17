@@ -3,12 +3,8 @@ import styled from 'styled-components';
 import PostQuestionModal from './PostQuestionModal';
 
 export default function CoverLetterInput3() {
-  const [questionNumber, setQuestionNumber] = useState(1); // 문항 번호 상태
   const [postModalOpen, setPostModalOpen] = useState(false); // PostQuestionModal 열림 상태
 
-  const addQuestion = () => {
-    setQuestionNumber(prevNumber => prevNumber + 1); // 문항 번호 업데이트
-  };
 
   const handleConfirm = () => {
     setPostModalOpen(true); // PostQuestionModal 열기
