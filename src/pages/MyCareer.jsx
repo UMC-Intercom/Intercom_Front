@@ -637,6 +637,35 @@ const MyProfile = () => {
 };
 
 const MyCareer = () => {
+  const [languages, setLanguages] = useState([]);
+const [education, setEducation] = useState({});
+const [certificates, setCertificates] = useState([]);
+const [activities, setActivities] = useState([]);
+
+useEffect(() => {
+  const fetchCareerInfo = async () => {
+    try {
+      const response = await axios.get(`${config.API_URL}/careers/current-user`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      // 서버로부터 받은 데이터를 각 상태 변수에 저장
+      const data = response.data;
+      setLanguages(data.languages || []);
+      setEducation({ university: data.university, major: data.major, gpa: data.gpa });
+      setCertificates(data.certificates || []);
+      setActivities(data.activity || []);
+    } catch (error) {
+      console.error('Failed to fetch career info:', error);
+    }
+  };
+
+  fetchCareerInfo();
+}, []);
+
+
   const [isSkillsVisible, setIsSkillsVisible] = useState(true);
   const [isPdfDownloadMode, setIsPdfDownloadMode] = useState(false);
   const navigate = useNavigate();
@@ -827,10 +856,12 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
           
           <EducationTitle>학력</EducationTitle>
           <CenteredContainer>
-            <EducationBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
-              <MajorText>{fakeCareerData.major}</MajorText>
-              <UniversityText>{fakeCareerData.university}</UniversityText>
-            </EducationBox>
+          <EducationBox>
+          <UniversityText>{education.university}</UniversityText>
+          <MajorText>{education.major}</MajorText>
+          <div>GPA: {education.gpa}</div>
+          </EducationBox>
+
           </CenteredContainer>
           <SectionDivider />
 
