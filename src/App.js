@@ -44,6 +44,7 @@ import FindingPassword from './pages/FindingPassword';
 import SettingPassword from './pages/SettingPassword';
 import PostSuccessPage from './pages/PostSuccessPage';
 import TypeTestHome from './typetestpage/TypeTestHome';
+import TypeTestQuestion1 from './typetestpage/TypeTestQuestion1';
 
 
 function App() {
@@ -99,6 +100,7 @@ function App() {
           <Route path="/interviews-input3" element={<InterviewInput3 />} />
 
           <Route path="/type-test-home" element={<TypeTestHome />} />
+          <Route path="/type-test-question1" element={<TypeTestQuestion1 />} />
           </Routes>
         </AuthProvider>
       </div>
