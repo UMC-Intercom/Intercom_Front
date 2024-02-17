@@ -72,7 +72,13 @@ const Talktalk = () => {
 useEffect(() => {
   if (isLoggedIn) {
     const profile = localStorage.getItem('userProfile');
-    setUserProfile(profile);
+
+    if (profile === "null") {
+      setUserProfile("./assets/Ellipse2.png");
+    }
+    else {
+      setUserProfile(profile);
+    }
   }
 }, [isLoggedIn]);
 
@@ -188,7 +194,7 @@ const WritingArea = () => {
   } else {
     return (
       <WritingContainer onClick={handleGoLogin}>
-                  <img src="./assets/Ellipse2.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
+                  <img src="./assets/MyProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px' }} />
         <WritingBox>
           로그인하고 글을 남겨보세요.
         </WritingBox>
@@ -240,12 +246,12 @@ return(
 <TalkListContainer>
   {searchResults.length > 0 ? (
       searchResults.map(item => (
-          <SearchResultItem 
-              key={item.id} 
+          <SearchResultItem
+              key={item.id}
               onClick={() => navigate(`/talks/${item.id}`)}>
               <p className="title">{item.title}</p>
-              <p className="content">{item.content || "내용이 없습니다."}</p>
-              <p className="response">답변: {item.commentCount} | 댓글: {item.replyCount} | 조회수: {item.viewCount} | 좋아요: {item.likeCount}</p>
+            <p className="content">{(item.content && item.content.replace(/<img[^>]*>/g,"").replace(/<[^>]*>?/gm, '')) || "내용이 없습니다."}</p>
+            <p className="response">답변: {item.commentCount} | 댓글: {item.replyCount} | 조회수: {item.viewCount} | 좋아요: {item.likeCount}</p>
           </SearchResultItem>
       ))
   ) : (

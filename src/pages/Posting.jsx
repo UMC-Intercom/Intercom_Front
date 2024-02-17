@@ -70,50 +70,67 @@ useEffect(() => {
   }, [content]);
 
   //이미지
-// 이미지 업로드를 처리하는 함수
-const handleImageUpload = () => {
-  const input = document.createElement('input');
-  input.setAttribute('type', 'file');
-  input.setAttribute('accept', 'image/*');
-  input.click();
-
-  input.onchange = async () => {
-    const file = input.files[0];
-    const formData = new FormData();
-    formData.append('image', file); // 서버에서 이미지 파일을 참조하는 키
-
-    try {
-      // 서버로 이미지 파일을 업로드하고, 업로드된 이미지의 URL을 받습니다.
-      const response = await axios.post('서버의 이미지 업로드 엔드포인트', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // FormData를 사용할 때 필요한 헤더
-        },
-      });
-      const imageUrl = response.data.imageUrl; // 업로드된 이미지의 URL
-
-      // 에디터에 이미지 삽입
-      const quill = quillRef.current.getEditor();
-      const range = quill.getSelection(true);
-      quill.insertEmbed(range.index, 'image', imageUrl);
-      quill.setSelection(range.index + 1);
-      
-      setImageUrls((prev) => [...prev, imageUrl]);
-
-    } catch (error) {
-      console.error('이미지 업로드 실패:', error);
-    }
-  };
-};
-
   useEffect(() => {
     const quill = quillRef.current;
     if (quill) {
-      const toolbar = quill.getEditor().getModule('toolbar');
-      toolbar.addHandler('image', handleImageUpload);
+      quill.getEditor().getModule('toolbar').addHandler('image', () => {
+        handleImageUpload();
+      });
     }
   }, []);
-  
 
+  const handleImageUpload = (e) => {
+    e.stopPropagation(); 
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+  
+    input.onchange = async () => {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+  
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+  
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+  
+          const MAX_WIDTH = 400;
+          let width = img.width;
+          let height = img.height;
+  
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+  
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+  
+          const resizedImgDataUrl = canvas.toDataURL('image/jpeg');
+  
+          // 에디터에 이미지 삽입
+          const quill = quillRef.current.getEditor();
+          const range = quill.getSelection(true);
+          quill.insertEmbed(range.index, 'image', resizedImgDataUrl);
+          quill.setSelection(range.index + 1);
+  
+          // 이미지 Data URL을 상태에 저장
+          handleImageUploadSuccess(resizedImgDataUrl);
+        };
+      };
+    };
+  };
+
+  const handleImageUploadSuccess = (dataUrl) => {
+    setImageUrls((prevUrls) => [...prevUrls, dataUrl]);
+  };
+  
   const handleTitleChange = (e) => {
     e.preventDefault();
     if (e.target.value.length <= maxTitleLength) {
@@ -126,6 +143,7 @@ const handleImageUpload = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
+  // 필수 입력값 검증
   if (!title.trim() || !content.trim()) {
     alert('제목과 내용을 입력해주세요.');
     return;
@@ -134,7 +152,7 @@ const handleSubmit = async (e) => {
   try {
     const response = await axios.get('http://localhost:8080/talks/check-mentor', {
       headers: {
-        'Authorization': `Bearer ${accessToken}`, 
+        'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
       },
     });
 
@@ -180,13 +198,11 @@ const handleSubmit = async (e) => {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
-      formData.append('category', categories);
-
       // 이미지 파일 및 기타 필요한 데이터 추가
       imageUrls.forEach((url, index) => {
         const blob = dataURLtoBlob(url);
         const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
-        formData.append('images', file);
+        formData.append('images[]', file);
       });
 
       try {
@@ -199,7 +215,8 @@ const handleSubmit = async (e) => {
     
         if (response.status === 200 || response.status === 201) {
           alert('글이 성공적으로 등록되었습니다.');
-          navigate('/success-page'); // 성공 시 리디렉션할 페이지 경로
+          // navigate('/PostSuccessPage', { state: { postId: response.data.id } }); // postId를 state로 전달
+          navigate(`/talks/${response.data.id}`);
         } else {
           throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
         }
@@ -596,6 +613,8 @@ transition: transform 0.3s;
 `;
 
 const DropdownList = styled.div`
+margin-top:7px;
+margin-left:-1px;
   position: absolute;
   width: 21.25rem;  
   height: 27rem;
@@ -604,7 +623,7 @@ const DropdownList = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
-const DropdownItem = styled.div`\
+const DropdownItem = styled.div`
 width: 14.25rem;
 height: 2.25rem;
 justify-content: flex;
