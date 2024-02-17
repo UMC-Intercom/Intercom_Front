@@ -59,6 +59,12 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if ((activePage === '/scrap' || activePage === '/mycareer') && !isLoggedIn) {
+      navigate('/join');
+    }
+  }, [activePage, isLoggedIn, navigate]);
+
   
 
   const handlePageChange = (path) => {
