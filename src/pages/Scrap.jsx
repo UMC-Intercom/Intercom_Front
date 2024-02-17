@@ -52,10 +52,7 @@ const Scrap = () => {
             axios.get(`${config.API_URL}/scraps/jobs?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                },
-                params: {
-                    page: 1, // 페이지 수
-                },
+                }
             })
                 .then((response) => {
                     const jobDto = response.data;
@@ -71,10 +68,7 @@ const Scrap = () => {
             axios.get(`${config.API_URL}/scraps/interviews?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                },
-                params: {
-                    page: 1, // 페이지 수
-                },
+                }
             })
                 .then((response) => {
                     const interviewData = response.data;
@@ -90,10 +84,7 @@ const Scrap = () => {
             axios.get(`${config.API_URL}/scraps/resumes?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                },
-                params: {
-                    page: 1, // 페이지 수
-                },
+                }
             })
                 .then((response) => {
                     const coverletterData = response.data;
@@ -109,10 +100,7 @@ const Scrap = () => {
             axios.get(`${config.API_URL}/scraps/talks?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                },
-                params: {
-                    page: 1, // 페이지 수
-                },
+                }
             })
                 .then((response) => {
                     const talkData = response.data;
