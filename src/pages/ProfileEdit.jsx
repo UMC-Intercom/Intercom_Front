@@ -63,7 +63,8 @@ export default function ProfileEdit() {
          },
        });
        const data = response.data;
-       const birthdayParts = data.birthday.split('-');
+       //const birthdayParts = data.birthday.split('-');
+      const birthdayParts = data.birthday.split('-');
        setUser({
          ...user,
          email: data.email,
@@ -87,7 +88,7 @@ const handleInputChange = useCallback((e) => {
   const { name, value } = e.target;
   setUser((prev) => ({
     ...prev,
-    [name]: value
+    [name]: value,
   }));
 }, []);
 
@@ -114,32 +115,36 @@ const handleInputChange = useCallback((e) => {
     }
   
     // 서버 요청 데이터 준비
-    const updateData = {
-      name: user.name,
-      nickname: user.nickName,
-      phone: user.phoneNum,
-      gender: user.gender,
-      birthday: `${user.birthYear}-${user.birthMonth}-${user.birthDay}`,
-    };
-  
-    // 새 비밀번호가 입력된 경우에만 updateData에 추가
-    if (newPassword && isPwdMatched) {
-      updateData.password = newPassword;
-    }
+    // 서버 요청 데이터 준비
+  let updateData = {
+    name: user.name,
+    nickname: user.nickname,
+    phone: user.phone,
+    gender: user.gender,
+    birthday: `${user.birthYear}-${user.birthMonth.padStart(2, '0')}-${user.birthDay.padStart(2, '0')}`, // LocalDate 형식에 맞춤
+  };
+
+  // 새 비밀번호가 입력된 경우에만 updateData에 추가
+  if (newPassword && isPwdMatched) {
+    updateData.password = newPassword;
+  }
   
     // 서버 요청 로직
     try {
-      await axios.put('/users/update', updateData, {
+      const response = await axios.put('/users/update', updateData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      setMessage('회원 정보가 성공적으로 업데이트되었습니다.');
-      // 성공 후 페이지 리디렉션
-      navigate('/settings');
+      if (response.status === 204) { // No Content
+        localStorage.setItem('userName', updateData.name);
+        localStorage.setItem('userNickname', updateData.nickname);
+        setMessage('회원 정보가 성공적으로 업데이트되었습니다.');
+        navigate('/settings');
+      }
     } catch (error) {
       console.error(error);
-      setMessage('회원 정보 업데이트 중 오류가 발생했습니다.');
+      setMessage('회원 정보 업데이트 중 오류가 발생했습니다. 서버 로그를 확인해주세요.');
     }
   };
   // 사용자 입력 처리
