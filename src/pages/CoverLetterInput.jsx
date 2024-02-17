@@ -7,7 +7,33 @@ export default function CoverLetterInput() {
   const [currentYear] = useState(new Date().getFullYear());
   const [years] = useState(Array.from(new Array(125), (val, index) => currentYear - index));
 
-  const navigateToPass2 = () => navigate('/cover-letters-input2');
+  const [formData, setFormData] = useState({
+    company: '',
+    department: '',
+    year: '',
+    semester: '',
+    gender: 'no-selected',
+    birthday: '',
+    education: '',
+    major: '',
+    gpa: '',
+    activity: '',
+    certifications: [],
+    english: '', 
+    score: '',
+    titles: [],
+    contents: []
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const navigateToPass2 = () => navigate('/cover-letters-input2', { state: formData });
 
   return (
     <SettingTitle>
@@ -19,30 +45,42 @@ export default function CoverLetterInput() {
 
           <InputWrap>
             <Label>회사명</Label>
-            <InputField type="text" placeholder="회사명" />
+            <InputField
+              type="text"
+              name="company"
+              placeholder="회사명"
+              value={formData.company}
+              onChange={handleChange}
+            />
             <PassSearch>
-              <PassSearchIcon src='./assets/passSearch.png'/>
+              <PassSearchIcon src='./assets/passSearch.png' />
               <PassSearchText>검색하기</PassSearchText>
             </PassSearch>
           </InputWrap>
 
           <InputWrap>
             <Label>부서 및 직무명</Label>
-            <InputField type="text" placeholder="부서 및 직무명" />
+            <InputField
+              type="text"
+              name="department"
+              placeholder="부서 및 직무명"
+              value={formData.department}
+              onChange={handleChange}
+            />
             <PassSearch>
-              <PassSearchIcon src='./assets/passSearch.png'/>
+              <PassSearchIcon src='./assets/passSearch.png' />
               <PassSearchText>검색하기</PassSearchText>
             </PassSearch>
           </InputWrap>
 
           <InputWrap>
             <Label>합격 연도</Label>
-            <Select name="passYear">
+            <Select name="year" value={formData.year} onChange={handleChange}>
               {years.map(year => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </Select>년
-            <Select name="passSemester">
+            <Select name="semester" value={formData.semester} onChange={handleChange}>
               <option value="상반기">상반기</option>
               <option value="하반기">하반기</option>
             </Select>
@@ -54,37 +92,44 @@ export default function CoverLetterInput() {
               name="gender"
               value="male"
               label="남자"
+              checked={formData.gender === 'male'}
+              onChange={handleChange}
             />
             <RadioInput
               name="gender"
               value="female"
               label="여자"
+              checked={formData.gender === 'female'}
+              onChange={handleChange}
             />
             <RadioInput
               name="gender"
               value="no-selected"
               label="선택 안 함"
+              checked={formData.gender === 'no-selected'}
+              onChange={handleChange}
             />
           </InputWrap>
 
           <InputWrap>
             <Label>생년월일</Label>
-            <Select name="birthYear">
+            <Select name="birthYear" value={formData.birthYear} onChange={handleChange}>
               {years.map(year => (
                 <option key={year} value={year}>{year}</option>
               ))}
             </Select>년
-            <Select name="birthMonth">
+            <Select name="birthMonth" value={formData.birthMonth} onChange={handleChange}>
               {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
                 <option key={month} value={month}>{month}</option>
               ))}
             </Select>월
-            <Select name="birthDay">
+            <Select name="birthDay" value={formData.birthDay} onChange={handleChange}>
               {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                 <option key={day} value={day}>{day}</option>
               ))}
             </Select>일
           </InputWrap>
+
         </Form>
         <SubmitButton type="submit" onClick={navigateToPass2}>다음</SubmitButton>
       </Container>
