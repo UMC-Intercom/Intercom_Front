@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import PostQuestionModal from './PostQuestionModal';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function CoverLetterInput3() {
   const [questionNumber, setQuestionNumber] = useState(1); // 문항 번호 상태
@@ -40,10 +41,25 @@ export default function CoverLetterInput3() {
       contents: [...prevData.contents, ''] // 빈 content 추가
     }));
   };
-
-  const handleConfirm = () => {
-    console.log(formData)
-    setPostModalOpen(true); // PostQuestionModal 열기
+  
+  const accessToken = localStorage.getItem('accessToken');
+  
+  const handleConfirm = async () => {
+    console.log(formData);
+  
+    try {
+      const response = await axios.post('http://localhost:8080/resumes', formData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+      console.log(response.data);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  
+    setPostModalOpen(true);
   };
 
   const handleClose = () => {

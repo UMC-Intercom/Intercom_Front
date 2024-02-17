@@ -43,6 +43,7 @@ import EditCareer from './pages/EditCareer';
 import FindingPassword from './pages/FindingPassword';
 import SettingPassword from './pages/SettingPassword';
 import PostSuccessPage from './pages/PostSuccessPage';
+import TypeTestHome from './typetestpage/TypeTestHome';
 
 
 function App() {
@@ -96,6 +97,8 @@ function App() {
           <Route path="/interviews-input1" element={<InterviewInput1 />} />
           <Route path="/interviews-input2" element={<InterviewInput2 />} />
           <Route path="/interviews-input3" element={<InterviewInput3 />} />
+
+          <Route path="/type-test-home" element={<TypeTestHome />} />
           </Routes>
         </AuthProvider>
       </div>

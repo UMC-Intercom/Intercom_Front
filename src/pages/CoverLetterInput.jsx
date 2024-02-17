@@ -10,27 +10,44 @@ export default function CoverLetterInput() {
   const [formData, setFormData] = useState({
     company: '',
     department: '',
-    year: '',
-    semester: '',
+    year: '2024',
+    semester: '상반기',
     gender: 'no-selected',
-    birthday: '',
+    birthday: `${currentYear}-01-01`,
     education: '',
     major: '',
     gpa: '',
     activity: '',
     certifications: [],
-    english: '', 
+    english: '',
     score: '',
     titles: [],
-    contents: []
+    contents: [],
+    birthYear: '2024',
+    birthMonth: '1',
+    birthDay: '1'
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
+    setFormData(prevData => {
+      if (name === 'birthYear' || name === 'birthMonth' || name === 'birthDay') {
+        const newBirthData = {
+          ...prevData,
+          [name]: value
+        };
+        const birthday = `${newBirthData.birthYear}-${newBirthData.birthMonth.padStart(2, '0')}-${newBirthData.birthDay.padStart(2, '0')}`;
+        return {
+          ...newBirthData,
+          birthday: birthday
+        };
+      } else {
+        return {
+          ...prevData,
+          [name]: value
+        };
+      }
+    });
   };
 
   const navigateToPass2 = () => navigate('/cover-letters-input2', { state: formData });
@@ -136,6 +153,7 @@ export default function CoverLetterInput() {
     </SettingTitle>
   );
 }
+
 
 const SettingTitle = styled.div``;
 
