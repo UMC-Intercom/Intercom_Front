@@ -13,8 +13,6 @@ export default function CoverLetterInput2() {
         department: '',
         year: '',
         semester: '',
-        gender: 'no-selected',
-        birthday: '',
         education: '',
         major: '',
         gpa: '',

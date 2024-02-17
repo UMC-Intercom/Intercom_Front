@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-export default function InterviewInput2() {
+export default function CoverLetterInput2() {
     const navigate = useNavigate();
-    const navigateToPass3 = () => navigate('/interviews-input3');
-
+    const navigateToPass3 = () => navigate('/interviews-input3', { state: formData });
+    const location = useLocation();
     const [languageFields, setLanguageFields] = useState([{ id: 1 }]);
     const [licenseFields, setLicenseFields] = useState([{ id: 1 }]);
+    const [formData, setFormData] = useState({
+        company: '',
+        department: '',
+        year: '',
+        semester: '',
+        gender: 'no-selected',
+        birthday: '',
+        education: '',
+        major: '',
+        gpa: '',
+        activity: '',
+        certifications: '',
+        english: '',
+        score: '',
+        titles: '',
+        contents: ''
+    });
+
+    useEffect(() => {
+        if (location.state) {
+            setFormData(location.state);
+        }
+    }, [location]);
 
     const handleAddLanguageField = () => {
         const newLanguageField = { id: languageFields.length + 1 };
@@ -19,9 +42,42 @@ export default function InterviewInput2() {
         setLicenseFields([...licenseFields, newLicenseField]);
     };
 
-    const [grade, setGrade] = useState('');
-    const handleGradeChange = (event) => {
-        setGrade(event.target.value);
+    const handleChange = (e, field, index) => {
+        const { name, value } = e.target;
+        if (field === 'certifications') {
+            const newCertifications = [...(formData.certifications || '').split(',')];
+
+
+            newCertifications[index] = value;
+            setFormData(prevData => ({
+                ...prevData,
+                certifications: newCertifications.join(',')
+            }));
+        } else if (field === 'gpa') {
+            setFormData(prevData => ({
+                ...prevData,
+                gpa: value
+            }));
+        } else if (field === 'english') {
+            const newEnglish = [...(formData.english || '').split(',')];
+            newEnglish[index] = value;
+            setFormData(prevData => ({
+                ...prevData,
+                english: newEnglish.join(',')
+            }));
+        } else if (field === 'score') {
+            const newScore = [...(formData.score || '').split(',')];
+            newScore[index] = value;
+            setFormData(prevData => ({
+                ...prevData,
+                score: newScore.join(',')
+            }));
+        } else {
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: value
+            }));
+        }
     };
 
     return (
@@ -40,21 +96,38 @@ export default function InterviewInput2() {
 
                     {languageFields.map((field, index) => (
                         <InputWrap key={field.id}>
-                            {index === 0 && <Label >어학</Label>}
-                            <InputField placeholder='어학 종류' type="text" style={{ marginLeft: index !== 0 ? '12.6rem' : '0' }} />
+                            {index === 0 && <Label>어학</Label>}
+                            <InputField
+                                placeholder='어학 종류'
+                                type="text"
+                                style={{ marginLeft: index !== 0 ? '12.6rem' : '0' }}
+                                value={(formData.english || '').split(',')[index] || ''}
+                                onChange={(e) => handleChange(e, 'english', index)} // 변경된 부분: 'license' -> 'english'
+                            />
+
                             <PassSearch>
                                 <PassSearchIcon src='./assets/passSearch.png' />
                                 <PassSearchText>검색하기</PassSearchText>
                             </PassSearch>
-                            <InputField placeholder='취득 점수' type="text" />
+                            <InputField
+                                placeholder='취득 점수'
+                                type="text"
+                                value={(formData.score || '').split(',')[index] || ''}
+                                onChange={(e) => handleChange(e, 'score', index)}
+                            />
                             <MiniPlusImage src='./assets/miniplus.png' onClick={handleAddLanguageField} />
                         </InputWrap>
                     ))}
 
                     {licenseFields.map((field, index) => (
                         <InputWrap key={field.id}>
-                            {index === 0 && <Label >자격증</Label>}
-                            <InputField type="text" style={{ marginLeft: index !== 0 ? '12.6rem' : '0' }} />
+                            {index === 0 && <Label>자격증</Label>}
+                            <InputField
+                                type="text"
+                                style={{ marginLeft: index !== 0 ? '12.6rem' : '0' }}
+                                value={(formData.certifications || '').split(',')[index] || ''}
+                                onChange={(e) => handleChange(e, 'certifications', index)}
+                            />
                             <PassSearch>
                                 <PassSearchIcon src='./assets/passSearch.png' />
                                 <PassSearchText>검색하기</PassSearchText>
@@ -64,13 +137,25 @@ export default function InterviewInput2() {
                     ))}
 
                     <InputWrap>
-                        <MajorLabel >학력</MajorLabel>
-                        <InputField placeholder='학교명' type="text" />
+                        <MajorLabel>학력</MajorLabel>
+                        <InputField
+                            placeholder='학교명'
+                            type="text"
+                            value={formData.education}
+                            onChange={handleChange}
+                            name="education"
+                        />
                         <PassSearch>
                             <PassSearchIcon src='./assets/passSearch.png' />
                             <PassSearchText>검색하기</PassSearchText>
                         </PassSearch>
-                        <InputField placeholder='학과명' type="text" />
+                        <InputField
+                            placeholder='학과명'
+                            type="text"
+                            value={formData.major}
+                            onChange={handleChange}
+                            name="major"
+                        />
                         <PassSearch>
                             <PassSearchIcon src='./assets/passSearch.png' />
                             <PassSearchText>검색하기</PassSearchText>
@@ -82,11 +167,13 @@ export default function InterviewInput2() {
                         <GradeInput
                             type="text"
                             placeholder="학점"
+                            value={formData.gpa}
+                            onChange={(e) => handleChange(e, 'gpa')}
                         />
                         <Slash>/</Slash>
                         <GradeSelect
-                            defaultValue={grade}
-                            onChange={handleGradeChange}
+                            defaultValue={formData.gpa}
+                            onChange={(e) => handleChange(e, 'gpa')}
                         >
                             <option value="" disabled selected>기준 학점</option>
                             <option value="4.0">4.0</option>
@@ -98,12 +185,16 @@ export default function InterviewInput2() {
                         </GradeSelect>
                     </InputWrap>
 
-                    <InputWrap style={ {marginBottom: '57px' }}>
-                        <Label >대외 활동</Label>
-                        <ExternalInputField type="text" placeholder='관련 설명 입력하기'/>
+                    <InputWrap style={{ marginBottom: '57px' }}>
+                        <Label>대외 활동</Label>
+                        <ExternalInputField
+                            type="text"
+                            placeholder='관련 설명 입력하기'
+                            value={formData.activity}
+                            onChange={handleChange}
+                            name="activity"
+                        />
                     </InputWrap>
-
-
                 </Form>
                 <SubmitButton type="submit" onClick={navigateToPass3}>다음</SubmitButton>
             </Container>

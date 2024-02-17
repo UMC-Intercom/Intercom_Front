@@ -11,9 +11,6 @@ export default function CoverLetterInput() {
     company: '',
     department: '',
     year: '',
-    semester: '',
-    gender: 'no-selected',
-    birthday: '',
     education: '',
     major: '',
     gpa: '',
@@ -23,9 +20,6 @@ export default function CoverLetterInput() {
     score: '',
     titles: [],
     contents: [],
-    birthYear: '',
-    birthMonth: '',
-    birthDay: ''
   });
 
   const handleChange = (e) => {
@@ -96,50 +90,6 @@ export default function CoverLetterInput() {
               <option value="상반기">상반기</option>
               <option value="하반기">하반기</option>
             </Select>
-          </InputWrap>
-
-          <InputWrap>
-            <Label>성별</Label>
-            <RadioInput
-              name="gender"
-              value="male"
-              label="남자"
-              checked={formData.gender === 'male'}
-              onChange={handleChange}
-            />
-            <RadioInput
-              name="gender"
-              value="female"
-              label="여자"
-              checked={formData.gender === 'female'}
-              onChange={handleChange}
-            />
-            <RadioInput
-              name="gender"
-              value="no-selected"
-              label="선택 안 함"
-              checked={formData.gender === 'no-selected'}
-              onChange={handleChange}
-            />
-          </InputWrap>
-
-          <InputWrap>
-            <Label>생년월일</Label>
-            <Select name="birthYear" value={formData.birthYear} onChange={handleChange}>
-              {years.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </Select>년
-            <Select name="birthMonth" value={formData.birthMonth} onChange={handleChange}>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                <option key={month} value={month}>{month}</option>
-              ))}
-            </Select>월
-            <Select name="birthDay" value={formData.birthDay} onChange={handleChange}>
-              {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                <option key={day} value={day}>{day}</option>
-              ))}
-            </Select>일
           </InputWrap>
 
         </Form>
