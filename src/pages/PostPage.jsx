@@ -22,7 +22,7 @@ const PostPage = () => {
                 console.error('Error fetching post:', error);
             });
     }, [postId]);
-
+    
     if (!post) {
         return <div>Loading post...</div>;
     }
@@ -30,7 +30,7 @@ const PostPage = () => {
       // '수정하기' 버튼 클릭 시 수행할 로직을 여기에 추가하세요.
       console.log("게시글 수정 페이지로 이동");
   };
-  const categories = post.category.split(',');
+  const categories = post.category ? post.category.split(',') : [];
 
   // 분리된 카테고리를 map 함수로 순회하며 렌더링
   const renderedCategories = categories.map((category, index) => (

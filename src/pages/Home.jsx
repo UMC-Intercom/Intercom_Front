@@ -1,37 +1,39 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import styled from "styled-components";
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from "./AuthContext";
-import fakeNotices from '../data/fakeNotices';
-
+import { useNavigate } from "react-router-dom";
+import TalkPagination from "./TalkPagination"; 
 
 const ITEMS_PER_PAGE = 24;
 
 const Home = () => {
-    const [activePage, setActivePage] = useState("/home");
-    const navigate = useNavigate();
-    const totalPages = Math.ceil(fakeNotices.length / ITEMS_PER_PAGE);
- 
-    const [currentPage, setCurrentPage] = useState(1);
-    const { isLoggedIn } = useAuth();
+  const [jobs, setJobs] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
     const handlePageChange = (path) => {
-      if ((path === '/scrap' || path === '/mycareer') && !isLoggedIn) {
-        navigate('/join');
-      } else {
-        navigate(path);
-      }
+      navigate(path);
     };
 
-    const indexOfLastNotice = currentPage * ITEMS_PER_PAGE;
-    const indexOfFirstNotice = indexOfLastNotice - ITEMS_PER_PAGE;
-    const currentNotices = fakeNotices.slice(indexOfFirstNotice, indexOfLastNotice);
-
-
-    const paginate = (pageNumber) => {
+    const onPageChange = (pageNumber) => {
       setCurrentPage(pageNumber);
       window.scrollTo(0, 0);
-    };
+  };
+
+    useEffect(() => {
+      const fetchJobs = async () => {
+          try {
+              const response = await axios.get(`http://localhost:8080/jobs/by-count?page=${currentPage}`);
+              setJobs(response.data.content);
+              setTotalPages(response.data.totalPages);
+          } catch (error) {
+              console.error("Failed to fetch jobs:", error);
+          }
+      };
+
+      fetchJobs();
+  }, [currentPage]);
 
 
   return (
@@ -71,98 +73,26 @@ const Home = () => {
         style={{width: "75rem"}} />
       </BannerImg>
       <PopularNoticesBox>
-        <span style={{fontSize: "1.563rem", fontWeight: "800"}}>실시간 인기 공고</span>
-        <ContentsBox>
-            <Content>
-                {currentNotices.map(notice => (
-                 <NoticeItem key={notice.id}>
-                    <img src={notice.imageUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
-                    <div>
-                        <Title>[{notice.title}] </Title>
-                        <Information>{notice.information}</Information>
-                        <br />
-                        <br />
-                        <Deadline>D-{notice.deadline}</Deadline> <Views>조회 {notice.views}</Views>
-                    </div>
-                 </NoticeItem>
-                ))}
-            </Content>
-        </ContentsBox>
-        <Pagination>
-          {/* 현재 페이지가 1 또는 2일 때 */}
-          {currentPage === 1 && totalPages > 1 && (
-            <>
-              <PageNumber
-                onClick={() => paginate(1)}
-                isActive={true}
-              >
-                1
-              </PageNumber>
-              <PageNumber
-                onClick={() => paginate(2)}
-                isActive={false}
-              >
-                2
-              </PageNumber>
-              {totalPages > 2 && (
-                <Arrow
-                  src="/assets/RightArrow.png"
-                  onClick={() => paginate(3)}
-                  alt="Next"
+                <span style={{ fontSize: "1.563rem", fontWeight: "800" }}>실시간 인기 공고</span>
+                <ContentsBox>
+                    <Content>
+                        {jobs.map(job => (
+                            <NoticeItem key={job.id}>
+                                <img src={job.logoUrl} alt={job.title} style={{ marginBottom: "1.25rem" }} />
+                                <div>
+                                    <Title>[{job.company}] {job.title}</Title>
+                                    <Deadline>D-{job.expirationDate}</Deadline> <Views>조회 {job.viewCount}</Views>
+                                </div>
+                            </NoticeItem>
+                        ))}
+                    </Content>
+                </ContentsBox>
+         <TalkPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
                 />
-              )}
-            </>
-          )}
-
-          {currentPage === 2 && (
-            <>
-              <PageNumber
-                onClick={() => paginate(1)}
-                isActive={false}
-              >
-                1
-              </PageNumber>
-              <PageNumber
-                onClick={() => paginate(2)}
-                isActive={true}
-              >
-                2
-              </PageNumber>
-              {totalPages > 2 && (
-                <Arrow
-                  src="/assets/RightArrow.png"
-                  onClick={() => paginate(3)}
-                  alt="Next"
-                />
-              )}
-            </>
-          )}
-
-          {/* 현재 페이지가 3 이상일 때 */}
-          {currentPage > 2 && (
-            <>
-              <Arrow
-                src="/assets/LeftArrow.png"
-                onClick={() => paginate(currentPage - 1)}
-                alt="Previous"
-              />
-              <PageNumber
-                onClick={() => paginate(currentPage)}
-                isActive={true}
-              >
-                {currentPage}
-              </PageNumber>
-              {currentPage < totalPages && (
-                <Arrow
-                  src="/assets/RightArrow.png"
-                  onClick={() => paginate(currentPage + 1)}
-                  alt="Next"
-                />
-              )}
-            </>
-          )}
-        </Pagination>
-      </PopularNoticesBox>
+            </PopularNoticesBox>
     </Main>
   );
 };
@@ -266,10 +196,6 @@ const Title = styled.span`
   font-size: 1.25rem;
 `;
 
-const Information = styled.span`
-  font-size: 1.25rem;
-  font-weight: bold;
-`;
 
 const Deadline = styled.span`
   font-size: 1.063rem;
@@ -285,29 +211,4 @@ const Pagination = styled.div`
   display: flex;
   justify-content: center;
   padding: 1rem;
-`;
-
-const PageNumber = styled.span`
-  font-family: SUITE;
-  font-size: 1.25rem;
-  margin: 0 0.1rem;
-  cursor: pointer;
-  font-weight: ${({ isActive }) => (isActive ? "700" : "400")};
-  ${({ isArrow }) => isArrow && `pointer-events: none;`}
-  border-radius: 50%; // 원형 모양
-  background-color: ${({ isActive }) => (isActive ? "#E0E0E0" : "transparent")}; // 선택된 페이지에 대한 배경색
-  display: inline-block;
-  text-align: center;
-  min-width: 2rem; // 최소 너비 설정
-  height: 2rem; // 높이 설정
-  line-height: 2rem; // 텍스트를 수직 중앙으로 정렬
-`;
-
-const Arrow = styled.img`
-  width: 7px;
-  height: 15px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  margin-left: 1rem;
-  margin-right: 1rem;
 `;
