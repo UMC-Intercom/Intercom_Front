@@ -168,22 +168,30 @@ const JobDetail = () => {
         <Content>
           <Title>면접 후기</Title>
           <InterviewListContainer>
-            {interviews.map((interview) => (
-              <InterviewItem key={job.id}>
-                <div className="company-position">{interview.company} | {interview.position} | {interview.when}</div>
-                <div className="details">
-                  <span>{interview.language}</span> /
-                  <span> 대외활동: {interview.activity}</span> /
-                  <span> {interview.certificate}</span> /
-                  <span> {interview.education}</span> /
-                  <span> {interview.department}</span> /
-                  <span> 학점: {interview.grade}</span>
-                </div>
-                <div className="scrap-views">
-                  스크랩 {interview.scrap} | 조회수 {interview.views}
-                </div>
-              </InterviewItem>
-            ))}
+            {interviews.map(interview => {
+
+              const englishList = interview.english ? interview.english.split(', ') : [];
+              const scoreList = interview.score ? interview.score.split(', ') : [];
+
+              return (
+                  <InterviewItem key={interview.id}>
+                    <div className="company-position">{interview.company} | {interview.department} | {interview.year} | {interview.semester}</div>
+                    <div className="details">
+                      {englishList.map((english, index) => (
+                          <span key={index}> {english}: {scoreList[index]}, </span>
+                      ))} /
+                      <span> 대외활동: {interview.activity}</span> /
+                      <span> {interview.certification}</span> /
+                      <span> {interview.education}</span> /
+                      <span> {interview.department}</span> /
+                      <span> 학점: {interview.gpa}</span>
+                    </div>
+                    <div className="scrap-views">
+                      스크랩 {interview.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {interview.viewCount}
+                    </div>
+                  </InterviewItem>
+              );
+            })}
           </InterviewListContainer>
         </Content>
       )}
@@ -192,22 +200,29 @@ const JobDetail = () => {
         <Content>
           <Title>합격 자소서</Title>
           <InterviewListContainer>
-            {resumes.map((resume) => (
-              <InterviewItem key={resume.id}>
-                <div className="company-position">{resume.company} | {resume.position} | {resume.when}</div>
-                <div className="details">
-                  <span>{resume.language}</span> /
-                  <span> 대외활동: {resume.activities}</span> /
-                  <span> {resume.certificate}</span> /
-                  <span> {resume.education}</span> /
-                  <span> {resume.department}</span> /
-                  <span> 학점: {resume.grade}</span>
-                </div>
-                <div className="scrap-views">
-                  스크랩 {resume.scrap} | 조회수 {resume.views}
-                </div>
-              </InterviewItem>
-            ))}
+            {resumes.map(resume => {
+              const englishList = resume.english ? resume.english.split(', ') : [];
+              const scoreList = resume.score ? resume.score.split(', ') : [];
+
+              return (
+                  <InterviewItem key={resume.id}>
+                    <div className="company-position">{resume.company} | {resume.department} | {resume.year} | {resume.semester}</div>
+                    <div className="details">
+                      {englishList.map((english, index) => (
+                          <span key={index}> {english}: {scoreList[index]}, </span>
+                      ))} /
+                      <span> 대외활동: {resume.activity}</span> /
+                      <span> {resume.certification}</span> /
+                      <span> {resume.education}</span> /
+                      <span> {resume.department}</span> /
+                      <span> 학점: {resume.gpa}</span>
+                    </div>
+                    <div className="scrap-views">
+                      스크랩 {resume.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {resume.viewCount}
+                    </div>
+                  </InterviewItem>
+              );
+            })}
           </InterviewListContainer>
         </Content>
       )}  
