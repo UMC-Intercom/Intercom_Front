@@ -210,37 +210,6 @@ const ResultCount = styled.span`
   font-family: SUITE; // 검색개수 폰트수정
 `;
 
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 0.3125rem;
-  margin-bottom: 0.3125rem;
-`;
-
-const StyledButton = styled.button`
-  border: 1.5px solid gray;
-  border-radius: 5px;
-  color: gray;
-  background-color: transparent;
-  width: 7.8125rem;
-  height: 2.5rem;
-  font-size: 1rem;
-  font-family: SUITE; //정렬버튼 폰트수정
-  cursor: pointer;
-  transition: all 0.3s ease;
-  &:not(:first-child) {
-    margin-left: 0.625rem;
-  }
-  &:hover {
-    border-color: #5B00EF;
-    color: #5B00EF;
-  }
-  &.selected {
-    border-color: #5B00EF;
-    color: #5B00EF;
-    background-color: transparent;
-  }
-`;
 
 const PopularNoticesBox = styled.div`
   width: 75rem;
@@ -379,6 +348,7 @@ const SearchResults = () => {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { selectedJobs, selectedLocation, searchInput } = location.state || {};
+  const [searchResults, setSearchResults] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isButtonSelected, setIsButtonSelected] = useState({
     button1: false,
@@ -402,6 +372,8 @@ const SearchResults = () => {
       [buttonName]: !isButtonSelected[buttonName],
     });
   };
+
+  
 
   return (
     <div>
@@ -449,29 +421,8 @@ const SearchResults = () => {
         <PopularNoticesBox>
             <SearchResultTextWrapper>
                 <SearchResultText>검색 결과</SearchResultText>
-                <ResultCount>(35)</ResultCount>
+                <ResultCount>({searchResults.length})</ResultCount>
             </SearchResultTextWrapper>
-
-            <ButtonWrapper>
-                <StyledButton
-                    className={isButtonSelected.button1 ? "selected" : ""}
-                    onClick={() => handleButtonClick("button1")}
-                >
-                    UX/UI/GUI
-                </StyledButton>
-                <StyledButton
-                    className={isButtonSelected.button2 ? "selected" : ""}
-                    onClick={() => handleButtonClick("button2")}
-                >
-                    그래픽 디자인
-                </StyledButton>
-                <StyledButton
-                    className={isButtonSelected.button3 ? "selected" : ""}
-                    onClick={() => handleButtonClick("button3")}
-                >
-                    마케팅
-                </StyledButton>
-            </ButtonWrapper>
 
             <ContentsBox>
                 <Content>
