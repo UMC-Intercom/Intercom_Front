@@ -7,6 +7,8 @@ import fakeNotices from '../data/fakeNotices'; // Ensure the path to fakeNotices
 import fakeInterviewData from '../data/fakeInterviewData'; 
 import fakeData from '../data/fakeData';
 import fakeCoverletterData from '../data/fakeCoverletterData';
+import axios from "axios";
+import config from '../path/config';
 
 const ITEMS_PER_PAGE = 4;
 const NOTICES_PER_PAGE = 9;
@@ -46,18 +48,82 @@ const Scrap = () => {
     const [view, setView] = useState('announcement');
     const [data, setData] = useState([]);
 
+    const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+
     useEffect(() => {
         if (view === 'announcement') {
-            setData(fakeNotices);
+            console.log("공고");
+            // setData(fakeNotices);
+            axios.get(`${config.API_URL}/scraps/jobs`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                params: {
+                    page: 1, // 페이지 수
+                },
+            })
+                .then((response) => {
+                    const jobDto = response.data;
+                    // console.log("ㅇㅇㅇ ", jobDto);
+                    setData(jobDto.content);
+                })
+                .catch((error) => {
+                    console.error('Error fetching job scraps:', error);
+                });
         }
         else if (view === 'interview') {
-          setData(fakeInterviewData);
+            console.log("면접후기");
+            axios.get(`${config.API_URL}/scraps/interviews`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                params: {
+                    page: 1, // 페이지 수
+                },
+            })
+                .then((response) => {
+                    const interviewData = response.data;
+                    setData(interviewData.content);
+                })
+                .catch((error) => {
+                    console.error('Error fetching interview data:', error);
+                });
         }
         else if (view === 'coverletter') {
-            setData(fakeCoverletterData);
+            console.log("자소서");
+            axios.get(`${config.API_URL}/scraps/resumes`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                params: {
+                    page: 1, // 페이지 수
+                },
+            })
+                .then((response) => {
+                    const coverletterData = response.data;
+                    setData(coverletterData.content);
+                })
+                .catch((error) => {
+                    console.error('Error fetching coverletter data:', error);
+                });
         }
         else if (view === 'talk') {
-            setData(fakeData);
+            console.log("톡");
+            axios.get(`${config.API_URL}/scraps/talks`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                params: {
+                    page: 1, // 페이지 수
+                },
+            })
+                .then((response) => {
+                    const talkData = response.data;
+                    setData(talkData.content);
+                })
+                .catch((error) => {
+                    console.error('Error fetching talk data:', error);
+                });
         }
       }, [view]);
 
@@ -111,7 +177,7 @@ const Scrap = () => {
                         <Content> 
                             <Title>공고({fakeNotices.length})</Title>
                             <NoticesContent>
-                                {currentNotices.map(notice => (
+                                {data.map(notice => (
                                     <NoticeItem key={notice.id} >
                                     <img src={notice.imageUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
                                     <div>
