@@ -13,7 +13,7 @@ export default function CoverLetterInput() {
     year: '2024',
     semester: '상반기',
     gender: 'no-selected',
-    birthday: '',
+    birthday: `${currentYear}-01-01`,
     education: '',
     major: '',
     gpa: '',
@@ -36,7 +36,7 @@ export default function CoverLetterInput() {
           ...prevData,
           [name]: value
         };
-        const birthday = `${newBirthData.birthYear}-${newBirthData.birthMonth}-${newBirthData.birthDay}`;
+        const birthday = `${newBirthData.birthYear}-${newBirthData.birthMonth.padStart(2, '0')}-${newBirthData.birthDay.padStart(2, '0')}`;
         return {
           ...newBirthData,
           birthday: birthday
