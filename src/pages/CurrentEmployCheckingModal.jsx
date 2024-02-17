@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 const ModalWrapper = styled.div`
   position: fixed;
@@ -233,20 +234,11 @@ const CurrentEmployCheckingModal = ({ isOpen, onClose, onCheck }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
   const handleCategoryChange = (categoryId) => {
-    setSelectedCategories((prevSelectedCategories) => {
-      const isSelected = prevSelectedCategories.includes(categoryId);
-      if (isSelected) {
-        const updatedCategories = prevSelectedCategories.filter(id => id !== categoryId);
-        const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
-        setSelectedCategoryNames(updatedCategoryNames);
-        return updatedCategories;
-      } else {
-        const updatedCategories = [...prevSelectedCategories, categoryId];
-        const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
-        setSelectedCategoryNames(updatedCategoryNames);
-        return updatedCategories;
-      }
-    });
+    if (selectedCategories.includes(categoryId)) {
+      setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
+    } else {
+      setSelectedCategories([categoryId]);
+    }
   };
   let selectedCategoriesHeader = '카테고리 선택';
   if (selectedCategoryNames.length > 0) {
@@ -283,23 +275,20 @@ const CurrentEmployCheckingModal = ({ isOpen, onClose, onCheck }) => {
       try {
         // `mentorField` 쿼리 파라미터로 카테고리 이름을 전송합니다.
         // JSON 형식이 아닌 URL 인코딩된 폼 데이터 형식을 사용할 경우, `Content-Type` 헤더와 `body` 형식을 변경해야 합니다.
-        const response = await fetch(`http://localhost:8080/talks/certification-mentor?mentorField=${selectedCategoryName}`, {
-          method: 'POST',
+        const response = await axios.post(`http://localhost:8080/talks/certification-mentor?mentorField=${selectedCategoryName}`, null,{
           headers: {
-            'Accept': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
           },
           // JSON 형식의 데이터 대신 쿼리 문자열을 사용하여 서버로 전송합니다.
           // body: JSON.stringify({ categories: selectedCategories }) 부분을 제거하거나 수정합니다.
         });
-    
-        if (!response.ok) {
+
+        if (response.status < 200 || response.status >= 300) {
           throw new Error(`Server response was not ok: ${response.status}`);
         }
-    
-        const data = await response.json(); // 서버로부터 받은 응답을 JSON 형식으로 파싱합니다.
-        console.log('Server response:', data);
-    
+
+        console.log('Server response:', response.data);
+
         onClose(); // 모달을 닫습니다.
       } catch (error) {
         console.error('Error submitting categories:', error);

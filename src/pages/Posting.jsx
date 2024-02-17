@@ -215,7 +215,8 @@ const handleSubmit = async (e) => {
     
         if (response.status === 200 || response.status === 201) {
           alert('글이 성공적으로 등록되었습니다.');
-          navigate('/PostSuccessPage'); // 성공 시 리디렉션할 페이지 경로
+          // navigate('/PostSuccessPage', { state: { postId: response.data.id } }); // postId를 state로 전달
+          navigate(`/talks/${response.data.id}`);
         } else {
           throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
         }
