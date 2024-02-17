@@ -31,8 +31,7 @@ const PostSuccessPage = ({ postId }) => {
   const navigate = useNavigate();
 
   const handleViewPost = () => {
-    navigate(`/post/1`);
-    //navigate(`/post/:${postId}`);
+    navigate(`/post/${postId}`);
   };
 
   return (
