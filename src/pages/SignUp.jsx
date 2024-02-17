@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styled from "styled-components";
 import fakeUsersData from '../data/fakeUsersData';
 
+
+
 //이메일 유효성
 const validateEmail = (email) => {
   return email
@@ -41,9 +43,13 @@ const hasSpecialCharacter = (password) => {
 export default function SignUp() {
   const navigate = useNavigate();
   const navigateToSignUp2 = () => navigate('/signup2');
+  
+  const [currentYear] = useState(new Date().getFullYear());
+  const [years] = useState(Array.from(new Array(125), (val, index) => currentYear - index));
 
   const [email, setEmail] = useState("");
   const [checkEmail, setCheckEmail] = useState(false)
+  const [checkNickname, setCheckNickname] = useState(false)
   const [password, setPassword] = useState("");
   const [checkPwd1, setCheckPwd1] = useState(false);
   const [checkPwd2, setCheckPwd2] = useState(false);
@@ -69,7 +75,50 @@ export default function SignUp() {
   const [isRequiredConsent2, setRequiredConsent2] = useState(false);
 
   //모든 조건 충족/ 이용약관관련 추가하기
-  const isAllValid = isEmailValid && isPwdValid1 && isPwdValid2 && isPwdValid3 && isConfirmPwd && checkEmail && isRequiredConsent1 && isRequiredConsent2;
+  const isAllValid = isEmailValid && isPwdValid1 && isPwdValid2 && isPwdValid3 && isConfirmPwd && checkNickname && checkEmail && isRequiredConsent1 && isRequiredConsent2;
+
+  // 닉네임 중복 검사 함수(수정해야함)
+const isNicknameDuplicated = async (nickname) => {
+  try {
+    // 가짜 서버 대신 localStorage에서 닉네임 목록을 가져옴
+    const nicknames = JSON.parse(localStorage.getItem('userNicknames')) || [];
+
+    // 닉네임 중복 여부 체크
+    const isDuplicated = nicknames.includes(nickname.toLowerCase());
+
+    return isDuplicated;
+  } catch (error) {
+    console.error('Error checking nickname duplication:', error);
+    return false;
+  }
+};
+
+// 닉네임 형식 및 중복 여부 확인
+const onChangeNickname = useCallback(async (e) => {
+  const currNickname = e.target.value;
+  setNickName(currNickname);
+
+  // 닉네임 형식 체크
+  // 여기서는 예시로 닉네임의 길이가 3자 이상이어야 한다고 가정합니다.
+  const isNicknameValid = currNickname.length >= 3;
+
+  // 닉네임 중복 여부 체크
+  const isDuplicated = await isNicknameDuplicated(currNickname);
+
+  // 형식 및 중복 여부에 따라 상태 업데이트
+  if (!isNicknameValid || isDuplicated) {
+    setCheckNickname(false);
+  } else {
+    setCheckNickname(true);
+
+    // 닉네임이 중복되지 않으면 localStorage에 추가
+    const nicknames = JSON.parse(localStorage.getItem('userNicknames')) || [];
+    await new Promise((resolve) => {
+      localStorage.setItem('userNicknames', JSON.stringify([...nicknames, currNickname.toLowerCase()]));
+      resolve();
+    });
+  }
+}, []);
 
 
   //이메일 형식
@@ -207,54 +256,64 @@ const onSubmit = (e) => {
         <InputWrap>
         <Label>이메일</Label>
         <InputField type="email" onChange={onChangeEmail} />
+        <CheckWrap>
         {checkEmail !== null && (
                   <img
                     src={checkEmail ? 'assets/Check2.png' : 'assets/UnChecked.png'}
                     alt="이메일 중복 확인"
-                    style={{ width: '17px', height: '11px', marginRight: '5px', marginLeft:'10px' }}
+                    style={{ width: '17px', height: '11px', marginRight: '7px', marginLeft:'49px', marginTop: '9px' }}
                   />
                 )} 중복확인
+        </CheckWrap>
         </InputWrap>
 
         <InputWrap>
         <Label>비밀번호</Label>
         <InputField type="password" onChange={onChangePwd1} />
+        <CheckWrap>
         {checkPwd1 !== null && (
           <img
             className='check'
             src={checkPwd1 ? 'assets/Check2.png' : 'assets/UnChecked.png'} // 변경필요
             alt="비밀번호수 제한 확인"
-            style={{ width: '17px', height: '11px', marginRight: '5px',  marginLeft:'10px'}} // 변경필요
+            style={{ width: '17px', height: '11px', marginRight: '7px',  marginLeft:'49px' , marginTop: '9px'}} // 변경필요
           />
         )} 영문 8~20자
+        </CheckWrap>
+        <CheckWrap>
                 {checkPwd2 !== null && (
+                
           <img
             src={checkPwd2 ? 'assets/Check2.png' : 'assets/UnChecked.png'} // 변경필요
             alt="대문자 포함 확인"
-            style={{width: '17px', height: '11px', marginRight: '5px', marginLeft:'70px' }} // 변경필요
+            style={{width: '17px', height: '11px', marginRight: '7px', marginLeft:'49px', marginTop: '9px' }} // 변경필요
           />
         )} 대문자 포함
+        </CheckWrap>
+        <CheckWrap>
                 {checkPwd3 !== null && (
           <img
             src={checkPwd3 ? 'assets/Check2.png' : 'assets/UnChecked.png'} // 변경필요
             alt="특수문자 포함 확인"
-            style={{ width: '17px', height: '11px', marginRight: '5px',  marginLeft:'70px'}} // 변경필요
+            style={{ width: '17px', height: '11px', marginRight: '7px',  marginLeft:'49px', marginTop: '9px'}} // 변경필요
           />
         )} 특수문자
-
+        </CheckWrap>
         </InputWrap>
 
         <InputWrap>
         <Label>비밀번호 확인</Label>
         <InputField type="password" onChange={onChangeConfirmPwd} />
+        <CheckWrap>
         {confirmPwdMsg !== null && (
           <img
             className='check'
             src={confirmPwdMsg ? 'assets/Check2.png' : 'assets/UnChecked.png'}
             alt="비밀번호 확인"
-            style={{ width: '17px', height: '11px', marginRight: '5px', marginLeft:'10px'}}
+            style={{ width: '17px', height: '11px', marginRight: '7px', marginLeft:'49px', marginTop: '9px'}}
           />
         )} 확인완료
+        </CheckWrap>
         </InputWrap>
 
         <InputWrap>
@@ -265,49 +324,64 @@ const onSubmit = (e) => {
         <InputWrap>
         <Label>닉네임</Label>
         <InputField type="text" value={nickName} onChange={(e) => setNickName(e.target.value)} />
+        <CheckWrap>
+        {checkEmail !== null && (
+                  <img
+                    src={checkEmail ? 'assets/Check2.png' : 'assets/UnChecked.png'}
+                    alt="이메일 중복 확인"
+                    style={{ width: '17px', height: '11px', marginRight: '7px', marginLeft:'49px', marginTop: '9px' }}
+                  />
+                )} 중복확인
+        </CheckWrap>
         </InputWrap>
 
         <InputWrap>
         <Label>휴대폰</Label>
-        <InputField type="text" value={phoneNum} onChange={(e) => setPhoneNum(e.target.value)} />
+        <InputField type="text" placeholder='  예시: 01000000000' maxLength={11} value={phoneNum} onChange={(e) => setPhoneNum(e.target.value)} />
         </InputWrap>
 
         <InputWrap>
-        <Label>성별</Label>
-        <RadioInput type='radio' name='gender' value='female' onChange={(e) => setGender(e.target.value)} checked={gender === 'female'} />여자
-        <RadioInput type='radio' name='gender' value='male' onChange={(e) => setGender(e.target.value)} checked={gender === 'male'} />남자
-        <RadioInput type='radio' name='gender' value='none-selected' onChange={(e) => setGender(e.target.value)} checked={gender === 'none-selected'} />선택 안 함
-        </InputWrap>
+            <Label>성별</Label>
+            <RadioInput
+              name="gender"
+              value="male"
+              label="남자"
+            />
+            <RadioInput
+              name="gender"
+              value="female"
+              label="여자"
+            />
+            <RadioInput
+              name="gender"
+              value="no-selected"
+              label="선택 안 함"
+            />
+          </InputWrap>
 
         <InputWrap>
-        <Label>생년월일</Label>
-        <select value={birthYear} onChange={(e) => setBirthYear(e.target.value)}>
-          <option value="" disabled></option>
-          {Array.from({ length: 125 }, (_, index) => 2024 - index).map((year) => (
-            <option key={year} value={year}>{year}</option>
-          ))}
-        </select>
-        년
-        <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)}>
-          <option value="" disabled></option>
-          {Array.from({ length: 12 }, (_, index) => index + 1).map((month) => (
-            <option key={month} value={month}>{month}</option>
-          ))}
-        </select>
-        월
-        <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)}>
-          <option value="" disabled></option>
-          {Array.from({ length: 31 }, (_, index) => index + 1).map((day) => (
-            <option key={day} value={day}>{day}</option>
-          ))}
-        </select>
-        일
-        </InputWrap>
+            <Label>생년월일</Label>
+            <Select name="birthYear">
+              {years.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </Select><span>년</span>
+            <Select name="birthMonth">
+              {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                <option key={month} value={month}>{month}</option>
+              ))}
+            </Select><span>월</span>
+            <Select name="birthDay">
+              {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                <option key={day} value={day}>{day}</option>
+              ))}
+            </Select><span>일</span>
+          </InputWrap>
 
         <svg xmlns="http://www.w3.org/2000/svg" width="1201" height="4" viewBox="0 0 1201 4" fill="none">
         <path d="M2 2L1199 2.0001" stroke="#A1A1A1" stroke-width="3" stroke-linecap="round"/>
         </svg>
-
+      
         <Terms>
         <InputWrap>
           <Label>이용약관동의</Label>
@@ -316,12 +390,16 @@ const onSubmit = (e) => {
         </InputWrap>
 
         <InputWrap>
-        <RadioInput type="checkbox" id="requiredconsent1" name="requiredconsent1" onChange={handleRequiredConsent1Change} checked={isFullAgreement || isRequiredConsent1} />
+        <RadioInput type="checkbox" id="requiredconsent1" name="requiredconsent1" onChange={handleRequiredConsent1Change} checked={isFullAgreement || isRequiredConsent1}
+        style={{marginLeft:'188px'}}
+        />
         <RequiredConsent for="scales">이용약관 동의 (필수)</RequiredConsent>
         </InputWrap>
 
         <InputWrap>
-        <RadioInput type="checkbox" id="requiredconsent2" name="requiredconsent2" onChange={handleRequiredConsent2Change} checked={isFullAgreement || isRequiredConsent2} />
+        <RadioInput type="checkbox" id="requiredconsent2" name="requiredconsent2" onChange={handleRequiredConsent2Change} checked={isFullAgreement || isRequiredConsent2} 
+        style={{marginLeft:'188px'}}
+        />
         <RequiredConsent for="scales">개인정보 수집 이용 동의 (필수)</RequiredConsent>
         </InputWrap>
         </Terms>
@@ -334,6 +412,10 @@ const onSubmit = (e) => {
   )
 }
 
+const CheckWrap = styled.div`
+margin-top: 15px;
+`
+
 const Container = styled.div`
 display: flex;
 justify-content: center;
@@ -341,15 +423,6 @@ align-items: center;
 
 svg {
   margin-top: 3.13rem;
-}
-
-//수정필요
-select {
-  border: 3px solid #E1E1E1;
-  border-radius: 10px;
-  margin-right: 12px;
-  width: 70px;
-  height: 40px;
 }
 `
 const Title = styled.p`
@@ -374,6 +447,16 @@ display: flex;
 flex-direction: row;
 height: 3.5rem;
 margin-bottom: 1.87rem;
+/* B2 */
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 25px;
+/* identical to box height */
+
+color: #636363;
+
 `
 
 const Terms = styled.div`
@@ -425,6 +508,8 @@ font-style: normal;
 font-weight: 800;
 line-height: normal;
 
+margin-top: 13px;
+
 `
 
 const RequiredConsent = styled.label`
@@ -436,6 +521,7 @@ font-size: 1.25rem;
 font-style: normal;
 font-weight: 600;
 line-height: normal;
+margin-top: 14px;
 `
 
 export const SignUpButton = styled.button`
@@ -466,40 +552,49 @@ cursor: pointer;
 `;
 
 const RadioLabel = styled.label`
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    margin-left: 2rem;
-    margin-right: 5rem; // 각 라디오 버튼 사이 간격
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 2rem;
+  margin-right: 5rem; // 각 라디오 버튼 사이 간격
 
-    & input {
-        appearance: none; // 기본 스타일 제거
-        -webkit-appearance: none; // Safari를 위한 기본 스타일 제거
-        border: 1rem solid #E2E2E2;
-        border-radius: 50%; // 원형 테두리
-        width: 1em; // 너비
-        height: 1em; // 높이
-        margin-right: 0.4em; // 텍스트와의 간격
+  /* B2 */
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 25px;
+/* identical to box height */
+
+color: #636363;
+
+  & input {
+    appearance: none; // 기본 스타일 제거
+    -webkit-appearance: none; // Safari를 위한 기본 스타일 제거
+    border: 1rem solid #E2E2E2;
+    border-radius: 50%; // 원형 테두리
+    width: 1em; // 너비
+    height: 1em; // 높이
+    margin-right: 0.4em; // 텍스트와의 간격
 
     &:checked {
-        background-color: #5B00EF; // 선택 시 보라색으로 채움
-        border: 1rem solid #5B00EF; // 선택 시 보라색 테두리
-        position: relative; // 가상 요소를 위한 포지셔닝 컨텍스트
-      }
-  
-      &:checked::after {
-        content: ''; // 가상 요소에는 내용이 없음
-        position: absolute; // 부모 요소(input) 기준으로 절대 위치
-        top: 50%; // 상위 요소의 정중앙
-        left: 50%; // 상위 요소의 정중앙
-        transform: translate(-50%, -50%); // 정확한 중앙에 위치
-        width: 1rem; // 내부 원의 너비
-        height: 1rem; // 내부 원의 높이
-        border-radius: 50%; // 원형
-        background: #fff; // 내부 원의 배경색은 흰색
-      }
+      background-color: #5B00EF; // 선택 시 보라색으로 채움
+      border: 1rem solid #5B00EF; // 선택 시 보라색 테두리
+      position: relative; // 가상 요소를 위한 포지셔닝 컨텍스트
+    }
+
+    &:checked::after {
+      content: ''; // 가상 요소에는 내용이 없음
+      position: absolute; // 부모 요소(input) 기준으로 절대 위치
+      top: 50%; // 상위 요소의 정중앙
+      left: 50%; // 상위 요소의 정중앙
+      transform: translate(-50%, -50%); // 정확한 중앙에 위치
+      width: 1rem; // 내부 원의 너비
+      height: 1rem; // 내부 원의 높이
+      border-radius: 50%; // 원형
+      background: #fff; // 내부 원의 배경색은 흰색
+    }
   }
-  
 `;
 
 const RadioInput = ({ className, label, ...props }) => (
@@ -508,3 +603,30 @@ const RadioInput = ({ className, label, ...props }) => (
     {label}
   </RadioLabel>
 );
+
+const Select = styled.select`
+  font-family: SUITE;
+  font-size: 1rem;
+  font-weight: 700;
+  width: 7rem;
+  padding: 1rem 1rem;
+  border: 3px solid #e2e2e2;
+  border-radius: 0.625rem;
+  background-color: white;
+  margin-right: 1rem;
+  margin-left: 2rem;
+
+  /* B2 */
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 25px;
+/* identical to box height */
+
+color: #636363;
+
+& + span {
+  margin-top: 16px; 
+}
+`;

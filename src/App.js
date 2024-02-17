@@ -34,6 +34,11 @@ import CoverLetterInput2 from './pages/CoverLetterInput2';
 import CoverLetterHome from './pages/CoverLetterHome';
 import CoverLetterInput3 from './pages/CoverLetterInput3';
 import CoverLetterResult from './pages/CoverLetterResult';
+import InterviewHome from './pages/InterviewHome';
+import InterviewResult from './pages/InterviewResult';
+import InterviewInput1 from './pages/InterviewInput1';
+import InterviewInput2 from './pages/InterviewInput2';
+import InterviewInput3 from './pages/InterviewInput3';
 
 function App() {
   return (
@@ -80,6 +85,12 @@ function App() {
           <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />
           <Route path="/cover-letters-input3" element={<CoverLetterInput3 />} />
           <Route path="/cover-letters-result" element={<CoverLetterResult />} />
+
+          <Route path="/interviews" element={<InterviewHome />} />
+          <Route path="/interviews-result" element={<InterviewResult />} />
+          <Route path="/interviews-input1" element={<InterviewInput1 />} />
+          <Route path="/interviews-input2" element={<InterviewInput2 />} />
+          <Route path="/interviews-input3" element={<InterviewInput3 />} />
           </Routes>
         </AuthProvider>
       </div>
