@@ -1,37 +1,49 @@
 //비밀번호 찾기
 import React, {useState} from 'react'
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 import { useNavigate } from 'react-router-dom';
-import fakeUsersData from '../data/fakeUsersData';
+import axios from 'axios';
+import config from '../path/config';
 
 export default function FindingPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const [isValidEmail, setIsValidEmail] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
   const handleInputChange = (e) => {
-    setEmail(e.target.value);
+    const inputEmail = e.target.value;
+    setEmail(inputEmail);
+    setIsValidEmail(validateEmail(inputEmail));
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && isValidEmail) {
         findPassword();
     }
   };
 
   const findPassword = () => {
-    const foundUser = fakeUsersData.find(user => user.email === email);
-
-    if (foundUser) {
-        navigate('/settingPwd', { state: { user: foundUser } });
-    } else {
-        setIsModalOpen(true);
+    if (!isValidEmail) {
+      setIsModalOpen(true); // 유효하지 않은 이메일 형식으로 모달 표시
+      return;
     }
+
+    axios.post(`${config.API_URL}/users/check-email`, { email })
+      .then(response => {
+        navigate('/settingPwd', { state: { email: email } });
+      })
+      .catch(error => {
+        console.error('비밀번호 찾기 실패:', error);
+        setIsModalOpen(true); // 서버 측 오류로 모달 표시
+      });
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
 
   return (
     <Container>
@@ -44,20 +56,24 @@ export default function FindingPassword() {
         onChange={handleInputChange}
         onKeyPress={handleKeyPress}
       />
-      {isModalOpen && (
-        <ModalBackdrop onClick={closeModal}>
-          <ModalView onClick={e => e.stopPropagation()}>
-            이메일에 일치하는 비밀번호가 없습니다.
-          </ModalView>
-        </ModalBackdrop>
-      )}
+      <CheckButton onClick={findPassword} disabled={!isValidEmail}>다음</CheckButton>
+        {isModalOpen && (
+          <ModalBackdrop onClick={() => setIsModalOpen(false)}>
+            <ModalView onClick={(e) => e.stopPropagation()}>
+              존재하지 않은 이메일입니다.<br/>
+              <CloseButton onClick={() => setIsModalOpen(false)}>닫기</CloseButton>
+            </ModalView>
+          </ModalBackdrop>
+        )}
     </Container>
   )
 }
 
 const Container = styled.div`
 text-align: center;
-margin-top: -7rem;
+display: flex;
+flex-direction: column;
+align-items: center;
 `;
 
 const Text1 = styled.p`
@@ -102,7 +118,7 @@ font-weight: 700;
 line-height: normal;
 
 margin-top:1rem;
-margin-bottom:42.81rem;
+margin-bottom:3.19rem;
 padding-left: 1.44rem;
 `;
 
@@ -126,4 +142,37 @@ const ModalView = styled.div`
   border-radius: 0.625rem;
   text-align: center;
   box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
+`;
+
+const CloseButton = styled.button`
+    font-family:SUITE;
+    background-color: #5B00EF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+`;
+
+export const CheckButton = styled.button`
+  width: 36.75rem;
+  height: 4.5rem;
+  background-color: #5B00EF;
+  ${props => props.disabled && css`
+    background-color: #A1A1A1; // 비활성화 상태일 때의 색상
+    cursor: not-allowed;
+  `}
+  border: none;
+  border-radius: 0.625rem;
+  cursor: pointer;
+  color: #FFF;
+
+  text-align: center;
+  /* B2 */
+  font-family: SUITE;
+  font-size: 1.25rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
 `;

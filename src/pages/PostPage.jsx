@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import ko from 'date-fns/locale/ko';
 import TalkComment from './TalkComment';
+import {useAuth} from "./AuthContext";
 
 const PostPage = () => {
     const { postId } = useParams();
@@ -13,8 +14,21 @@ const PostPage = () => {
     const [isOwner, setIsOwner] = useState(false); // 작성자 본인 여부
     const defaultProfileImg = '../assets/MyProfile.png';
 
+    const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+    const { isLoggedIn } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
     useEffect(() => {
-        axios.get(`http://localhost:8080/talks/${postId}`)
+        if (!isLoggedIn) {
+            navigate('/join', { state: { from: location } });
+            return;
+        }
+        axios.get(`http://localhost:8080/talks/${postId}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
+            },
+        })
             .then(response => {
                 setPost(response.data);
             })
@@ -49,7 +63,7 @@ const PostPage = () => {
                     <EditImage src="../assets/Group73.png" alt="Profile"/>
               </EditButton>}
                 </TitleWrapper>
-                <Content>{post.content}</Content>
+                <Content dangerouslySetInnerHTML={{ __html: post.content }} />
                 <PostingInfoContainer>
                 <ProfileImage src={post.imageUrls && post.imageUrls.length > 0 ? post.imageUrls[0] : defaultProfileImg} alt="Profile" />
                     <User>{post.writer}</User>
@@ -59,7 +73,7 @@ const PostPage = () => {
                 {renderedCategories}
                 </Categories>
                             </PostContainer>
-            <TalkComment />
+            <TalkComment postId={post.id}/>
         </PageContainer>
     );
 };
