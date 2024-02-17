@@ -41,15 +41,21 @@ export default function CoverLetterInput3() {
       contents: [...prevData.contents, ''] // 빈 content 추가
     }));
   };
-
+  
+  const accessToken = localStorage.getItem('accessToken');
+  
   const handleConfirm = async () => {
     console.log(formData);
   
     try {
-      const response = await axios.post('http://localhost:8080//resumes', formData);
-  
+      const response = await axios.post('http://localhost:8080/resumes', formData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
       console.log(response.data);
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
     }
   
