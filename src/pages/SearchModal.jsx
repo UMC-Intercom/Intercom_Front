@@ -122,29 +122,6 @@ const CheckboxOption = ({ innerProps, label, isSelected }) => (
     </CheckboxOptionContainer>
 );
 
-// const jobOptions = [
-//     { value: 'planning', label: '기획·전략' },
-//     { value: 'it_development', label: 'IT개발·데이터' },
-//     { value: 'product_planning', label: '상품기획·MD' },
-//     { value: 'medical', label: '의료' },
-//     { value: 'marketing', label: '마케팅·홍보·조사' },
-//     { value: 'design', label: '디자인' },
-//     { value: 'transport', label: '운전·운송·배송' },
-//     { value: 'research', label: '연구·R&D' },
-//     { value: 'finance', label: '회계·세무·재무' },
-//     { value: 'sales', label: '영업·판매·무역' },
-//     { value: 'service', label: '서비스' },
-//     { value: 'education', label: '교육' },
-//     { value: 'hr', label: '인사·노무·HRD' },
-//     { value: 'customer_support', label: '고객상담·TM' },
-//     { value: 'production', label: '생산' },
-//     { value: 'media', label: '미디어·문화·스포츠' },
-//     { value: 'administrative', label: '총무·법무·사무' },
-//     { value: 'logistics', label: '구매·자재·물류' },
-//     { value: 'construction', label: '건설·건축' },
-//     { value: 'banking', label: '금융·보험' },
-// ];
-
 const jobOptions = [
     { value: '기획·전략', label: '기획·전략' },
     { value: 'IT개발·데이터', label: 'IT개발·데이터' },
@@ -168,28 +145,10 @@ const jobOptions = [
     { value: '금융·보험', label: '금융·보험' },
 ];
 
-// const locationOptions = [
-//     { value: 'all', label: '지역 제한 없음' },
-//     { value: 'seoul', label: '서울' },
-//     { value: 'busan', label: '부산' },
-//     { value: 'daegu', label: '대구' },
-//     { value: 'incheon', label: '인천' },
-//     { value: 'gwangju', label: '광주' },
-//     { value: 'daejeon', label: '대전' },
-//     { value: 'ulsan', label: '울산' },
-//     { value: 'gyeonggi', label: '경기' },
-//     { value: 'gangwon', label: '강원' },
-//     { value: 'chungbuk', label: '충북' },
-//     { value: 'chungnam', label: '충남' },
-//     { value: 'jeonbuk', label: '전북' },
-//     { value: 'jeonnam', label: '전남' },
-//     { value: 'gyeongbuk', label: '경북' },
-//     { value: 'gyeongnam', label: '경남' },
-//     { value: 'jeju', label: '제주' },
-// ];
+
 
 const locationOptions = [
-    { value: '지역 제한 없음', label: '지역 제한 없음' },
+    { value: 'all', label: '지역 제한 없음' },
     { value: '서울', label: '서울' },
     { value: '부산', label: '부산' },
     { value: '대구', label: '대구' },

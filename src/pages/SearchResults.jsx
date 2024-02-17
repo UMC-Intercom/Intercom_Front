@@ -102,23 +102,46 @@ const CustomValueContainer = ({ children, getValue, ...props }) => {
 };
 
 const jobOptions = [
-  { value: 'sales', label: '영업/고객상담' },
-  { value: 'management', label: '경영/사무' },
-  { value: 'marketing', label: '마케팅/경영/홍보' },
-  { value: 'production', label: '생산/제조' },
-  { value: 'research', label: '연구개발/설계' },
-  { value: 'it', label: 'IT/인터넷' },
-  { value: 'design', label: '디자인' },
+  { value: '기획·전략', label: '기획·전략' },
+  { value: 'IT개발·데이터', label: 'IT개발·데이터' },
+  { value: '상품기획·MD', label: '상품기획·MD' },
+  { value: '의료', label: '의료' },
+  { value: '마케팅·홍보·조사', label: '마케팅·홍보·조사' },
+  { value: '디자인', label: '디자인' },
+  { value: '운전·운송·배송', label: '운전·운송·배송' },
+  { value: '연구·R&D', label: '연구·R&D' },
+  { value: '회계·세무·재무', label: '회계·세무·재무' },
+  { value: '영업·판매·무역', label: '영업·판매·무역' },
+  { value: '서비스', label: '서비스' },
+  { value: '교육', label: '교육' },
+  { value: '인사·노무·HRD', label: '인사·노무·HRD' },
+  { value: '고객상담·TM', label: '고객상담·TM' },
+  { value: '생산', label: '생산' },
+  { value: '미디어·문화·스포츠', label: '미디어·문화·스포츠' },
+  { value: '총무·법무·사무', label: '총무·법무·사무' },
+  { value: '구매·자재·물류', label: '구매·자재·물류' },
+  { value: '건설·건축', label: '건설·건축' },
+  { value: '금융·보험', label: '금융·보험' },
 ];
 
 const locationOptions = [
   { value: 'all', label: '지역 제한 없음' },
-  { value: 'seoul', label: '서울' },
-  { value: 'gyeonggi', label: '경기' },
-  { value: 'incheon', label: '인천' },
-  { value: 'busan', label: '부산' },
-  { value: 'daegu', label: '대구' },
-  { value: 'daejeon', label: '대전' },
+  { value: '서울', label: '서울' },
+  { value: '부산', label: '부산' },
+  { value: '대구', label: '대구' },
+  { value: '인천', label: '인천' },
+  { value: '광주', label: '광주' },
+  { value: '대전', label: '대전' },
+  { value: '울산', label: '울산' },
+  { value: '경기', label: '경기' },
+  { value: '강원', label: '강원' },
+  { value: '충북', label: '충북' },
+  { value: '충남', label: '충남' },
+  { value: '전북', label: '전북' },
+  { value: '전남', label: '전남' },
+  { value: '경북', label: '경북' },
+  { value: '경남', label: '경남' },
+  { value: '제주', label: '제주' },
 ];
 
 const CustomMenuList = props => (
@@ -277,74 +300,6 @@ const Views = styled.span`
   color: #636363;
 `;
 
-const fakeNotices = [
-    {
-      id: 1,
-      imageUrl: "/assets/notice1.jpg",
-      title: "가짜 공고 냠냠냠",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-      id: 2,
-      imageUrl: "/assets/notice2.jpg",
-      title: "가짜 공고 냉돌이",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-      id: 3,
-      imageUrl: "/assets/notice3.jpg",
-      title: "가짜 공고 냥돌냥",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-        id: 4,
-        imageUrl: "/assets/notice4.jpg",
-        title: "가짜 공고 돌돌이",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    }, 
-    {
-        id: 5,
-        imageUrl: "/assets/notice5.jpg",
-        title: "가짜 공고 냠냠냠",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-        id: 6,
-        imageUrl: "/assets/notice6.jpg",
-        title: "가짜 공고 냉돌이",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-        id: 7,
-        imageUrl: "/assets/notice7.jpg",
-        title: "가짜 공고 냥돌냥",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-          id: 8,
-          imageUrl: "/assets/notice8.jpg",
-          title: "가짜 공고 돌돌이",
-          information: "2024년 상반기 체험형 청년인턴",
-          deadline:15,
-          views:1202
-        },
-  ];
-
-
 const SearchResults = () => {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -377,6 +332,13 @@ const SearchResults = () => {
     });
   };
 
+  const calculateRemainingDays = (expirationDate) => {
+    const today = new Date();
+    const expiration = new Date(expirationDate);
+    const timeDiff = expiration - today;
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return daysDiff > 0 ? `D-${daysDiff}` : '기한 만료';
+  };
 
   return (
     <div>
@@ -431,12 +393,12 @@ const SearchResults = () => {
                     <Content>
                         {searchResults.map(result => (
                             <NoticeItem key={result.id}>
-                                <img src={result.imageUrl} alt={result.title} style={{ marginBottom: "20px" }} />
+                                <img src={result.logoUrl} alt={result.title} style={{ marginBottom: "20px" }} />
                                 <div>
                                     <Title>[{result.title}]</Title>
-                                    <Information>{result.information}</Information>
+                                    <Information>{result.company}</Information>
                                     <br /><br />
-                                    <Deadline>D-{result.deadline}</Deadline> <Views>조회 {result.views}</Views>
+                                    <Deadline>{calculateRemainingDays(result.expirationDate)}</Deadline> <Views>조회 {result.viewCount.toLocaleString()}회</Views>
                                 </div>
                             </NoticeItem>
                         ))}
