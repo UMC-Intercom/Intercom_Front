@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios'; 
 import styled from 'styled-components';
 import Select, { components } from 'react-select';
@@ -356,7 +356,10 @@ const SearchResults = () => {
     button2: false,
     button3: false,
   });
-  
+
+  useEffect(() => {
+      setSearchResults(location.state.searchResults);
+      }, []);
 
   const handleSearchBarClick = () => {
     setIsModalOpen(true);

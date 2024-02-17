@@ -320,8 +320,7 @@ const SearchModal = ({ onClose, setSearchResults}) => {
                 }
             });
             console.log(response.data);
-            setSearchResults(response.data); // 검색 결과를 전달
-            navigate('/search-results');
+            navigate('/search-results', { state: { searchResults: response.data.content } });
             onClose();
         } catch (error) {
             console.error('Error searching for jobs:', error);
