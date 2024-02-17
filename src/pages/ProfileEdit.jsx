@@ -224,21 +224,21 @@ const handleInputChange = useCallback((e) => {
                     name="gender"
                     value="male"
                     onChange={handleInputChange}
-                    checked={user.gender === "male"}
+                    checked={user.gender.toUpperCase() === 'MALE'}
                     label="남자"
                 />
                 <RadioInput
                     name="gender"
                     value="female"
                     onChange={handleInputChange}
-                    checked={user.gender === "female"}
+                    checked={user.gender.toUpperCase() === 'FEMALE'}
                     label="여자"
                 />
                 <RadioInput
                     name="gender"
-                    value="no-selected"
+                    value="none"
                     onChange={handleInputChange}
-                    checked={user.gender === "no-selected"}
+                    checked={user.gender.toUpperCase() === 'NONE'}
                     label="선택 안 함"
                 />
             </InputWrap>
