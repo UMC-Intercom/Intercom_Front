@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
 import styled from "styled-components";
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 export default function OnBoarding2() {
   const navigate = useNavigate();
-  const navigateToSignUp4 = () => navigate('/signup4');
+  const userNickname = localStorage.getItem('userNickname');
+
+  const navigateToSignUp4 = () => {
+    // 서버
+    axios.post(`http://localhost:8080/users/interests?nickname=${userNickname}`, selectedStr)
+        .then(response => {
+          alert('관심분야가 저장되었습니다.');
+          navigate('/signup4');
+        })
+        .catch(error => {
+          console.error('관심분야 저장 실패:', error);
+          alert('관심분야 저장에 실패하였습니다.');
+        });
+  }
 
   const [selected, setSelected] = useState([]);
 
@@ -15,7 +29,7 @@ export default function OnBoarding2() {
       setSelected([...selected, index]);
     }
     
-    console.log(selected);
+    // console.log(selected);
     console.log(selectedStr);
   };
   
