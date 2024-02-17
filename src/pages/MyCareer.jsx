@@ -1,10 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect  } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import fakeCareerData from '../data/fakeCareerData';
 import fakeCareerDetailData from '../data/fakeCareerDetailData';
 import fakeUserData from '../data/fakeUserData';
 import html2pdf from 'html2pdf.js';
+import axios from 'axios';
+import config from '../path/config';
+import { useAuth } from './AuthContext';
 
 const MainContainer = styled.div`
   font-family: SUITE;
@@ -33,7 +36,7 @@ const ContentContainer = styled.div`
 
 const ProfileBox = styled.div`
   width: 384px;
-  height: 385px;
+  height: 511px;
   background-color: #EFF0F4;
   border-radius: 10px;
   display: flex;
@@ -53,9 +56,8 @@ const CareerBox = styled.div`
 `;
 
 const ProfileImage = styled.img`
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
+  width: 198px;
+  height: 254.43px;
   margin-bottom: 20px;
 `;
 
@@ -63,8 +65,8 @@ const EditButton = styled.img`
   width: 50px;
   height: 50px;
   position: absolute;
-  right: 107px; 
-  bottom: 185px; 
+  right: 70px; 
+  bottom: 220px; 
   cursor: pointer;
 `;
 
@@ -305,73 +307,93 @@ const CertificateScore = styled.div`
   color: #636363;
 `;
 
-const CareerTitle = styled(EducationTitle)`
-    margin-bottom: 10px;
+const ActivityTitle = styled(EducationTitle)`
+  margin-bottom: 10px;
 `;
 
-const CareerBox2 = styled(EducationBox)`
+const ActivityBox = styled(EducationBox)`
   margin-top: 10px;
   height: 123px; 
 `;
 
-const CareerText = styled.div`
-  padding-left: 25px;
-  font-weight: 700;
-  font-size: 15px;
-  color: #636363;
-`;
-
-const MonthText = styled.div`
-  font-weight: 700;
-  padding-left: 25px;
-  font-size: 15px;
-  color: #5B00EF;
-  margin-top: 5px;
-  margin-bottom: 30px;
-`;
-
-const CareerContainer = styled.div`
+const ActivityDetailsContainer = styled.div`
   display: flex;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
 `;
 
-const CareerInfoLeft = styled.div`
-  display: flex;
-  flex-direction: column;
+const ActivityName = styled.div`
+  font-weight: 800;
+  font-size: 16px;
 `;
 
-const CareerInfoRight = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-left: 5rem;
-`;
-
-const JobDescription = styled.div`
+const ActivityPeriod = styled.div`
   font-weight: 700;
-  font-size: 15px;
-  color: #636363;
-  margin-top: 5px;
-`;
-
-const SalaryText = styled.div`
-  font-weight: 700;
+  padding-left: 10px;
   font-size: 15px;
   color: #636363;
 `;
 
-const Company = styled.div`
-  font-weight: 800;
-  font-size: 16px;
-  margin-bottom: 10px;
+const ActivityContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-left: 25px;
+  padding-right: 25px;
 `;
 
-const PositionText = styled.div`
-  font-weight: 800;
-  font-size: 16px;
+
+const ActivityDescription = styled.div`
+  font-weight: 700;
+  font-size: 15px;
   color: #636363;
-  margin-left: 15px;
-  margin-bottom: 10px;
+  margin-top: 10px;
 `;
+
+const SkillsSection = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  margin-top: -20px;
+`;
+
+const SkillsTitle = styled.h3`
+  font-weight: 800;
+  font-size: 25px;
+  color: #636363;
+  margin-left: 55px;
+  margin-bottom: 20px; 
+`;
+
+const ToggleImage = styled.img`
+  cursor: pointer;
+  align-self: center; 
+  margin-right: 55px; 
+  width: 14px;
+  transform: ${({ isRotated }) => isRotated ? 'rotate(180deg)' : 'rotate(0deg)'};
+`;
+
+const SkillBox = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 55px;
+  gap: 10px; 
+  justify-content: flex-start;
+  align-items: center;
+  width: calc(100% - 110px); 
+`;
+
+const SkillItem = styled.div`
+  background-color: #9FAEFF;
+  color: white;
+  font-family: 'SUITE-Bold', sans-serif;
+  font-size: 17px; 
+  padding: 10px 20px;
+  border-radius: 22px;
+`;
+
 
 const DownloadButtonContainer = styled.div`
   display: flex;
@@ -499,19 +521,92 @@ const ProfileSection = styled.div`
 
 
 const MyProfile = () => {
-  const [profileImage, setProfileImage] = useState('./assets/MyProfile.png');
-  const navigate = useNavigate();
+  const [profileImage, setProfileImage] = useState(localStorage.getItem('careerProfileImage') || './assets/careerprofile.png');
+  const navigate = useNavigate()
+  ;
+  const { isLoggedIn } = useAuth();
+
+  const [userInfo, setUserInfo] = useState({
+    name: '',
+    email: '',
+    phoneNum: '',
+  });
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        // 예시: 사용자 정보를 가져오는 axios 요청
+        const response = await axios.get(`${config.API_URL}/users/current-user`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+  
+        if (response.data) {
+          const userEmail = response.data.email; // 사용자 ID를 응답에서 가져옴 (가정)
+          // 사용자 정보 상태 업데이트
+          setUserInfo({
+            name: response.data.name,
+            email: response.data.email,
+            phoneNum: response.data.phone,
+          });
+          
+          // 사용자 ID를 기반으로 프로필 이미지 URL 로딩
+          const storedImageUrl = localStorage.getItem(`profileImage_${userEmail}`) || './assets/careerprofile.png';
+          setProfileImage(storedImageUrl);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user info:', error);
+      }
+    };
+  
+    fetchUserInfo();
+  }, []);
+  
+  
+  
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('file', file); // 'file'은 서버에서 요구하는 필드명입니다.
+  
+      axios.post(`${config.API_URL}/users/career-profile`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      })
+      .then((response) => {
+        const uploadedImageUrl = response.data; // 예시로 추가한 대체 경로
+        if (uploadedImageUrl) {
+          // userInfo.email을 사용하여 로컬 스토리지에 저장
+          const userEmail = userInfo.email;
+          if (userEmail) {
+            localStorage.setItem(`profileImage_${userEmail}`, uploadedImageUrl);
+            setProfileImage(uploadedImageUrl);
+          } else {
+            console.error('User email is not defined.');
+          }
+        } else {
+          console.error('Invalid response for image upload:', response.data);
+          alert('이미지 URL을 받아오는 데 실패했습니다.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error uploading image:', error);
+      });
     }
   };
+  
+  
+  useEffect(() => {
+    // 로컬 스토리지에서 사용자 프로필 이미지 URL을 가져와 상태에 저장
+    const storedImageUrl = localStorage.getItem('careerProfileImage') || './assets/careerprofile.png';
+    setProfileImage(storedImageUrl);
+  }, [isLoggedIn]);
+  
 
   const handleNavigate = () => {
     navigate('/profile-edit');
@@ -531,34 +626,58 @@ const MyProfile = () => {
       />
       <ProfileDetailsContainer>
         <NameAndButtonContainer>
-          <ProfileName>{fakeUserData.name}</ProfileName>
+          <ProfileName>{userInfo.name}</ProfileName>
           <NavigateButton src="./assets/Edit2.png" alt="Settings" onClick={handleNavigate} />
         </NameAndButtonContainer>
-        <ProfileDetail>이메일 <ProfileEmailValue>{fakeUserData.email}</ProfileEmailValue></ProfileDetail>
-        <ProfileDetail>휴대전화 <ProfileNumberValue>{fakeUserData.phoneNum}</ProfileNumberValue></ProfileDetail>
+        <ProfileDetail>이메일 <ProfileEmailValue>{userInfo.email}</ProfileEmailValue></ProfileDetail>
+        <ProfileDetail>휴대전화 <ProfileNumberValue>{userInfo.phoneNum}</ProfileNumberValue></ProfileDetail>
       </ProfileDetailsContainer>
     </ProfileBox>
   );
 };
 
 const MyCareer = () => {
+  const [isSkillsVisible, setIsSkillsVisible] = useState(true);
   const [isPdfDownloadMode, setIsPdfDownloadMode] = useState(false);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false); 
   const contentRef = useRef(null);
   const [showDownloadCompleteModal, setShowDownloadCompleteModal] = useState(false);
+  const [userInfo, setUserInfo] = useState({
+    name: '',
+    email: '',
+    phoneNum: '',
+  });
+  
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get(`${config.API_URL}/users/current-user`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+  
+        if (response.data) {
+          setUserInfo({
+            name: response.data.name,
+            email: response.data.email,
+            phoneNum: response.data.phone,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch user info:', error);
+      }
+    };
+  
+    fetchUserInfo();
+  }, []);
+  
 
 
-
-  const calculateDuration = (start, end) => {
-    const startDate = new Date(start.split('. ').join('-'));
-    const endDate = new Date(end.split('. ').join('-'));
-    const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + endDate.getMonth() - startDate.getMonth() + 1;
-    const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
-    return `${years > 0 ? `${years}년 ` : ''}${remainingMonths > 0 ? `${remainingMonths}개월` : ''}`.trim();
+  const toggleSkillsVisibility = () => {
+    setIsSkillsVisible(!isSkillsVisible);
   };
-
   
   const togglePdfDownloadMode = () => {
     setIsPdfDownloadMode(!isPdfDownloadMode);
@@ -577,14 +696,31 @@ const MyCareer = () => {
     navigate('/mycareer-edit');
   };
 
+  const renderActivities = () => {
+    return fakeCareerData.activity.map((act, index) => (
+      <CenteredContainer key={index}>
+        <ActivityBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
+          <ActivityContainer>
+            <ActivityDetailsContainer>
+              <ActivityName>{act.name}</ActivityName>
+              <ActivityPeriod>{`${act.start_date} ~ ${act.end_date}`}</ActivityPeriod>
+            </ActivityDetailsContainer>
+            <ActivityDescription>{act.description}</ActivityDescription>
+          </ActivityContainer>
+        </ActivityBox>
+      </CenteredContainer>
+    ));
+  };
 
   const handleDownload = () => {
+
+    
     setShowModal(false);
     setIsPdfDownloadMode(true);
     
     setTimeout(() => {
       const element = document.getElementById('pdf-content');
-      const fileName = `${fakeUserData.name}님의 커리어.pdf`;
+      const fileName = `${userInfo.name}님의 커리어.pdf`;
   
       const options = {
       margin: [5, 5, 5, 5],
@@ -611,6 +747,8 @@ const MyCareer = () => {
 };
 
 const DownloadCompleteModal = () => (
+
+  
   <ModalBackground>
     <ModalContainer>
       <ModalCloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setShowDownloadCompleteModal(false)} />
@@ -621,6 +759,9 @@ const DownloadCompleteModal = () => (
     </ModalContainer>
   </ModalBackground>
 );
+
+const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/idphoto.png';
+
   return (
     <>
       {showModal && (
@@ -644,12 +785,13 @@ const DownloadCompleteModal = () => (
         <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '757px' : '792px' }}>
         {isPdfDownloadMode && (
         <ProfileSection>
-          <IDPhoto src="./assets/idphoto.png" alt="ID Photo" />
+          <IDPhoto src={profileImageUrl} alt="ID Photo" />
           <ProfileDetailsContainer2>
-            <ProfileName2>{fakeUserData.name}</ProfileName2>
-            <ProfileDetail2>이메일 <ProfileEmailValue>{fakeUserData.email}</ProfileEmailValue></ProfileDetail2>
-            <ProfileDetail2>휴대전화 <ProfileNumberValue>{fakeUserData.phoneNum}</ProfileNumberValue></ProfileDetail2>
-          </ProfileDetailsContainer2>
+            <ProfileName2>{userInfo.name}</ProfileName2>
+            <ProfileDetail2>이메일 <ProfileEmailValue>{userInfo.email}</ProfileEmailValue></ProfileDetail2>
+            <ProfileDetail2>휴대전화 <ProfileNumberValue>{userInfo.phoneNum}</ProfileNumberValue></ProfileDetail2>
+        </ProfileDetailsContainer2>
+
         </ProfileSection>
       )}
         <LanguageTitleContainer>
@@ -691,28 +833,29 @@ const DownloadCompleteModal = () => (
             </EducationBox>
           </CenteredContainer>
           <SectionDivider />
-          <CareerTitle>경력</CareerTitle>
-          {fakeCareerDetailData.map((career, index) => (
-            <CenteredContainer key={index}>
-              <CareerBox2 style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
-                <CareerContainer>
-                  <CareerInfoLeft>
-                    <CareerText>{`${career.start_data} ~ ${career.end_data}`}</CareerText>
-                    <MonthText>{calculateDuration(career.start_data, career.end_data)}</MonthText>
-                  </CareerInfoLeft>
-                  <CareerInfoRight>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Company>{career.company}</Company>
-                      <PositionText>{career.position}</PositionText>
-                    </div>
-                    <SalaryText>연봉 | {career.salary}</SalaryText>
-                    <JobDescription>주요 직무 | {career.job}</JobDescription>
-                  </CareerInfoRight>
-                </CareerContainer>
-              </CareerBox2>
-            </CenteredContainer>
-          ))}
+
           
+      <ActivityTitle>대외활동</ActivityTitle>
+        {renderActivities()}
+        <SectionDivider />
+
+        <SkillsSection>
+            <SkillsTitle>보유 스펙</SkillsTitle>
+            <ToggleImage
+              src="./assets/Toggle.png"
+              alt="Toggle Skills"
+              onClick={toggleSkillsVisibility}
+              isRotated={!isSkillsVisible}
+            />
+          </SkillsSection>
+          {isSkillsVisible && (
+            <SkillBox>
+              {fakeCareerData.skill.map((skill, index) => (
+                <SkillItem key={index}>{skill}</SkillItem>
+              ))}
+            </SkillBox>
+          )}
+
         </CareerBox>
         
       </ContentContainer>

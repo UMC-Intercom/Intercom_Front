@@ -5,6 +5,8 @@ import certificates from '../data/certificates';
 import schools from '../data/schools'; // 학교 데이터
 import majors from '../data/majors'; // 학과 데이터
 import jobSkills from '../data/skillsData';
+import axios from 'axios';
+import config from '../path/config';
 
 const EditCareerPage = styled.div`
   display: flex;
@@ -725,6 +727,35 @@ const EditCareer = () => {
     링크: true, // 기본적으로 숨김
   });
 
+  const handleSave = async () => {
+    // 서버에 전송할 데이터 객체 구성
+    const payload = {
+      english: languageInputs.map(input => input.name).join(", "),
+      score: languageInputs.map(input => input.score).join(", "),
+      certification: certificateInputs.map(input => input.name).join(", "),
+      university: schoolInputs[0].name,
+      major: majorInputs[0].name,
+      gpa: grade + "/" + graduate, // 예제에 따라 GPA와 졸업여부를 결합
+      activity: activityDescription, // 이 부분은 문자열로 변경됨
+      skill: selectedSkills.join(", "),
+      link: links.join(", "),
+    };
+  
+    try {
+      const response = await axios.post(`${config.API_URL}/careers`, payload, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 필요한 인증 헤더가 있다면 추가
+          'Content-Type': 'application/json', // JSON 형태로 데이터를 전송한다고 서버에 알림
+        },
+      });
+      console.log("서버 응답:", response.data);
+      alert('저장되었습니다.'); // 성공 메시지
+    } catch (error) {
+      console.error("서버로 데이터 저장 중 오류 발생:", error);
+      alert('저장에 실패했습니다.'); // 오류 메시지
+    }
+  };
+  
   // 스펙 모달에서 체크박스 선택을 처리하는 함수
 const handleSpecCheckboxChange = (specName) => {
   setSectionsVisible(prevSections => ({
@@ -1241,39 +1272,37 @@ const handleSearchMajorClick = () => {
       {renderSection('링크')}
 
         
-
-       
-
-     
-      {/* Skill Search Modal */}
       {isSkillModalVisible && (
-        <ModalOverlay show={isSkillModalVisible}>
-          <ModalContainer>
-            <CloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setSkillModalVisible(false)} />
-            <SearchSection>
-              <SearchInput
-                placeholder="직무를 검색해보세요 ex) 개발자"
-                value={skillSearchTerm}
-                onChange={(e) => setSkillSearchTerm(e.target.value)}
-              />
-                     <SearchButtonContainer onClick={handleSearchClick}>
-            <SearchIcon src="./assets/EditCareerSearch.png" alt="Search" />
-            <SearchButton>검색하기</SearchButton>
-          </SearchButtonContainer>
-            </SearchSection>
-            <ResultsContainer>
-              {renderSkillBoxes()}
-            </ResultsContainer>
-          </ModalContainer>
-        </ModalOverlay>
+  <ModalOverlay show={isSkillModalVisible}>
+    <ModalContainer>
+      <CloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setSkillModalVisible(false)} />
+      <SearchSection>
+        <SearchInput
+          placeholder="직무를 검색해보세요 ex) 개발자"
+          value={skillSearchTerm}
+          onChange={(e) => setSkillSearchTerm(e.target.value)}
+        />
+        <SearchButtonContainer onClick={handleSearchClick}>
+          <SearchIcon src="./assets/EditCareerSearch.png" alt="Search" />
+          <SearchButton>검색하기</SearchButton>
+        </SearchButtonContainer>
+      </SearchSection>
+      {/* 사용자가 검색어를 입력했을 때만 결과 컨테이너를 렌더링 */}
+      {skillSearchTerm && (
+        <ResultsContainer>
+          {renderSkillBoxes()}
+        </ResultsContainer>
       )}
+    </ModalContainer>
+  </ModalOverlay>
+)}
 
 
           
       </EditContainer>
 
       <SaveButtonContainer>
-          <SaveButton>
+          <SaveButton onClick={handleSave}>
             저장하기
           </SaveButton>
       </SaveButtonContainer>
