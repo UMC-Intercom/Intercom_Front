@@ -1,12 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import PostQuestionModal from './PostQuestionModal';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function CoverLetterInput3() {
   const [postModalOpen, setPostModalOpen] = useState(false); // PostQuestionModal 열림 상태
+  const location = useLocation();
+  const [formData, setFormData] = useState({
+    company: '',
+    department: '',
+    year: '',
+    semester: '',
+    gender: 'no-selected',
+    birthday: '',
+    education: '',
+    major: '',
+    gpa: '',
+    activity: '',
+    certifications: '',
+    english: '',
+    score: '',
+    content: ''
+});
 
+useEffect(() => {
+  if (location.state) {
+      setFormData(location.state);
+  }
+}, [location]);
 
   const handleConfirm = () => {
+    console.log(formData); 
     setPostModalOpen(true); // PostQuestionModal 열기
   };
 
@@ -24,8 +48,10 @@ export default function CoverLetterInput3() {
             <SubTitle>후기를 작성해주세요</SubTitle>
           </SubtitleWrap>
 
-            <QuestionWrap type='text' placeholder='답변을 입력해주세요'>
-            </QuestionWrap>
+            <QuestionWrap type='text' placeholder='답변을 입력해주세요'
+            value={formData.content}
+            onChange={(e) => setFormData({...formData, content: e.target.value})}
+            />
 
         </Form>
         <SubmitButton type="button" onClick={handleConfirm}>등록하기</SubmitButton>

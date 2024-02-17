@@ -22,8 +22,7 @@ export default function CoverLetterInput2() {
         certifications: '',
         english: '',
         score: '',
-        titles: '',
-        contents: ''
+        content: ''
     });
 
     useEffect(() => {

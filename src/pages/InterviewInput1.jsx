@@ -10,8 +10,8 @@ export default function InterviewInput1() {
   const [formData, setFormData] = useState({
     company: '',
     department: '',
-    year: '',
-    semester: '',
+    year: '2024',
+    semester: '상반기',
     gender: 'no-selected',
     birthday: '',
     education: '',
@@ -21,11 +21,10 @@ export default function InterviewInput1() {
     certification: "",
     english: '',
     score: '',
-    title: "",
     content: "",
-    birthYear: '',
-    birthMonth: '',
-    birthDay: ''
+    birthYear: '2024',
+    birthMonth: '1',
+    birthDay: '1'
   });
 
   const handleChange = (e) => {
