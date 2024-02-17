@@ -9,7 +9,7 @@ export default function ProfileEdit() {
   const [user, setUser] = useState({
     email: '', // 예: 'user@example.com'
     name: '',
-    nickName: '',
+    nickname: '',
     phoneNum: '',
     gender: '',
     birthYear: '',
@@ -82,40 +82,51 @@ export default function ProfileEdit() {
  
    fetchUserData();
  }, []);
+   // 사용자 입력 처리
+const handleInputChange = useCallback((e) => {
+  const { name, value } = e.target;
+  setUser((prev) => ({
+    ...prev,
+    [name]: value
+  }));
+}, []);
+
   // 폼 제출 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 유효성 검사 로직
-    if (!isValidPwd1 || !isValidPwd2 || !isValidPwd3 || !isPwdMatched) {
-      // 유효성 검사 실패 시 메시지 설정
-      let errorMessage = '비밀번호 유효성 검사에 실패했습니다.';
-      if (!isValidPwd1) {
-        errorMessage = '비밀번호는 8자 이상이며 소문자를 포함해야 합니다.';
-      } else if (!isValidPwd2) {
-        errorMessage = '비밀번호는 대문자를 포함해야 합니다.';
-      } else if (!isValidPwd3) {
-        errorMessage = '비밀번호는 특수 문자(!@#$%^*+=-)를 포함해야 합니다.';
-      } else if (!isPwdMatched) {
-        errorMessage = '새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.';
+  
+    // 새 비밀번호가 입력된 경우 유효성 검사 실행
+    if (newPassword) {
+      if (!isValidPwd1 || !isValidPwd2 || !isValidPwd3 || newPassword !== confirmNewPassword) {
+        let errorMessage = '비밀번호 유효성 검사에 실패했습니다.';
+        if (!isValidPwd1) {
+          errorMessage = '비밀번호는 8자 이상이며 소문자를 포함해야 합니다.';
+        } else if (!isValidPwd2) {
+          errorMessage = '비밀번호는 대문자를 포함해야 합니다.';
+        } else if (!isValidPwd3) {
+          errorMessage = '비밀번호는 특수 문자(!@#$%^*+=-)를 포함해야 합니다.';
+        } else if (newPassword !== confirmNewPassword) {
+          errorMessage = '새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.';
+        }
+        setMessage(errorMessage);
+        return;
       }
-      setMessage(errorMessage);
-      return;
     }
-
-      // 서버 요청 데이터 준비
+  
+    // 서버 요청 데이터 준비
     const updateData = {
       name: user.name,
-      nickname: user.nickname,
-      phone: user.phone,
+      nickname: user.nickName,
+      phone: user.phoneNum,
       gender: user.gender,
       birthday: `${user.birthYear}-${user.birthMonth}-${user.birthDay}`,
     };
-
-    if (newPassword) {
+  
+    // 새 비밀번호가 입력된 경우에만 updateData에 추가
+    if (newPassword && isPwdMatched) {
       updateData.password = newPassword;
     }
-
+  
     // 서버 요청 로직
     try {
       await axios.put('/users/update', updateData, {
@@ -124,17 +135,15 @@ export default function ProfileEdit() {
         },
       });
       setMessage('회원 정보가 성공적으로 업데이트되었습니다.');
-      // 성공 후 추가 작업 (예: 페이지 리디렉션)
+      // 성공 후 페이지 리디렉션
+      navigate('/settings');
     } catch (error) {
-      // 요청 실패 시 메시지 설정
+      console.error(error);
       setMessage('회원 정보 업데이트 중 오류가 발생했습니다.');
     }
   };
   // 사용자 입력 처리
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setUser((prev) => ({ ...prev, [name]: value }));
-  }, []);
+
 
   // 메시지 창
   const MessageModal = ({ message, onClose }) => (
@@ -196,33 +205,33 @@ export default function ProfileEdit() {
 
             <InputWrap>
             <Label>닉네임</Label>
-            <InputField type="text" name="nickName" value={user.nickname} onChange={handleInputChange} />
+            <InputField type="text" name="nickname" value={user.nickname} onChange={handleInputChange} />
             </InputWrap>
 
             <InputWrap>
             <Label>휴대폰</Label>
-            <InputField type="text" name="phoneNum" value={user.phone} onChange={handleInputChange} />
+            <InputField type="text" name="phone" value={user.phone} onChange={handleInputChange} />
             </InputWrap>
 
             <InputWrap>
             <Label>성별</Label>
                 <RadioInput
                     name="gender"
-                    value="male"
+                    value="MALE"
                     onChange={handleInputChange}
                     checked={user.gender === 'MALE'}
                     label="남자"
                 />
                 <RadioInput
                     name="gender"
-                    value="female"
+                    value="FEMALE"
                     onChange={handleInputChange}
                     checked={user.gender === 'FEMALE'}
                     label="여자"
                 />
                 <RadioInput
                     name="gender"
-                    value="none"
+                    value="NONE"
                     onChange={handleInputChange}
                     checked={user.gender === 'NONE'}
                     label="선택 안 함"
