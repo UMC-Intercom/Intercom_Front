@@ -15,8 +15,8 @@ const WrittenContentPage = styled.div`
 `;
 
 const Title = styled.h2`
-  font-family: 'SUITE-SemiBold', sans-serif;
-  font-size: 25px;
+  font-family: 'SUITE';
+  font-weight: 400;
   color: #636363;
   align-self: flex-start;
   margin-left: calc(50% - 592px);
@@ -39,7 +39,7 @@ const Button = styled.button`
   border: none;
   cursor: pointer;
   padding: 0 30px;
-  font-family: 'SUITE-SemiBold', sans-serif;
+  font-family: 'SUITE';
   font-size: 22px;
   color: white;
   transition: background-color 0.2s;
@@ -50,14 +50,15 @@ const TalkListContainer = styled.div`
   max-height: 958px;
   background-color: #EFF0F4;
   border-radius: 10px;
-  padding-top: 40px;
+  padding-top: 30px;
   padding-bottom: 40px;
   overflow-y: auto;
 `;
 const SearchResultItem = styled.div`
   border-bottom: 1px solid #ddd;
+  font-family: 'SUITE';
 
-  padding: 20px 0;
+  padding: 32px 0;
 
   .title, .content, .response {
     margin: 5px 0;
@@ -66,17 +67,16 @@ const SearchResultItem = styled.div`
   }
 
   .title {
-    font-family: 'SUITE-ExtraBold', sans-serif;
     font-size: 24px;
+    font-weight: 700;
   }
   .content{
     margin-top: 10px;
-    font-family: 'SUITE-SemiBold', sans-serif;
     font-size: 19px;
     color: #A1A1A1;
   }
   .response {
-    font-family: 'SUITE-Bold', sans-serif;
+    font-weight: 500;
     font-size: 16px;
     margin-top: 10px;
     color: #636363;
@@ -115,57 +115,37 @@ const InterviewReviewBox = styled.div`
   padding-bottom: 40px;
 `;
 
-const FieldBoxContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-right: 40px;
-`;
-
-const FieldBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  margin-left: 40px;
-  gap: 10px; // 아이템들 사이의 고정 간격
-  justify-content: flex-start;
-  align-items: center;
-  width: calc(100% - 110px); 
-`;
-
-const FieldItem = styled.div`
-  background-color: transparent;
-  color: #5B00EF; 
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 17px; 
-  padding: 10px 20px; 
-  margin-top: 2.2rem;
-  border-radius: 5px; 
-  border: 1.5px solid #5B00EF;
-`;
-
 const InfoBox = styled.div`
-  display: flex;
-  align-items: flex-start;
   margin-top: 25px;
   margin-bottom: 20px; 
   margin-left: 40px;
 `;
 
-const InfoItem = styled.div`
+const InfoItems = styled.div`
   display: flex;
-  flex-direction: column;
-  margin-top: 39px;
+  align-items: flex-start;
+  padding-top: 32px;
 `;
 
-const InfoTitle = styled.span`
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 15px;
-  color: #A1A1A1;
-  margin-bottom: 5px;
+const InfoItem = styled.div`
+  font-family: 'SUITE';
+  display: flex;
+  flex-direction: column;
+  margin-top: 7px;
+`;
+
+const InfoDetail = styled.div`
+  color: #636363;
+  font-family: 'SUITE';
+  font-size: 19px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 7px;
 `;
 
 const InfoContent = styled.span`
-  font-family: 'SUITE-Bold', sans-serif;
+  font-family: 'SUITE';
+  font-weight: 700;
   font-size: 24px;
 `;
 
@@ -181,27 +161,8 @@ const ReviewBox = styled.div`
   margin-right: 40px;
 `;
 
-const ReviewTitle = styled.h3`
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 15px;
-  color: #A1A1A1;
-  margin-bottom: -15px;
-`;
-
-const ReviewContentHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: -25px;
-`;
-
-const ReviewContentTitle = styled.p`
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 24px;
-`;
-
 const ReviewContent = styled.p`
-  font-family: 'SUITE-SemiBold', sans-serif;
+  font-family: 'SUITE';
   font-size: 19px;
   color: #636363;
   margin-bottom: 20px;
@@ -210,30 +171,11 @@ const ReviewContent = styled.p`
 const ReviewStats = styled.div`
   display: flex;
   justify-content: flex-start;
-  font-family: 'SUITE-Bold', sans-serif;
+  font-family: 'SUITE';;
   font-size: 16px;
   color: #636363;
   & > span {
     margin-right: 20px;
-  }
-`;
-
-const EditButton = styled.img`
-  cursor: pointer;
-  width: 19.73px; // Set a specific size for your image
-  align-self: flex-end;
-`;
-
-const ViewMoreButton = styled.button`
-  font-family: 'SUITE-SemiBold', sans-serif;
-  font-size: 16px;
-  color: #A1A1A1; // Adjust the color to match your design
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    color: #5B00EF;
   }
 `;
 
@@ -283,7 +225,7 @@ const WrittenContentPageComponent = () => {
             <SearchResultItem key={item.id}>
               <p className="title">{item.title}</p>
               <p className="content">{item.content || "내용이 없습니다."}</p>
-              <p className="response">답변: {item.answers} | 댓글: {item.comments} | 조회수: {item.views} | 좋아요: {item.likes}</p>
+              <p className="response">답변 {item.answers} &nbsp;&nbsp; 댓글 {item.comments} &nbsp;&nbsp; 조회수 {item.views} &nbsp;&nbsp; 좋아요 {item.likes}</p>
             </SearchResultItem>
           ))}
         </TalkListContainer>
@@ -295,25 +237,25 @@ const WrittenContentPageComponent = () => {
             <InterviewReviewContainer2>
                 {fakeInterviewData && fakeInterviewData.length > 0 && fakeInterviewData.map((data, index) => (
                 <InterviewReviewBox key={index}>
-                    <InfoBox>
-                    <InfoItem>
-                        <InfoContent>{data.company} |&nbsp;</InfoContent>
-                    </InfoItem>
-                    <InfoItem>
-                        <InfoContent>{data.position} |&nbsp;</InfoContent>
-                    </InfoItem>
-                    <InfoItem>
-                        <InfoContent>{data.when}</InfoContent>
-                    </InfoItem>
+                    <InfoBox onClick={handleNavigate}>
+                      <InfoItems>
+                        <InfoItem>
+                            <InfoContent>{data.company} |&nbsp;</InfoContent>
+                        </InfoItem>
+                        <InfoItem>
+                            <InfoContent>{data.position} |&nbsp;</InfoContent>
+                        </InfoItem>
+                        <InfoItem>
+                            <InfoContent>{data.when}</InfoContent>
+                        </InfoItem>
+                      </InfoItems>
+                      <InfoDetail>
+                        토익 어쩌고 오픽 어쩌고 사회생활 어쩌고 자격증 어쩌고 서성한 어쩌고 사회과학대 어쩌고 학점 어쩌고
+                      </InfoDetail>
                     </InfoBox>
                     <SectionDivider />
                     <ReviewBox>
-                    <ReviewTitle>면접 후기</ReviewTitle>
-                    <ReviewContentHeader>
-                        <ReviewContentTitle>{data.interview.q1}</ReviewContentTitle>
-                        <ViewMoreButton onClick={handleNavigate}>더보기</ViewMoreButton>
-                    </ReviewContentHeader>
-                    <ReviewContent>{data.interview.content}</ReviewContent>
+                    <ReviewContent>{data.content}</ReviewContent>
                     <ReviewStats>
                         <span>스크랩 {data.scrap}</span>
                         <span>조회수 {data.views}회</span>
@@ -332,34 +274,26 @@ const WrittenContentPageComponent = () => {
             <InterviewReviewContainer2>
                 {fakeCoverletterData && fakeCoverletterData.length > 0 && fakeCoverletterData.map((data, index) => (
                 <InterviewReviewBox key={index}>
-                    <FieldBoxContainer>
-                    <FieldBox>
-                        {data.field.map((fieldItem, fieldIndex) => (
-                        <FieldItem key={fieldIndex}>{fieldItem}</FieldItem>
-                        ))}
-                    </FieldBox>
-                    <EditButton src="./assets/Edit2.png" onClick={handleNavigate2} alt="Edit" />
-                    </FieldBoxContainer>
-                    <InfoBox>
-                    <InfoItem>
-                        <InfoTitle>기업 이름</InfoTitle>
-                        <InfoContent>{data.company}</InfoContent>
-                    </InfoItem>
-                    <InfoItem>
-                        <InfoTitle>지원 포지션</InfoTitle>
-                        <InfoContent>{data.position}</InfoContent>
-                    </InfoItem>
+                    <InfoBox onClick={handleNavigate2}>
+                      <InfoItems>
+                        <InfoItem>
+                            <InfoContent>{data.company} |&nbsp;</InfoContent>
+                        </InfoItem>
+                        <InfoItem>
+                            <InfoContent>{data.position} |&nbsp;</InfoContent>
+                        </InfoItem>
+                        <InfoItem>
+                            <InfoContent>{data.when}</InfoContent>
+                        </InfoItem>
+                      </InfoItems>
+                      <InfoDetail>
+                        토익 어쩌고 오픽 어쩌고 사회생활 어쩌고 자격증 어쩌고 서성한 어쩌고 사회과학대 어쩌고 학점 어쩌고
+                      </InfoDetail>
                     </InfoBox>
                     <SectionDivider />
                     <ReviewBox>
-                    <ReviewTitle>면접 후기</ReviewTitle>
-                    <ReviewContentHeader>
-                        <ReviewContentTitle>{data.coverletter.title}</ReviewContentTitle>
-                        <ViewMoreButton onClick={handleNavigate2}>더보기</ViewMoreButton>
-                    </ReviewContentHeader>
-                    <ReviewContent>{data.coverletter.content}</ReviewContent>
+                    <ReviewContent>{data.content}</ReviewContent>
                     <ReviewStats>
-                        <span>댓글 {data.comments}</span>
                         <span>스크랩 {data.scrap}</span>
                         <span>조회수 {data.views}회</span>
                     </ReviewStats>
