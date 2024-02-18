@@ -17,7 +17,7 @@ const fakeInterViewData = [
       scrap: '20',
     },
     {
-      company: '[두번쨰 기업 이름]',
+      company: '[두번째 기업 이름]',
       position: '마케팅',
       when: '2023 상반기',
       language: '토익: 955, 오픽: AL',

@@ -149,12 +149,12 @@ const InfoBox = styled.div`
   margin-top: 25px;
   margin-bottom: 20px; 
   margin-left: 40px;
-  gap: 80px;
 `;
 
 const InfoItem = styled.div`
   display: flex;
   flex-direction: column;
+  margin-top: 39px;
 `;
 
 const InfoTitle = styled.span`
@@ -295,26 +295,15 @@ const WrittenContentPageComponent = () => {
             <InterviewReviewContainer2>
                 {fakeInterviewData && fakeInterviewData.length > 0 && fakeInterviewData.map((data, index) => (
                 <InterviewReviewBox key={index}>
-                    <FieldBoxContainer>
-                    <FieldBox>
-                        {data.field.map((fieldItem, fieldIndex) => (
-                        <FieldItem key={fieldIndex}>{fieldItem}</FieldItem>
-                        ))}
-                    </FieldBox>
-                    <EditButton src="./assets/Edit2.png" onClick={handleNavigate2} alt="Edit" />
-                    </FieldBoxContainer>
                     <InfoBox>
                     <InfoItem>
-                        <InfoTitle>기업 이름</InfoTitle>
-                        <InfoContent>{data.company}</InfoContent>
+                        <InfoContent>{data.company} |&nbsp;</InfoContent>
                     </InfoItem>
                     <InfoItem>
-                        <InfoTitle>지원 포지션</InfoTitle>
-                        <InfoContent>{data.position}</InfoContent>
+                        <InfoContent>{data.position} |&nbsp;</InfoContent>
                     </InfoItem>
                     <InfoItem>
-                        <InfoTitle>질문 수</InfoTitle>
-                        <InfoContent>{data.question}</InfoContent>
+                        <InfoContent>{data.when}</InfoContent>
                     </InfoItem>
                     </InfoBox>
                     <SectionDivider />
@@ -326,7 +315,6 @@ const WrittenContentPageComponent = () => {
                     </ReviewContentHeader>
                     <ReviewContent>{data.interview.content}</ReviewContent>
                     <ReviewStats>
-                        <span>댓글 {data.comments}</span>
                         <span>스크랩 {data.scrap}</span>
                         <span>조회수 {data.views}회</span>
                     </ReviewStats>
