@@ -52,6 +52,11 @@ import TypeTestQuestion5 from './typetestpage/TypeTestQuestion5';
 import TypeTestQuestion6 from './typetestpage/TypeTestQuestion6';
 import TypeTestQuestion7 from './typetestpage/TypeTestQuestion7';
 import TypeTestQuestion8 from './typetestpage/TypeTestQuestion8';
+import TypeTestResult1 from './typetestpage/TypeTestResult1';
+import TypeTestResult2 from './typetestpage/TypeTestResult2';
+import TypeTestResult3 from './typetestpage/TypeTestResult3';
+import TypeTestResult4 from './typetestpage/TypeTestResult4';
+import TypeTestResult5 from './typetestpage/TypeTestResult5';
 
 
 function App() {
@@ -115,6 +120,12 @@ function App() {
           <Route path="/type-test-question6" element={<TypeTestQuestion6 />} />
           <Route path="/type-test-question7" element={<TypeTestQuestion7 />} />
           <Route path="/type-test-question8" element={<TypeTestQuestion8 />} />
+
+          <Route path="/type-test-result1" element={<TypeTestResult1 />} />
+          <Route path="/type-test-result2" element={<TypeTestResult2 />} />
+          <Route path="/type-test-result3" element={<TypeTestResult3 />} />
+          <Route path="/type-test-result4" element={<TypeTestResult4 />} />
+          <Route path="/type-test-result5" element={<TypeTestResult5 />} />
           </Routes>
         </AuthProvider>
       </div>
