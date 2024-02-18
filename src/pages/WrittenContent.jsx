@@ -119,6 +119,7 @@ const InfoBox = styled.div`
   margin-top: 25px;
   margin-bottom: 20px; 
   margin-left: 40px;
+  cursor: pointer;
 `;
 
 const InfoItems = styled.div`
