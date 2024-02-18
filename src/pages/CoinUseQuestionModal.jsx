@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoinUseModal from './CoinUseModal';
 
-const CoinUseQuestionModal = ({ isOpen, onClose }) => {
+const CoinUseQuestionModal = ({ isOpen, onClose, selectedItem}) => {
     const [coinUseModalOpen, setCoinUseModalOpen] = useState(false);
 
     const handleConfirm = () => {
@@ -29,7 +29,7 @@ const CoinUseQuestionModal = ({ isOpen, onClose }) => {
                             </ModalContent>
                         </ModalContainer>
                     </ModalOverlay>
-                    <CoinUseModal isOpen={coinUseModalOpen} onClose={handleClose} />
+                    <CoinUseModal isOpen={coinUseModalOpen} onClose={handleClose} selectedItem={selectedItem}/>
                 </>
             )}
         </>

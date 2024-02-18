@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const CoinUseModal = ({ isOpen}) => {
+const CoinUseModal = ({ isOpen, selectedItem}) => {
     const navigate = useNavigate();
-    const navigateToCoverLetterResult = () => navigate('/cover-letters-result');
+    const navigateToCoverLetterResult = () => navigate(`/cover-letters/${selectedItem.id}`);
     return (
         <>
             {isOpen && (
