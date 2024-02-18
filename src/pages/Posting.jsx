@@ -295,28 +295,61 @@ function dataURLtoBlob(dataUrl) {
     }
   }
   const [showTempSaveAlert, setShowTempSaveAlert] = useState(false);
+ // 'handleSave' 함수 내용 변경
+ const handleSave = async () => {
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('content', content);
+  
+  // 선택된 카테고리 ID들을 쉼표로 구분된 문자열로 변환
+  const categoriesString = selectedCategories.join(',');
+  formData.append('category', categoriesString); // 서버에서 받는 필드명이 'category'라고 가정
 
-  const handleSave = () => {
-    const temporaryData = { title, content };
-    localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
-    setShowTempSaveAlert(true); // 사용자가 임시저장을 요청했음을 나타냄
+  // 이미지 파일 추가
+  imageUrls.forEach((url, index) => {
+    const blob = dataURLtoBlob(url);
+    const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
+    formData.append('images[]', file);
+  });
+
+  try {
+    const response = await axios.post('http://localhost:8080/talks/temporary-save', formData, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        // 'Content-Type': 'multipart/form-data' 헤더는 FormData와 함께 사용할 때 자동으로 설정됩니다.
+      },
+    });
+
+    if (response.status === 200 || response.status === 201) { // 200 또는 201 상태 코드를 성공으로 처리
+      alert('글이 임시 저장되었습니다.');
+      // 성공 후 필요한 로직 처리
+    } else {
+      throw new Error('Unexpected response status: ' + response.status);
+    }
+  } catch (error) {
+    console.error('Error during temporary save:', error);
+    alert('임시 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+  }
+};
+
+
+  const handleCancel = () => {
+    // Step 1: Clear the state values for title, content, and any other temporary data
+    setTitle('');
+    setContent('');
+    setSelectedCategories([]);
+    setImageUrls([]);
+  
+    // Step 2: Clear any temporary data stored in localStorage or other storages
+    localStorage.removeItem(TEMP_DATA_KEY);
+  
+    // Step 3: Navigate back to the previous page
+    navigate(-1);
+  
+    // Step 4: Show an alert or a confirmation message if needed
+    alert("작성 내용이 초기화되었으며, 이전 페이지로 돌아갑니다.");
   };
   
-  useEffect(() => {
-    if (showTempSaveAlert) {
-      alert("임시저장 되었습니다.");
-      setShowTempSaveAlert(false); // 알림을 표시한 후 다시 false로 설정
-    }
-  }, [showTempSaveAlert]);
-  
-  
-    const handleCancel = () => {
-      localStorage.removeItem(TEMP_DATA_KEY);
-      alert("작성이 취소되고 글이 삭제되었습니다.");
-      navigate(-1);  
-    };
-//임시저장 불러오면서 아이디 같이 넘겨주야댐
-
 const location = useLocation();
 
 useEffect(() => {
@@ -340,24 +373,6 @@ useEffect(() => {
   }
 }, [location.pathname]);
 
-/*  const TEMP_DATA_KEY = "temporaryData";
-
-  useEffect(() => {
-    // 글쓰기 페이지로 이동하는 경우에만 실행
-    if (location.pathname === '/post-create') {
-      const savedData = localStorage.getItem(TEMP_DATA_KEY);
-      if (savedData) {
-        // 임시 저장된 글이 있는 경우, 사용자에게 확인 메시지 표시
-        const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
-        if (shouldLoadData) {
-          // 사용자가 '예'를 선택한 경우, 글쓰기 페이지로 이동하고 임시 저장된 데이터를 불러옵니다.
-          navigate('/post-create', { state: { savedData: JSON.parse(savedData) } });
-        }
-      }
-    }
-  }, [location, navigate]);
- */
-    
     
   return (
     <PageContainer>
