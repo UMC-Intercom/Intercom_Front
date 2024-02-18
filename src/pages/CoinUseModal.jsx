@@ -1,10 +1,31 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import config from "../path/config";
 
 const CoinUseModal = ({ isOpen, selectedItem}) => {
     const navigate = useNavigate();
     const navigateToCoverLetterResult = () => navigate(`/cover-letters/${selectedItem.id}`);
+    const [coins, setCoins] = useState();
+
+    useEffect(() => {
+        // 사용자의 보유 코인 정보 조회
+        const fetchCoins = async () => {
+            try {
+                const response = await axios.get(`${config.API_URL}/users/coin`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 인증 토큰 추가
+                    },
+                });
+                setCoins(response.data); // 보유 코인 상태 업데이트
+            } catch (error) {
+                console.error('코인 정보 조회 실패:', error);
+            }
+        };
+
+        fetchCoins();
+    }, []);
     return (
         <>
             {isOpen && (
@@ -12,7 +33,7 @@ const CoinUseModal = ({ isOpen, selectedItem}) => {
                     <ModalContainer>
                         <ModalContent>
                             <ModalText>10코인을 사용했어요</ModalText>
-                            <Coin>잔여코인 n개</Coin> 
+                            <Coin>잔여코인 {coins-10}개</Coin>
                             <ModalButtons>
                                 <CancelButton onClick={navigateToCoverLetterResult}>확인</CancelButton>
                             </ModalButtons>
@@ -53,28 +74,28 @@ const ModalContent = styled.div`
 `;
 
 const ModalText = styled.p`
-font-family: 'SUITE';
-font-style: normal;
-font-weight: 700;
-font-size: 50px;
-line-height: 62px;
-text-align: center;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 50px;
+  line-height: 62px;
+  text-align: center;
 
-color: #000000;
-margin-bottom:21px;
+  color: #000000;
+  margin-bottom:21px;
 `;
 
 const Coin = styled.p`
-font-family: 'SUITE';
-font-style: normal;
-font-weight: 600;
-font-size: 25px;
-line-height: 38px;
-/* identical to box height, or 150% */
-text-align: center;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 25px;
+  line-height: 38px;
+  /* identical to box height, or 150% */
+  text-align: center;
 
-color: #636363;
-margin-bottom:55px;
+  color: #636363;
+  margin-bottom:55px;
 `;
 
 const Button = styled.button`
