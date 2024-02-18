@@ -43,7 +43,7 @@ import EditCareer from './pages/EditCareer';
 import FindingPassword from './pages/FindingPassword';
 import SettingPassword from './pages/SettingPassword';
 import PostSuccessPage from './pages/PostSuccessPage';
-import JobDetail from './pages/JobDetail';
+import TypeTestHome from './typetestpage/TypeTestHome';
 
 
 function App() {
@@ -85,7 +85,6 @@ function App() {
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
-          <Route path='/job/:jobId' element={<JobDetail />} />
 
           <Route path="/cover-letters" element={<CoverLetterInput />} />
           <Route path="/cover-letters-home" element={<CoverLetterHome />} />
@@ -98,6 +97,8 @@ function App() {
           <Route path="/interviews-input1" element={<InterviewInput1 />} />
           <Route path="/interviews-input2" element={<InterviewInput2 />} />
           <Route path="/interviews-input3" element={<InterviewInput3 />} />
+
+          <Route path="/type-test-home" element={<TypeTestHome />} />
           </Routes>
         </AuthProvider>
       </div>

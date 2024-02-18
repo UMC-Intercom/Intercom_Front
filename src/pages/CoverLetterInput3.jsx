@@ -1,17 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import PostQuestionModal from './PostQuestionModal';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function CoverLetterInput3() {
   const [questionNumber, setQuestionNumber] = useState(1); // 문항 번호 상태
   const [postModalOpen, setPostModalOpen] = useState(false); // PostQuestionModal 열림 상태
+  const location = useLocation();
+  
+  const [formData, setFormData] = useState({
+    company: '',
+    department: '',
+    year: '',
+    semester: '',
+    gender: 'no-selected',
+    birthday: '',
+    education: '',
+    major: '',
+    gpa: '',
+    activity: '',
+    certifications: [],
+    english: '',
+    score: '',
+    titles: [],
+    contents: []
+  }); // 기존 formData 상태
+
+  useEffect(() => {
+    if (location.state) {
+        setFormData(location.state);
+    }
+}, [location]);
 
   const addQuestion = () => {
     setQuestionNumber(prevNumber => prevNumber + 1); // 문항 번호 업데이트
+    setFormData(prevData => ({
+      ...prevData,
+      titles: [...prevData.titles, ''], // 빈 title 추가
+      contents: [...prevData.contents, ''] // 빈 content 추가
+    }));
   };
-
-  const handleConfirm = () => {
-    setPostModalOpen(true); // PostQuestionModal 열기
+  
+  const accessToken = localStorage.getItem('accessToken');
+  
+  const handleConfirm = async () => {
+    console.log(formData);
+  
+    try {
+      const response = await axios.post('http://localhost:8080/resumes', formData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      })
+      console.log(response.data);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  
+    setPostModalOpen(true);
   };
 
   const handleClose = () => {
@@ -38,8 +86,32 @@ export default function CoverLetterInput3() {
                 <QuestionNumber>
                   문항{index + 1}
                 </QuestionNumber>
-                <Question type='text' placeholder='내용을 입력해주세요' />
-                <Detail type='text' placeholder='답변을 입력해주세요' />
+                <Question
+                  type='text'
+                  placeholder='내용을 입력해주세요'
+                  value={formData.titles[index] || ''}
+                  onChange={(e) => {
+                    const newTitles = [...formData.titles];
+                    newTitles[index] = e.target.value;
+                    setFormData(prevData => ({
+                      ...prevData,
+                      titles: newTitles
+                    }));
+                  }}
+                />
+                <Detail
+                  type='text'
+                  placeholder='답변을 입력해주세요'
+                  value={formData.contents[index] || ''}
+                  onChange={(e) => {
+                    const newContents = [...formData.contents];
+                    newContents[index] = e.target.value;
+                    setFormData(prevData => ({
+                      ...prevData,
+                      contents: newContents
+                    }));
+                  }}
+                />
               </QuestionBox>
             </QuestionWrap>
           ))}
