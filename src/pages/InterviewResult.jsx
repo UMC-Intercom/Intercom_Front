@@ -5,35 +5,75 @@
     import config from "../path/config";
 
     export default function InterviewResult() {
-        const { id } = useParams();
-        const [interview, setInterview] = useState(null);
-
-        useEffect(() => {
-            if (id) { // id가 존재하는 경우에만 API 호출
-                const fetchInterview = async () => {
-                    try {
-                        const response = await axios.get(`http://localhost:8080/interviews/${id}`);
-                        setInterview(response.data);
-                    } catch (error) {
-                        console.error('Failed to fetch interview:', error);
-                    }
-                };
-
-                fetchInterview();
-            }
-        }, [id]);
-
-
         const [isScrapped, setIsScrapped] = useState(false);
+        const [interview, setInterview] = useState(null);
+        const { id } = useParams();
+        const accessToken = localStorage.getItem('accessToken');
+        
+        useEffect(() => {
+            const fetchInterview = async () => {
+              try {
+                // 변경된 API 경로에 맞춰서 요청
+                const response = await axios.get(`http://localhost:8080/interviews/${id}`, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                  },
+                });
+                setInterview(response.data);
+              } catch (error) {
+                console.error('공고 상세 정보를 가져오는 데 실패했습니다:', error);
+              }
+            };
+          
+            fetchInterview();
+          }, [id, accessToken]);
 
+          useEffect(() => {
+            const fetchInterview = async () => {
+              try {
+                // 변경된 API 경로에 맞춰서 요청
+                const response = await axios.get(`http://localhost:8080/interviews/${id}`, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                  },
+                });
+                setInterview(response.data);
+        
+                const scrapResponse = await axios.get(`http://localhost:8080/scraps/posts/${id}`, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                  },
+                });
+                setIsScrapped(scrapResponse.data);
+        
+              } catch (error) {
+                console.error('면접후기 상세 정보를 가져오는 데 실패했습니다:', error);
+              }
+            };
+        
+            fetchInterview();
+          }, [id, accessToken]);  
 
-        const toggleScrap = () => {
-            setIsScrapped(!isScrapped);
+          const toggleScrap = async () => {
+            try {
+              if (isScrapped) {
+                await axios.delete(`http://localhost:8080/scraps/posts/${id}`, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                  },
+                });
+              } else {
+                await axios.post(`http://localhost:8080/scraps/posts/${id}`, {}, {
+                  headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                  },
+                });
+              }
+              setIsScrapped(!isScrapped);
+            } catch (error) {
+              console.error('스크랩 처리 중 오류가 발생했습니다:', error);
+            }
         };
-
-        if (!interview) {
-            return <div>Loading...</div>; // interview가 아직 로드되지 않은 경우 로딩 상태 표시
-        }
 
         return (
             <Container>
