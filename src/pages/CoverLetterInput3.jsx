@@ -45,6 +45,13 @@ export default function CoverLetterInput3() {
   const accessToken = localStorage.getItem('accessToken');
   
   const handleConfirm = async () => {
+    const isEveryQuestionFilled = formData.titles.every(title => title.trim()) && formData.contents.every(content => content.trim());
+  
+    if (!isEveryQuestionFilled) {
+      alert('모든 문항의 제목과 내용을 입력해주세요.');
+      return;
+    }
+  
     console.log(formData);
   
     try {
@@ -52,15 +59,15 @@ export default function CoverLetterInput3() {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
-      })
+      });
       console.log(response.data);
-    }
-    catch (error) {
+      setPostModalOpen(true);
+    } catch (error) {
       console.error(error);
+      alert('자소서 등록에 실패했습니다. 나중에 다시 시도해주세요.');
     }
-  
-    setPostModalOpen(true);
   };
+  
 
   const handleClose = () => {
     setPostModalOpen(false); // PostQuestionModal 닫기
