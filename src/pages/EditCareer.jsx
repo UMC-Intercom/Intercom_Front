@@ -5,6 +5,11 @@ import certificates from '../data/certificates';
 import schools from '../data/schools'; // 학교 데이터
 import majors from '../data/majors'; // 학과 데이터
 import jobSkills from '../data/skillsData';
+import axios from 'axios';
+import config from '../path/config';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 
 const EditCareerPage = styled.div`
   display: flex;
@@ -369,7 +374,6 @@ const GradeSelect = styled.select`
   font-family: SUITE;
   font-weight: 700;
   font-size: 1.1rem;
-  color: ${({ defaultValue }) => defaultValue ? "#636363" : "#BDBDBD"};
   background: #FFF;
   cursor: pointer;
   margin-left: 10px;
@@ -413,7 +417,6 @@ const GraduateSelect = styled.select`
   font-family: SUITE;
   font-weight: 700;
   font-size: 1.1rem;
-  color: ${({ defaultValue }) => defaultValue ? "#636363" : "#BDBDBD"};
   background: #FFF;
   cursor: pointer;
   margin-left: 40px;
@@ -458,13 +461,85 @@ const ActivityDescription = styled.input`
 
 `;
 
-const Count = styled.span`
+const ActivityTitle = styled.input`
+  width: 215px;
+  height: 50px;
+  margin-right: 3rem;
+  padding: 10px;
+  border: 3px solid #E2E2E2;
+  border-radius: 10px;
   font-family: SUITE;
   font-weight: 700;
-  font-size: 17px;
+  font-size: 1.1rem;
   color: #636363;
-  margin-left: 10px;
+  cursor: default;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #BDBDBD;
+  }
+
 `;
+
+const InputFieldRow = styled.div`
+  margin-left: 3.4375rem;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 1.75rem;
+`;
+
+
+const StyledDatePicker = styled(DatePicker)`
+  height: 50px;
+  width: 158px;
+  border: 3px solid #E2E2E2;
+  border-radius: 10px;
+  padding: 0.625rem;
+  font-family: SUITE;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #636363; 
+  margin-right: 10px; 
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+const DateInputContainer = styled.div`
+  margin-right: 10px; // Adjust spacing as needed
+  margin-left: 15px;
+`;
+
+const Tilde = styled.span`
+  font-size: 30px;
+  color: #A1A1A1;
+`;
+
+
+const AddButtonContainer = styled.div`
+  display: flex;
+  margin-left: 900px; 
+`;
+
+const AddButton4 = styled.img`
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  align-self: center; // 추가 버튼을 위로 정렬
+  margin-left: 10px; 
+  margin-top: -50px;
+`;
+
 
 const SkillBox = styled.div`
   width: auto;
@@ -693,6 +768,155 @@ const AddButton3 = styled.img`
 
 
 const EditCareer = () => {
+  const [gradeScale, setGradeScale] = useState(""); // 선택한 기준 학점
+
+  const [activities, setActivities] = useState([
+    { title: '', startDate: null, endDate: null, description: '' },
+  ]);
+
+  // 새로운 대외활동 정보 추가
+  const addActivity = () => {
+    setActivities([...activities, { title: '', startDate: null, endDate: null, description: '' }]);
+  };
+
+  // 대외활동 정보 업데이트
+  const updateActivity = (index, field, value) => {
+    const updatedActivities = activities.map((activity, i) =>
+      i === index ? { ...activity, [field]: value } : activity
+    );
+    setActivities(updatedActivities);
+  };
+
+  useEffect(() => {
+    // 로컬 스토리지에서 섹션의 활성화 상태를 불러옵니다.
+    const savedSectionsVisible = JSON.parse(localStorage.getItem('sectionsVisible'));
+  
+    // 저장된 상태가 있으면 해당 상태를 사용하여 sectionsVisible 상태를 업데이트합니다.
+    if (savedSectionsVisible) {
+      setSectionsVisible(savedSectionsVisible);
+    }
+  }, []);
+  
+  
+  useEffect(() => {
+
+
+    const fetchCareerData = async () => {
+      try {
+        // 서버에서 사용자의 커리어 정보를 불러오는 GET 요청
+        const response = await axios.get(`${config.API_URL}/careers`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+  
+        const data = response.data;
+        const isAllDataEmpty = !data.english && !data.certification && !data.university && !data.activity && !data.skill && !data.link;
+
+
+        if (isAllDataEmpty) {
+          // 모든 섹션을 활성화합니다.
+          setSectionsVisible({
+            어학: true,
+            자격증: true,
+            학력: true,
+            대외활동: true,
+            보유스킬: true,
+            링크: true,
+          });
+        } else {
+          // 데이터가 존재하는 섹션만 활성화
+          const initialSectionsVisible = {
+            어학: data.english && data.english.length > 0,
+            자격증: data.certification && data.certification.length > 0,
+            학력: data.university && data.university.length > 0,
+            대외활동: data.activity && data.activity.length > 0,
+            보유스킬: data.skill && data.skill.length > 0,
+            링크: data.link && data.link.length > 0,
+          };
+  
+          setSectionsVisible(initialSectionsVisible);
+        }
+     
+  
+       
+      // 어학 점수 분할하여 상태 업데이트
+      const languages = data.english.split(", ");
+      const scores = data.score.split(", ");
+      const languageInputs = languages.map((language, index) => ({
+        name: language,
+        score: scores[index] || '',
+      }));
+      setLanguageInputs(languageInputs);
+
+      // 자격증 분할하여 상태 업데이트
+      const certifications = data.certification.split(", ");
+      const certificateInputs = certifications.map(certification => ({
+        name: certification,
+      }));
+      setCertificateInputs(certificateInputs);
+  
+        // 학력 정보 업데이트
+        setSchoolInputs([{ name: data.university }]);
+        setMajorInputs([{ name: data.major }]);
+  
+        // GPA와 졸업 상태 분할 및 업데이트
+        const [userGrade, userGradeScale] = data.gpa.split('/');
+        setGrade(userGrade); // 사용자가 입력한 학점
+        setGradeScale(userGradeScale); // 기준 학점
+
+        setGraduate(data.graduateStatus);
+  
+        if (data.activity && data.activity.length > 0) {
+          setActivities(data.activity.map(act => ({
+            title: act.name,
+            startDate: new Date(act.startDate),
+            endDate: new Date(act.endDate),
+            description: act.description
+          })));
+        } else {
+          // 대외활동 데이터가 없는 경우, 빈 입력 필드 하나를 초기 상태로 설정
+          setActivities([{ title: '', startDate: null, endDate: null, description: '' }]);
+        }
+  
+        // 보유 스킬 정보 업데이트
+        setSelectedSkills(data.skill.split(', '));
+  
+        // 링크 정보 업데이트
+        if (data.link) {
+          const linkData = parseLinkData(data.link); // Implement `parseLinkData` based on how data is stored
+          setLink(linkData);
+        }
+  
+        // 커리어 프로필 이미지 URL 업데이트
+        if (data.careerProfile) {
+          localStorage.setItem('careerProfileImage', data.careerProfile);
+        }
+      } catch (error) {
+        console.error("Error fetching career data:", error);
+      }
+    };
+  
+    fetchCareerData();
+  }, []);
+
+  const parseLinkData = (linkStr) => {
+    // Assuming `linkStr` is a string "title: URL", parse it into an object {title, url}
+    // Adjust this function based on the actual format of your link data
+    const [title, url] = linkStr.split(": ");
+    return { title, url };
+  };
+
+  // Update the link object on user input
+  const handleLinkChange = (field, value) => {
+    setLink(prevLink => ({
+      ...prevLink,
+      [field]: value,
+    }));
+  };
+
+  const [link, setLink] = useState({ title: '', url: '' });
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -704,7 +928,6 @@ const EditCareer = () => {
   const [searchTermMajor, setSearchTermMajor] = useState('');
   const [schoolInputs, setSchoolInputs] = useState([{ name: "" }]);
   const [majorInputs, setMajorInputs] = useState([{ name: "" }]);
-  const [showEducationSection, setShowEducationSection] = useState(true);
   const [grade, setGrade] = useState("");
   const [graduate, setGraduate] = useState("");
   const [activityDescription, setActivityDescription] = useState('');
@@ -713,7 +936,7 @@ const EditCareer = () => {
   const [skillSearchTerm, setSkillSearchTerm] = useState('');
   const [skillSearchResults, setSkillSearchResults] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState([{ title: '', url: '' }]);
   const [linkInput, setLinkInput] = useState('');
   const [isSpecModalVisible, setSpecModalVisible] = useState(false);
   const [sectionsVisible, setSectionsVisible] = useState({
@@ -725,20 +948,146 @@ const EditCareer = () => {
     링크: true, // 기본적으로 숨김
   });
 
-  // 스펙 모달에서 체크박스 선택을 처리하는 함수
-const handleSpecCheckboxChange = (specName) => {
-  setSectionsVisible(prevSections => ({
-    ...prevSections,
-    [specName]: !prevSections[specName]
-  }));
-};
+  const addLink = () => {
+    setLinks([...links, { title: '', url: '' }]);
+  };
+  
+  // 링크 정보 업데이트 함수
+  const updateLink = (index, field, value) => {
+    const updatedLinks = links.map((link, i) =>
+      i === index ? { ...link, [field]: value } : link
+    );
+    setLinks(updatedLinks);
+  };
 
+  const handleSave = async () => {
+
+    if (!isFormValid()) {
+      // 폼이 유효하지 않으면 경고 메시지 표시
+      alert('모든 활성화된 섹션의 필수 입력 필드를 채워주세요.');
+      return; // 함수 실행 종료
+    }
+
+    const formatDate = (date) => {
+      if (!date) return '';
+      const d = new Date(date);
+      let month = '' + (d.getMonth() + 1),
+          day = '' + d.getDate(),
+          year = d.getFullYear();
+      if (month.length < 2) month = '0' + month;
+      if (day.length < 2) day = '0' + day;
+      return [year, month, day].join('-');
+    };
+  
+    const payload = {
+      // 다음은 섹션별로 정보를 포함시킬지 여부를 결정하는 예시입니다.
+      // `sectionsVisible` 상태를 기반으로 각 섹션의 데이터를 포함하거나 제외합니다.
+      english: sectionsVisible['어학'] ? languageInputs.map(input => input.name).join(", ") : "",
+      score: sectionsVisible['어학'] ? languageInputs.map(input => input.score).join(", ") : "",
+      certification: sectionsVisible['자격증'] ? certificateInputs.map(input => input.name).join(", ") : "",
+      university: sectionsVisible['학력'] ? schoolInputs[0].name : "",
+      major: sectionsVisible['학력'] ? majorInputs[0].name : "",
+      gpa: sectionsVisible['학력'] ? `${grade}/${gradeScale}` : "",
+      graduateStatus: sectionsVisible['학력'] ? graduate : "",
+      activity: sectionsVisible['대외활동'] ? activities.map(activity => ({
+        name: activity.title,
+        startDate: activity.startDate ? formatDate(activity.startDate) : "",
+        endDate: activity.endDate ? formatDate(activity.endDate) : "",
+        description: activity.description
+      })) : [],
+      skill: sectionsVisible['보유스킬'] ? selectedSkills.join(", ") : "",
+      link: `${link.title}: ${link.url}`,
+      careerProfile: localStorage.getItem('careerProfileImage'), // 사용자가 업로드한 이미지 URL 사용
+      noCareer: false
+    };
+  
+    // 서버에 POST 요청 보내기
+    axios.post(`${config.API_URL}/careers`, payload, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      console.log("서버 응답:", response.data);
+      alert('저장되었습니다.');
+    })
+    .catch(error => {
+      console.error("서버로 데이터 저장 중 오류 발생:", error);
+      alert('저장에 실패했습니다.');
+    });
+  };
+  
+  
+  const handleSpecCheckboxChange = (specName) => {
+    setSectionsVisible(prevSections => {
+      const updatedSections = {
+        ...prevSections,
+        [specName]: !prevSections[specName]
+      };
+  
+      // 변경된 상태를 로컬 스토리지에 저장합니다.
+      localStorage.setItem('sectionsVisible', JSON.stringify(updatedSections));
+  
+      return updatedSections;
+    });
+  };
+  
+  
+  
 const handleDeleteSection = (sectionName) => {
   setSectionsVisible(prevSpecs => ({
     ...prevSpecs,
     [sectionName]: false
   }));
 };
+
+const parseDateOrNull = (dateStr) => {
+  // 입력값이 null이거나 undefined인 경우 바로 null을 반환
+  if (!dateStr) return null;
+
+  // 공백 문자열인 경우도 처리
+  if (typeof dateStr === 'string' && dateStr.trim() === "") return null;
+
+  const date = new Date(dateStr);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+const isFormValid = () => {
+  // 어학 섹션이 활성화되어 있고, 필수 필드가 모두 채워져 있는지 확인
+  if (sectionsVisible['어학'] && !languageInputs.every(input => input.name && input.score)) {
+    return false; // 하나라도 비어있다면 false 반환
+  }
+
+  // 자격증 섹션 확인
+  if (sectionsVisible['자격증'] && !certificateInputs.every(input => input.name)) {
+    return false;
+  }
+
+  // 학력 섹션 확인
+  if (sectionsVisible['학력'] && (!schoolInputs[0].name || !majorInputs[0].name || !grade || !gradeScale || !graduate)) {
+    return false;
+  }
+
+  // 대외활동 섹션 확인
+  if (sectionsVisible['대외활동'] && !activities.every(activity => activity.title && activity.startDate && activity.endDate && activity.description)) {
+    return false;
+  }
+
+  // 보유스킬 섹션 확인 (활성화된 경우 선택된 스킬이 있는지 확인)
+  if (sectionsVisible['보유스킬'] && selectedSkills.length === 0) {
+    return false;
+  }
+
+  // 링크 섹션 확인 (활성화된 경우 링크가 최소 하나 이상 있는지 확인)
+  if (sectionsVisible['링크'] && links.length === 0) {
+    return false;
+  }
+
+  // 모든 조건을 만족하는 경우 true 반환
+  return true;
+};
+
 
 // 각 섹션을 조건부로 렌더링하는 함수
 const renderSection = (sectionName) => {
@@ -840,11 +1189,14 @@ const renderSection = (sectionName) => {
           <GradeInput
             type="text"
             placeholder="학점"
+            value={grade} // 사용자가 입력한 학점을 표시
+            onChange={(e) => setGrade(e.target.value)} // 사용자 입력을 grade 상태에 저장
           />
+
           <Slash>/</Slash>
           <GradeSelect
-            defaultValue={grade}
-            onChange={handleGradeChange}
+             value={gradeScale}
+             onChange={(e) => setGradeScale(e.target.value)}
           >
             <option value="" disabled selected>기준 학점</option>
             <option value="4.0">4.0</option>
@@ -856,47 +1208,86 @@ const renderSection = (sectionName) => {
           </GradeSelect>
           <GraduateLabel>졸업여부</GraduateLabel>
           <GraduateSelect
-            defaultValue={graduate}
+            value={graduate}
             onChange={handleGraduateChange}
           >
             <option value="" disabled selected>졸업 여부</option>
-            <option value="graudate">졸업</option>
-            <option value="attending">재학중</option>
-            <option value="absence">휴학중</option>
-            <option value="completion">수료</option>
-            <option value="dropout">중퇴</option>
-            <option value="quit">자퇴</option>
+            <option value="졸업">졸업</option>
+            <option value="졸업예정">졸업 예정</option>
+            <option value="재학중">재학중</option>
+            <option value="휴학중">휴학중</option>
+            <option value="수료">수료</option>
+            <option value="중퇴">중퇴</option>
+            <option value="자퇴">자퇴</option>
           </GraduateSelect>
         </InputFieldContainer>
           <SectionDivider />
         </EducationSectionContainer>
       );
-    case '대외활동':
-      if (!sectionsVisible['대외활동']) return null;
-      return (
-        <ActivitySectionContainer>
-        <LanguageTitleContainer>
-          <LanguageTitle>대외 활동</LanguageTitle>
-          <DeleteButton src="./assets/editclose.png" onClick={() => handleDeleteSection('대외활동')}/>
-        </LanguageTitleContainer>
-        <InputFieldContainer style={{ justifyContent: 'start' }}>
-          <ActivityDescription
-            placeholder="활동 설명 입력하기"
-            value={activityDescription}
-            onChange={handleActivityDescriptionChange}
-          />
-          <Count>{`(${charCount}/50자)`}</Count>
-        </InputFieldContainer>
-        <SectionDivider />
-      </ActivitySectionContainer>
-      );
+      case '대외활동':
+        if (!sectionsVisible['대외활동']) return null;
+        return (
+          <ActivitySectionContainer>
+            <LanguageTitleContainer>
+              <LanguageTitle>대외 활동</LanguageTitle>
+              <DeleteButton src="./assets/editclose.png" onClick={() => handleDeleteSection('대외활동')} />
+            </LanguageTitleContainer>
+            {activities.map((activity, index) => (
+              <div key={index}>
+                <InputFieldRow>
+                  <ActivityTitle
+                    placeholder="제목"
+                    value={activity.title}
+                    onChange={(e) => updateActivity(index, 'title', e.target.value)}
+                  />
+                  <GradeLabel>활동기간</GradeLabel>
+                  <DateInputContainer>
+                  <StyledDatePicker
+                    selected={parseDateOrNull(activity.startDate)}
+                    onChange={(date) => updateActivity(index, 'startDate', date)}
+                    selectsStart
+                    startDate={parseDateOrNull(activity.startDate)}
+                    endDate={parseDateOrNull(activity.endDate)}
+                    placeholderText="시작 날짜"
+                  />
+                  </DateInputContainer>
+                  <Tilde>~</Tilde>
+                  <DateInputContainer>
+                  <StyledDatePicker
+                    selected={parseDateOrNull(activity.endDate)}
+                    onChange={(date) => updateActivity(index, 'endDate', date)}
+                    selectsEnd
+                    startDate={parseDateOrNull(activity.startDate)}
+                    endDate={parseDateOrNull(activity.endDate)}
+                    placeholderText="종료 날짜"
+                  />
+
+
+                  </DateInputContainer>
+                </InputFieldRow>
+                <InputFieldContainer style={{ justifyContent: 'start' }}>
+                  <ActivityDescription
+                    placeholder="활동 설명 입력하기"
+                    value={activity.description}
+                    onChange={(e) => updateActivity(index, 'description', e.target.value)}
+                  />
+                </InputFieldContainer>
+              </div>
+            ))}
+          <AddButtonContainer>
+            <AddButton4 src="./assets/addbtn.png" onClick={addActivity} alt="대외활동 추가" />
+          </AddButtonContainer>
+            <SectionDivider />
+          </ActivitySectionContainer>
+        );
+      
     case '보유스킬':
       if (!sectionsVisible['보유스킬']) return null;
       return (
         <SkillSectionContainer>
         <LanguageTitleContainer>
-          <LanguageTitle>보유 스킬</LanguageTitle>
-          <DeleteButton src="./assets/editclose.png" />
+          <LanguageTitle>보유 스펙</LanguageTitle>
+          <DeleteButton src="./assets/editclose.png"  onClick={() => handleDeleteSection('보유스킬')}/>
         </LanguageTitleContainer>
         <SkillsContainerWrapper>
             {renderSkillsSection()}
@@ -907,38 +1298,28 @@ const renderSection = (sectionName) => {
       </SkillSectionContainer>
 
       );
-    case '링크':
-      if (!sectionsVisible['링크']) return null;
-      return (
-        
-        <LinkSectionContainer>
-        <LanguageTitleContainer>
-          <LanguageTitle>링크</LanguageTitle>
-          <DeleteButton src="./assets/editclose.png" onClick={() => handleDeleteSection('링크')} />
-        </LanguageTitleContainer>
-        <InputFieldContainer>
-            <LinkInput
-              placeholder="링크 입력하기"
-              value={linkInput}
-              onChange={handleLinkInput}
-              onKeyDown={handleLinkSubmit}
-            />
-           
-            
-          </InputFieldContainer>
-          {links.map((link, index) => (
-              <HyperLinkContainer>
-              <HyperLink key={index} href={link} target="_blank" rel="noopener noreferrer">
-                {link}
-              </HyperLink>
-              </HyperLinkContainer>
-            ))}
-        <InputFieldContainer>
-        </InputFieldContainer>
-       
-
-      </LinkSectionContainer>
-      );
+      case '링크':
+        if (!sectionsVisible['링크']) return null;
+        return (
+          <LinkSectionContainer>
+            <LanguageTitleContainer>
+              <LanguageTitle>링크</LanguageTitle>
+              <DeleteButton src="./assets/editclose.png" onClick={() => handleDeleteSection('링크')} />
+            </LanguageTitleContainer>
+            <InputFieldRow>
+              <ActivityTitle
+                placeholder="링크 제목"
+                value={link.title}
+                onChange={(e) => handleLinkChange('title', e.target.value)}
+              />
+              <LinkInput
+                placeholder="링크 URL 입력하기"
+                value={link.url}
+                onChange={(e) => handleLinkChange('url', e.target.value)}
+              />
+            </InputFieldRow>
+          </LinkSectionContainer>
+        );
     default:
       return null;
   }
@@ -1241,39 +1622,37 @@ const handleSearchMajorClick = () => {
       {renderSection('링크')}
 
         
-
-       
-
-     
-      {/* Skill Search Modal */}
       {isSkillModalVisible && (
-        <ModalOverlay show={isSkillModalVisible}>
-          <ModalContainer>
-            <CloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setSkillModalVisible(false)} />
-            <SearchSection>
-              <SearchInput
-                placeholder="직무를 검색해보세요 ex) 개발자"
-                value={skillSearchTerm}
-                onChange={(e) => setSkillSearchTerm(e.target.value)}
-              />
-                     <SearchButtonContainer onClick={handleSearchClick}>
-            <SearchIcon src="./assets/EditCareerSearch.png" alt="Search" />
-            <SearchButton>검색하기</SearchButton>
-          </SearchButtonContainer>
-            </SearchSection>
+      <ModalOverlay show={isSkillModalVisible}>
+        <ModalContainer>
+          <CloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setSkillModalVisible(false)} />
+          <SearchSection>
+            <SearchInput
+              placeholder="직무를 검색해보세요 ex) 개발자"
+              value={skillSearchTerm}
+              onChange={(e) => setSkillSearchTerm(e.target.value)}
+            />
+            <SearchButtonContainer onClick={handleSearchClick}>
+              <SearchIcon src="./assets/EditCareerSearch.png" alt="Search" />
+              <SearchButton>검색하기</SearchButton>
+            </SearchButtonContainer>
+          </SearchSection>
+          {/* 사용자가 검색어를 입력했을 때만 결과 컨테이너를 렌더링 */}
+          {skillSearchTerm && (
             <ResultsContainer>
               {renderSkillBoxes()}
             </ResultsContainer>
-          </ModalContainer>
-        </ModalOverlay>
-      )}
+          )}
+        </ModalContainer>
+      </ModalOverlay>
+    )}
 
 
           
       </EditContainer>
 
       <SaveButtonContainer>
-          <SaveButton>
+          <SaveButton onClick={handleSave}>
             저장하기
           </SaveButton>
       </SaveButtonContainer>

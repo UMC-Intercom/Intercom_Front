@@ -185,7 +185,7 @@ const WritingArea = () => {
   if (isLoggedIn) {
     return (
       <WritingContainer onClick={handleGoPosting}>
-        <img src= {userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px' }} />
+      <img src={userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px', borderRadius: '100%', border: '3px solid #E2E2E2' }} />
         <WritingBox>
           질문을 남겨 보세요.
         </WritingBox>

@@ -46,7 +46,7 @@ export default function CoverLetterResult() {
                         <ScrapButton onClick={toggleScrap}>
                             {isScrapped ? '스크랩' : '스크랩'}
                         </ScrapButton>
-                        <ScrapIcon src={isScrapped ? './assets/scrap.png' : './assets/unscrap.png'} alt="Scrap Icon" />
+                        <ScrapIcon src={isScrapped ? '/assets/Vector10.png' : '/assets/Vector11.png'} alt="Scrap Icon" width={24} height={35}/>
                     </IconWrap>
                 </SubTitleWrap>
 
