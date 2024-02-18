@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import InterviewCoinUseModal from './InterviewCoinUseModal';
 
-const InterviewCoinUseQuestionModal = ({ isOpen, onClose }) => {
+const InterviewCoinUseQuestionModal = ({ isOpen, onClose, selectedItem }) => {
   const [coinUseModalOpen, setCoinUseModalOpen] = useState(false);
 
   const handleConfirm = () => {
@@ -29,7 +29,7 @@ const InterviewCoinUseQuestionModal = ({ isOpen, onClose }) => {
                           </ModalContent>
                       </ModalContainer>
                   </ModalOverlay>
-                  <InterviewCoinUseModal isOpen={coinUseModalOpen} onClose={handleClose} />
+                  <InterviewCoinUseModal isOpen={coinUseModalOpen} onClose={handleClose} selectedItem={selectedItem}/>
               </>
           )}
       </>

@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const InterviewCoinUseModal = ({ isOpen}) => {
+const InterviewCoinUseModal = ({ isOpen, selectedItem}) => {
     const navigate = useNavigate();
-    const navigateToInterviewResult = () => navigate('/interviews-result');
+    const navigateToInterviewResult = () => navigate(`/interviews/${selectedItem.id}`);
     return (
         <>
             {isOpen && (

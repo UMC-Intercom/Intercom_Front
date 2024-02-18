@@ -44,7 +44,7 @@
                     <SubTitleWrap>
                         <Subtitle>
                             <Company>{interview?.company}</Company>
-                            <DepartmentSemester>{interview?.department}</DepartmentSemester>
+                            <DepartmentSemester>{interview?.department} / {interview?.year} {interview?.semester}</DepartmentSemester>
                         </Subtitle>
 
                         <IconWrap>
