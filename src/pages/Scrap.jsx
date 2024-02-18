@@ -214,7 +214,7 @@ const Scrap = () => {
                                     const scoreList = item.score ? item.score.split(', ') : [];
 
                                     return (
-                                        <StyledLink to={`/interview/${item.id}`} key={item.id}>
+                                        <StyledLink to={`/interviews/${item.id}`} key={item.id}>
                                         <InterviewItem key={item.id}>
                                             <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
                                             <div className="details">
@@ -253,7 +253,7 @@ const Scrap = () => {
                                 const scoreList = item.score ? item.score.split(', ') : [];
 
                                 return (
-                                    <StyledLink to={`/coverletter/${item.id}`} key={item.id}>
+                                    <StyledLink to={`/cover-letters-result/${item.id}`} key={item.id}>
                                     <InterviewItem key={item.id}>
                                         <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
                                         <div className="details">
