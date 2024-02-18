@@ -6,10 +6,11 @@ import CoinUseQuestionModal from './CoinUseQuestionModal';
 import axios from "axios";
 import config from "../path/config";
 import TalkPagination from "./TalkPagination";
+import { useAuth } from './AuthContext';
 
 export default function CoverLetterHome() {
   const navigate = useNavigate();
-  const navigateToInput = () => navigate('/cover-letters');
+  const { isLoggedIn } = useAuth();
   const [sortByDateActive, setSortByDateActive] = useState(true);
   const [sortByLikesActive, setSortByLikesActive] = useState(false);
   // const [sortedData, setSortedData] = useState(fakeCoverletterData);
@@ -46,11 +47,23 @@ export default function CoverLetterHome() {
     fetchPosts(currentPage);
   }, [currentPage, sortByDateActive]);
 
-
   const handleResultClick = (item) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
+    if (isLoggedIn) {
+      setSelectedItem(item);
+      setIsModalOpen(true);
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
   };
+
+  const navigateToInput = () => {
+    if (isLoggedIn) {
+      navigate('/cover-letters'); // 로그인했다면 입력 페이지로 이동
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
+  };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
