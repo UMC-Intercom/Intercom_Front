@@ -47,7 +47,6 @@ const Button = styled.button`
 
 const TalkListContainer = styled.div`
   width: 1202px;
-  max-height: 958px;
   background-color: #EFF0F4;
   border-radius: 10px;
   padding-top: 30px;

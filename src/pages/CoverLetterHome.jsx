@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import fakeCoverletterData from '../data/fakeSearchCoverLetterData';
 import CoinUseQuestionModal from './CoinUseQuestionModal';
+import axios from "axios";
+import config from "../path/config";
+import TalkPagination from "./TalkPagination";
 
 export default function CoverLetterHome() {
   const navigate = useNavigate();
   const navigateToInput = () => navigate('/cover-letters');
   const [sortByDateActive, setSortByDateActive] = useState(true);
   const [sortByLikesActive, setSortByLikesActive] = useState(false);
-  const [sortedData, setSortedData] = useState(fakeCoverletterData);
+  // const [sortedData, setSortedData] = useState(fakeCoverletterData);
+  const [sortedData, setSortedData] = useState([]);
   const [searchQuery, setSearchQuery] = useState({
     company: '',
     position: ''
@@ -17,6 +21,31 @@ export default function CoverLetterHome() {
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalElements, setTotalElements] = useState([]);
+  const ITEMS_PER_PAGE = 10;
+  const indexOfLast = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+
+  const fetchPosts = async (page) => {
+    try {
+      const sortBy = sortByDateActive ? '' : '/scrap-counts'; // 추가된 부분
+      const response = await axios.get(`${config.API_URL}/resumes${sortBy}?page=${currentPage}`);
+
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+      // setSearchResults(response.data.content);
+    } catch (error) {
+      console.error('Failed to fetch posts:', error);
+    }
+  };
+  useEffect(() => {
+    fetchPosts(currentPage);
+  }, [currentPage, sortByDateActive]);
+
 
   const handleResultClick = (item) => {
     setSelectedItem(item);
@@ -31,15 +60,13 @@ export default function CoverLetterHome() {
   const handleSortByDate = () => {
     setSortByDateActive(true);
     setSortByLikesActive(false);
-    const sortedByDate = [...fakeCoverletterData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-    setSortedData(sortedByDate);
+    setCurrentPage(1);
   };
 
   const handleSortByLikes = () => {
     setSortByDateActive(false);
     setSortByLikesActive(true);
-    const sortedByLikes = [...fakeCoverletterData].sort((a, b) => b.scrap - a.scrap);
-    setSortedData(sortedByLikes);
+    setCurrentPage(1);
   };
 
   const handleSearchInputChange = (event) => {
@@ -61,6 +88,11 @@ export default function CoverLetterHome() {
     setSortedData(filteredData);
   };
 
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <PageContainer>
       <SearchBox>
@@ -80,10 +112,10 @@ export default function CoverLetterHome() {
       </WritingContainer>
 
       <SearchResultWrap>
-        {sortedData.length > 0 && (
+        {totalElements > 0 && (
           <SearchResultVar>
             <SearchResultText>
-              검색결과 ({sortedData.length})
+              검색결과 ({totalElements})
             </SearchResultText>
 
             <SortButtonsContainer>
@@ -99,26 +131,46 @@ export default function CoverLetterHome() {
           </SearchResultVar>
         )}
 
-        {sortedData.map((coverLetter, index) => (
-          <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
-            <InformationContainer>
-              <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
-              <Information2>
-                토익: {coverLetter.english}, 오픽: {coverLetter.opic} / {coverLetter.activity} / 컴퓨터활용능력: {coverLetter.certification} / {coverLetter.major} / 학점 {coverLetter.gpa}
-              </Information2>
-              <Information3>
-                {coverLetter.contents}
-              </Information3>
-            </InformationContainer>
-            <ScrapIconWrap>
-              <ScrapIcon src="./assets/scrap.png" />
-              <ScrapCount>{coverLetter.scrap}</ScrapCount>
-            </ScrapIconWrap>
-          </SearchResultBox>
-        ))}
+        {sortedData.map((coverLetter, index) => {
+          const englishList = coverLetter.english ? coverLetter.english.split(', ') : [];
+          const scoreList = coverLetter.score ? coverLetter.score.split(', ') : [];
+
+          return (
+              <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
+                <InformationContainer>
+                  <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
+                  <Information2>
+                    {englishList.map((english, index) => (
+                        <span key={index}> {english}: {scoreList[index]}, </span>
+                    ))} /
+                    <span> 대외활동: {coverLetter.activity}</span> /
+                    <span> {coverLetter.certification}</span> /
+                    <span> {coverLetter.education}</span> /
+                    <span> {coverLetter.department}</span> /
+                    <span> 학점: {coverLetter.gpa}</span>
+                  </Information2>
+                  <Information3>
+                    {coverLetter.titles[0]}
+                    <br/>
+                    {coverLetter.contents[0]}
+                  </Information3>
+                </InformationContainer>
+                <ScrapIconWrap>
+                  <ScrapIcon src="./assets/scrap.png" />
+                  <ScrapCount>{coverLetter.scrapCount}</ScrapCount>
+                </ScrapIconWrap>
+              </SearchResultBox>
+          );
+        })}
       </SearchResultWrap>
 
       <CoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
+
+      <TalkPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+      />
     </PageContainer>
   );
 }
