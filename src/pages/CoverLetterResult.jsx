@@ -1,12 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 
 export default function CoverLetterResult() {
     const [isScrapped, setIsScrapped] = useState(false);
+    const [resume , setResume] = useState(null);
+    const { id } = useParams();
+    // const navigate = useNavigate();
+    const accessToken = localStorage.getItem('accessToken');
 
     const toggleScrap = () => {
         setIsScrapped(!isScrapped);
     };
+
+    useEffect(() => {
+    const fetchResumeDetail = async () => {
+      try {
+        // 변경된 API 경로에 맞춰서 요청
+        const response = await axios.get(`http://localhost:8080/resumes/{id}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+  
+        setResume(response.data); // job 상태 설정
+      } catch (error) {
+        console.error('공고 상세 정보를 가져오는 데 실패했습니다:', error);
+      }
+    };
+  
+    fetchResumeDetail();
+  }, [id, accessToken]);
 
     return (
         <Container>
@@ -16,8 +41,8 @@ export default function CoverLetterResult() {
 
                 <SubTitleWrap>
                     <Subtitle>
-                        <Company>현대자동차</Company>
-                        <DepartmentSemester>마케팅 / 2023 하반기</DepartmentSemester>
+                        <Company>{resume.company}</Company>
+                        <DepartmentSemester>{resume.department} / {resume.year} {resume.semester}</DepartmentSemester>
                     </Subtitle>
 
                     <IconWrap>
@@ -32,23 +57,21 @@ export default function CoverLetterResult() {
             <SpecificationWrap>
                 <SpecificationTitle>합격 스펙:</SpecificationTitle>
                 <SpecificationInformation>
-                    홍익대학교 경영학과<br />
-                    학점 3.6<br />
-                    오픽:IM2
+                    {resume.education}<br />
+                    학점 {resume.gpa}<br />
+                    {resume.english}:{resume.score}
                 </SpecificationInformation>
             </SpecificationWrap>
 
             <QuestionContainer>
                 <QuestionWrap>
-                    <QuestionNum>문항1</QuestionNum>
+                    <QuestionNum>{resume.title[0]}</QuestionNum>
                     <Question>해당 직무에 지원하게 된 동기와 이 직무를 수행하기 위한
                         본인만의 강점에 대해 구체적 사례를 들어 설명해주십시오. 또한 이를 바탕으로 입사 후
                         실현하고자 하는 커리어 목표에 대해서도 함께 작성해주시기 바랍니다. (1000자)
                     </Question>
                     <QuestionDetail>
-                        현대자동차는 전기차 시장에서 가격적 측면을 넘어, 고성능 브랜드 가치를 제공하기 위해 노력하고 있습니다. 후발주자임에도 다양한 노력으로 탑기어 2021 올해의 차에 뽑히는 훌륭한 제품군을 구축했으며 최근 미래 방향성을 제시하는 롤링랩 N 74 공개 마케팅을 전개하는 등 새로운 브랜드 이미지를 구축하기 위해 적극적으로 나아가고 있습니다. 이러한 현재자동차의 행보는 "탄탄한 브랜딩에서 성공이 나온다"라는 제 신념과 일치합니다.
-
-                        현대자동차는 전기차 시장에서 가격적 측면을 넘어, 고성능 브랜드 가치를 제공하기 위해 노력하고 있습니다. 후발주자임에도 다양한 노력으로 탑기어 2021 올해의 차에 뽑히는 훌륭한 제품군을 구축했으며 최근 미래 방향성을 제시하는 롤링랩 N 74 공개 마케팅을 전개하는 등 새로운 브랜드 이미지를 구축하기 위해 적극적으로 나아가고 있습니다. 이러한 현재자동차의 행보는 "탄탄한 브랜딩에서 성공이 나온다"라는 제 신념과 일치합니다.
+                        {resume.contents[0]}
                     </QuestionDetail>
                 </QuestionWrap>
             </QuestionContainer>
