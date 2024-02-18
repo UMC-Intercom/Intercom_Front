@@ -17,7 +17,7 @@ export default function TypeTestQuestion3() {
         const newChoice = choice + input;
         setChoice(newChoice);
         navigateToQuestion(newChoice);
-        console.log(newChoice); 
+        // console.log(newChoice); 
     }
 
     const navigateToQuestion = (newChoice) => {
