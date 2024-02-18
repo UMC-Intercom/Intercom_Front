@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import fakeInterviewData from '../data/fakeSearchInterviewData';
 import InterviewCoinUseQuestionModal from './InterviewCoinUseQuestionModal';
+import axios from "axios";
+import config from "../path/config";
+import TalkPagination from "./TalkPagination";
 
 
 export default function InterviewHome() {
   const navigate = useNavigate();
-  const navigateToInput = () => navigate('/interviews-input1');
+  const navigateToInput = () => navigate('/interviews');
   const [sortByDateActive, setSortByDateActive] = useState(true);
   const [sortByLikesActive, setSortByLikesActive] = useState(false);
-  const [sortedData, setSortedData] = useState(fakeInterviewData);
+//  const [sortedData, setSortedData] = useState(fakeInterviewData);
+  const [sortedData, setSortedData] = useState([]);
   const [searchQuery, setSearchQuery] = useState({
     company: '',
     position: ''
@@ -18,6 +22,29 @@ export default function InterviewHome() {
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);const [totalElements, setTotalElements] = useState([]);
+  const ITEMS_PER_PAGE = 10;
+  const indexOfLast = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+
+  const fetchPosts = async (page) => {
+    try{
+      const sortBy = sortByDateActive ? '' : '/scrap-counts';
+      const response = await axios.get(`${config.API_URL}/interviews${sortBy}?page=${currentPage}`);
+
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+    } catch (error){
+      console.error('Failed to fetch posts:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts(currentPage);
+  }, [currentPage, sortByDateActive]);
 
   const handleResultClick = (item) => {
     setSelectedItem(item);
@@ -32,20 +59,23 @@ export default function InterviewHome() {
   const handleSortByDate = () => {
     setSortByDateActive(true);
     setSortByLikesActive(false);
-    const sortedByDate = [...fakeInterviewData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-    setSortedData(sortedByDate);
+    setCurrentPage(1);
   };
 
   const handleSortByLikes = () => {
     setSortByDateActive(false);
     setSortByLikesActive(true);
-    const sortedByLikes = [...fakeInterviewData].sort((a, b) => b.scrap - a.scrap);
-    setSortedData(sortedByLikes);
+    setCurrentPage(1);
   };
 
   const handleSearchInputChange = (event) => {
     const { id, value } = event.target;
     setSearchQuery({ ...searchQuery, [id]: value });
+  };
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0,0);
   };
 
   const handleSearch = () => {
@@ -63,64 +93,81 @@ export default function InterviewHome() {
   };
 
   return (
-    <PageContainer>
-      <SearchBox>
-        <SearchText>면접 후기 검색하기</SearchText>
-        <SearchInput>
-          <InputField type="text" id="company" placeholder="기업명" onChange={handleSearchInputChange} />
-          <InputField type="text" id="position" placeholder="직무" onChange={handleSearchInputChange} />
-          <SearchButton onClick={handleSearch}>검색</SearchButton>
-        </SearchInput>
-      </SearchBox>
+      <PageContainer>
+        <SearchBox>
+          <SearchText>면접 후기 검색하기</SearchText>
+          <SearchInput>
+            <InputField type="text" id="company" placeholder="기업명" onChange={handleSearchInputChange} />
+            <InputField type="text" id="position" placeholder="직무" onChange={handleSearchInputChange} />
+            <SearchButton onClick={handleSearch}>검색</SearchButton>
+          </SearchInput>
+        </SearchBox>
 
-      <WritingContainer>
-        <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
-        <WritingBox onClick={navigateToInput}>
-          면접 후기를 남겨보세요
-        </WritingBox>
-      </WritingContainer>
+        <WritingContainer>
+          <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
+          <WritingBox onClick={navigateToInput}>
+            면접 후기를 남겨보세요
+          </WritingBox>
+        </WritingContainer>
 
-      <SearchResultWrap>
-        {sortedData.length > 0 && (
-          <SearchResultVar>
-            <SearchResultText>
-              검색결과 ({sortedData.length})
-            </SearchResultText>
+        <SearchResultWrap>
+          {totalElements > 0 && (
+              <SearchResultVar>
+                <SearchResultText>
+                  검색결과 ({totalElements})
+                </SearchResultText>
 
-            <SortButtonsContainer>
-              <SortButton onClick={handleSortByDate} active={sortByDateActive}>
-                <ButtonImage src={sortByDateActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
-                최근 작성순
-              </SortButton>
-              <SortButton onClick={handleSortByLikes} active={sortByLikesActive}>
-                <ButtonImage src={sortByLikesActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
-                스크랩 많은 순
-              </SortButton>
-            </SortButtonsContainer>
-          </SearchResultVar>
-        )}
+                <SortButtonsContainer>
+                  <SortButton onClick={handleSortByDate} active={sortByDateActive}>
+                    <ButtonImage src={sortByDateActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+                    최근 작성순
+                  </SortButton>
+                  <SortButton onClick={handleSortByLikes} active={sortByLikesActive}>
+                    <ButtonImage src={sortByLikesActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+                    스크랩 많은 순
+                  </SortButton>
+                </SortButtonsContainer>
+              </SearchResultVar>
+          )}
+          {sortedData.map((interview, index) => {
+            const englishList = interview.english ? interview.english.split(', ') : [];
+            const scoreList = interview.score ? interview.score.split(', ') : [];
 
-        {sortedData.map((coverLetter, index) => (
-          <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
-            <InformationContainer>
-              <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
-              <Information2>
-                토익: {coverLetter.english}, 오픽: {coverLetter.opic} / {coverLetter.activity} / 컴퓨터활용능력: {coverLetter.certification} / {coverLetter.major} / 학점 {coverLetter.gpa}
-              </Information2>
-              <Information3>
-                {coverLetter.contents}
-              </Information3>
-            </InformationContainer>
-            <ScrapIconWrap>
-              <ScrapIcon src="./assets/scrap.png" />
-              <ScrapCount>{coverLetter.scrap}</ScrapCount>
-            </ScrapIconWrap>
-          </SearchResultBox>
-        ))}
-      </SearchResultWrap>
+            return (
+                <SearchResultBox key={index} >
+                  <InformationContainer key = {interview.id} onClick={() => handleResultClick(interview)}>
+                    <Information1>{interview.company} | {interview.department} | {interview.year} {' '} {interview.semester}</Information1>
+                    <Information2>
+                      {englishList.map((english, index) => (
+                          <span key={index}> {english}: {scoreList[index]}, </span>
+                      ))} /
+                      <span> 대외활동: {interview.activity}</span> /
+                      <span> {interview.certification}</span> /
+                      <span> {interview.education}</span> /
+                      <span> {interview.department}</span> /
+                      <span> 학점: {interview.gpa}</span>
+                    </Information2>
+                    <Information3>
+                      {interview.contents && interview.contents.length > 0 ? interview.contents[0] : '내용이 없습니다.'}
+                    </Information3>
+                  </InformationContainer>
+                  <ScrapIconWrap>
+                    <ScrapIcon src="./assets/scrap.png" />
+                    <ScrapCount>{interview.scrapCount}</ScrapCount>
+                  </ScrapIconWrap>
+                </SearchResultBox>
+            );
+          })}
+        </SearchResultWrap>
 
-      <InterviewCoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
-    </PageContainer>
+        <InterviewCoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} selectedItem={selectedItem} />
+
+        <TalkPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+        />
+      </PageContainer>
   );
 }
 
@@ -132,7 +179,7 @@ const PageContainer = styled.div`
 `;
 
 const SearchBox = styled.div`
-  width: 74.9375rem;  
+  width: 74.9375rem;
   height: 15.5625rem;
   background-color: #E5FF7D;
   border-radius: 0.5rem;
@@ -178,7 +225,7 @@ const InputField = styled.input`
 const SearchButton = styled.button`
   width: 132px;
   height: 78px;
-  background-color:  #5B00EF; 
+  background-color:  #5B00EF;
   border: 0.1875rem solid  #5B00EF;
   border-radius: 1rem;
   color: white;
@@ -264,7 +311,7 @@ const ButtonImage = styled.img`
 
 const SearchResultBox = styled.div`
   display: flex;
-  width: calc(1198px); 
+  width: calc(1198px);
   height: 165px;
   margin-top: 30px;
   border-bottom: 2px solid #E2E2E2;

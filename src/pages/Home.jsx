@@ -167,7 +167,7 @@ const calculateRemainingDays = (expirationDate) => {
              style={{width: "5.136rem", height: "5.124rem", marginBottom: "1.126rem"}} />
              <span>톡톡</span>
           </Icons>
-          <Icons onClick={() => handlePageChange('/cover-letters')}>
+          <Icons onClick={() => handlePageChange('/cover-letters-home')}>
             <img src="/assets/Coverletters.png" alt="Coverletters"
              style={{width: "4rem", height: "5.063rem", marginBottom: "1.188rem"}} />
              <span>합격 자소서</span>

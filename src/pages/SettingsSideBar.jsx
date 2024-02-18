@@ -116,13 +116,13 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
       <MenuItem onMouseEnter={() => setHoveredItem('scraps')}
                    onMouseLeave={() => setHoveredItem(null)}
                    onClick={handleScrapsClick}>
-        {hoveredItem === 'scraps' && <CheckIcon src="./assets/Check.png" alt="Check" />}
+        {hoveredItem === 'scraps' && <CheckIcon src="/assets/Check.png" alt="Check" />}
         <ItemText>스크랩</ItemText>
       </MenuItem>
       <MenuItem onMouseEnter={() => setHoveredItem('settings')}
                 onMouseLeave={() => setHoveredItem(null)}
                 onClick={handleSettingsClick}>
-        {hoveredItem === 'settings' && <CheckIcon src="./assets/Check.png" alt="Check" />}
+        {hoveredItem === 'settings' && <CheckIcon src="/assets/Check.png" alt="Check" />}
         <ItemText>설정</ItemText>
         <LogoutLine />
       </MenuItem>

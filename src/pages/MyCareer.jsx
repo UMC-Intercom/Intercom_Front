@@ -696,7 +696,7 @@ const MyCareer = () => {
   const renderLinks = () => {
     return links.map((link, index) => (
       <CenteredContainer key={index}>
-        <LinkBox>
+        <LinkBox  style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
           <LinkEntry>
             {/* LinkName을 <a> 태그로 변경합니다. */}
             <LinkName as="a" href={link.url} target="_blank" rel="noopener noreferrer">
@@ -920,7 +920,7 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
         <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '757px' : '792px' }}>
         {isPdfDownloadMode && (
         <ProfileSection>
-          <IDPhoto src={profileImageUrl} alt="ID Photo" />
+          <IDPhoto src={profileImage} alt="ID Photo" />
           <ProfileDetailsContainer2>
             <ProfileName2>{userInfo.name}</ProfileName2>
             <ProfileDetail2>이메일 <ProfileEmailValue>{userInfo.email}</ProfileEmailValue></ProfileDetail2>
@@ -953,7 +953,7 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
             <CertificateTitle>자격증</CertificateTitle>
             {certificates.map((certificate, index) => (
               <CenteredContainer key={index}>
-                <CertificateBox style={{ width: isPdfDownloadMode ? '670px' : '690px' }}>
+                <CertificateBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
                   <CertificateEntry>
                     <CertificateName>{certificate.name}</CertificateName>
                   </CertificateEntry>
@@ -969,7 +969,7 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
            <>
           <EducationTitle>학력</EducationTitle>
           <CenteredContainer>
-          <EducationBox>
+          <EducationBox  style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
           <MajorText>{education.major}</MajorText>
          
           <EducationContent> {/* 여기서 flex-direction: row; 설정을 사용 */}

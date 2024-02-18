@@ -2,8 +2,14 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios'; 
 import styled from 'styled-components';
 import Select, { components } from 'react-select';
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import SearchModal from './SearchModal';
+
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
 
 const SearchBarContainer = styled.div`
   width: 75rem;
@@ -245,28 +251,44 @@ const PopularNoticesBox = styled.div`
 `;
 
 const ContentsBox = styled.div`
-  width: 75rem;
-  min-height: 27.3125rem;
-  background-color: #FFFFFF;
-  border-radius: 1.25rem;
+display: flex;
+justify-content: flex-start;
+flex-wrap: wrap;
+gap: 1rem;
 `;
 
 const Content = styled.div`
-  display: flex;
-  gap: 1.5625rem;
-  flex-wrap: wrap;
-  @media (max-width: 75rem) {
-    justify-content: space-around;
-  }
+display: flex;
+justify-content: flex-start; // flex-start를 사용하여 왼쪽 정렬합니다.
+flex-wrap: wrap;
+gap: 1rem; // 아이템 사이에 1rem의 공간을 둡니다.
+`;
+
+const ImageContainer = styled.div`
+  width: 282px; // 컨테이너의 폭을 NoticeItem에 맞춥니다.
+  height: 280px; // 또는 원하는 높이 값으로 설정
+  background-color: #D9D9D9;
+  position: relative;
+  overflow: hidden; // 이미지가 컨테이너를 넘어가지 않게 설정
+`;
+
+const StyledImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; // 이미지가 컨테이너에 꽉 차도록 설정
 `;
 
 const NoticeItem = styled.div`
-  flex: 0 0 calc(25% - 1.25rem);
+  flex: 0 0 calc(25% - 1rem); // 한 줄에 4개씩 표시되도록 수정합니다.
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 1.25rem;
+  height: auto;
+  cursor: pointer;
+
+  // 이 부분은 기존대로 유지합니다.
   img {
     background-color: #D9D9D9;
     width: 100%;
@@ -274,21 +296,26 @@ const NoticeItem = styled.div`
     aspect-ratio: 1 / 1;
     object-fit: cover;
   }
-  span {
-    font-size: 1.25rem;
-    text-align: left;
-    margin-top: 1.25rem;
-  }
 `;
 
 const Title = styled.span`
-  font-weight: bold;
-  font-size: 1.25rem;
+font-weight: bold;
+font-size: 1.25rem;
+white-space: nowrap; /* 텍스트를 한 줄로 설정 */
+overflow: hidden; /* 넘칠 경우 숨김 처리 */
+text-overflow: ellipsis; /* 넘칠 경우 말줄임표 표시 */
+max-width: 250px; /* 최대 너비 설정 */
+display: block;
 `;
 
 const Information = styled.span`
   font-size: 1.25rem;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+  display: block;
 `;
 
 const Deadline = styled.span`
@@ -313,8 +340,10 @@ const SearchResults = () => {
   });
 
   useEffect(() => {
+    if (location.state?.searchResults) {
       setSearchResults(location.state.searchResults);
-      }, []);
+    }
+  }, [location.state?.searchResults]);
 
   const handleSearchBarClick = () => {
     setIsModalOpen(true);
@@ -390,23 +419,32 @@ const SearchResults = () => {
                 </SearchResultTextWrapper>
 
                 <ContentsBox>
-                    <Content>
                         {searchResults.map(result => (
+                          <StyledLink to={`/job/${result.id}`} key={result.id}>
                             <NoticeItem key={result.id}>
-                                <img src={result.logoUrl} alt={result.title} style={{ marginBottom: "20px" }} />
-                                <div>
+                              <ImageContainer>
+                                <StyledImage src={result.logoUrl} alt={result.title} />
+                                
+                              </ImageContainer>
+                              <div>
                                     <Title>[{result.title}]</Title>
+                                    <br />
                                     <Information>{result.company}</Information>
-                                    <br /><br />
+                                    <br />
                                     <Deadline>{calculateRemainingDays(result.expirationDate)}</Deadline> <Views>조회 {result.viewCount.toLocaleString()}회</Views>
                                 </div>
                             </NoticeItem>
+                          </StyledLink>
                         ))}
-                    </Content>
                 </ContentsBox>
             </PopularNoticesBox>
 
-        {isModalOpen && <SearchModal onClose={() => setIsModalOpen(false)} />}
+            {isModalOpen && (
+              <SearchModal
+                onClose={() => setIsModalOpen(false)}
+                setSearchResults={setSearchResults} // setSearchResults 함수를 SearchModal에 prop으로 전달합니다.
+              />
+            )}
     </div>
 );
 };

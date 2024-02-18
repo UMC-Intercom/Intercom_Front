@@ -9,7 +9,7 @@ export default function ProfileEdit() {
   const [user, setUser] = useState({
     email: '', // 예: 'user@example.com'
     name: '',
-    nickName: '',
+    nickname: '',
     phoneNum: '',
     gender: '',
     birthYear: '',
@@ -63,7 +63,8 @@ export default function ProfileEdit() {
          },
        });
        const data = response.data;
-       const birthdayParts = data.birthday.split('-');
+       //const birthdayParts = data.birthday.split('-');
+      const birthdayParts = data.birthday.split('-');
        setUser({
          ...user,
          email: data.email,
@@ -82,59 +83,72 @@ export default function ProfileEdit() {
  
    fetchUserData();
  }, []);
+   // 사용자 입력 처리
+const handleInputChange = useCallback((e) => {
+  const { name, value } = e.target;
+  setUser((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+}, []);
+
   // 폼 제출 처리
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 유효성 검사 로직
-    if (!isValidPwd1 || !isValidPwd2 || !isValidPwd3 || !isPwdMatched) {
-      // 유효성 검사 실패 시 메시지 설정
-      let errorMessage = '비밀번호 유효성 검사에 실패했습니다.';
-      if (!isValidPwd1) {
-        errorMessage = '비밀번호는 8자 이상이며 소문자를 포함해야 합니다.';
-      } else if (!isValidPwd2) {
-        errorMessage = '비밀번호는 대문자를 포함해야 합니다.';
-      } else if (!isValidPwd3) {
-        errorMessage = '비밀번호는 특수 문자(!@#$%^*+=-)를 포함해야 합니다.';
-      } else if (!isPwdMatched) {
-        errorMessage = '새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.';
-      }
-      setMessage(errorMessage);
-      return;
-    }
-
-      // 서버 요청 데이터 준비
-    const updateData = {
-      name: user.name,
-      nickname: user.nickname,
-      phone: user.phone,
-      gender: user.gender,
-      birthday: `${user.birthYear}-${user.birthMonth}-${user.birthDay}`,
-    };
-
+  
+    // 새 비밀번호가 입력된 경우 유효성 검사 실행
     if (newPassword) {
-      updateData.password = newPassword;
+      if (!isValidPwd1 || !isValidPwd2 || !isValidPwd3 || newPassword !== confirmNewPassword) {
+        let errorMessage = '비밀번호 유효성 검사에 실패했습니다.';
+        if (!isValidPwd1) {
+          errorMessage = '비밀번호는 8자 이상이며 소문자를 포함해야 합니다.';
+        } else if (!isValidPwd2) {
+          errorMessage = '비밀번호는 대문자를 포함해야 합니다.';
+        } else if (!isValidPwd3) {
+          errorMessage = '비밀번호는 특수 문자(!@#$%^*+=-)를 포함해야 합니다.';
+        } else if (newPassword !== confirmNewPassword) {
+          errorMessage = '새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.';
+        }
+        setMessage(errorMessage);
+        return;
+      }
     }
+  
+    // 서버 요청 데이터 준비
+    // 서버 요청 데이터 준비
+  let updateData = {
+    name: user.name,
+    nickname: user.nickname,
+    phone: user.phone,
+    gender: user.gender,
+    birthday: `${user.birthYear}-${user.birthMonth.padStart(2, '0')}-${user.birthDay.padStart(2, '0')}`, // LocalDate 형식에 맞춤
+  };
 
+  // 새 비밀번호가 입력된 경우에만 updateData에 추가
+  if (newPassword && isPwdMatched) {
+    updateData.password = newPassword;
+  }
+  
     // 서버 요청 로직
     try {
-      await axios.put('/users/update', updateData, {
+      const response = await axios.put('/users/update', updateData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      setMessage('회원 정보가 성공적으로 업데이트되었습니다.');
-      // 성공 후 추가 작업 (예: 페이지 리디렉션)
+      if (response.status === 204) { // No Content
+        localStorage.setItem('userName', updateData.name);
+        localStorage.setItem('userNickname', updateData.nickname);
+        setMessage('회원 정보가 성공적으로 업데이트되었습니다.');
+        navigate('/settings');
+      }
     } catch (error) {
-      // 요청 실패 시 메시지 설정
-      setMessage('회원 정보 업데이트 중 오류가 발생했습니다.');
+      console.error(error);
+      setMessage('회원 정보 업데이트 중 오류가 발생했습니다. 서버 로그를 확인해주세요.');
     }
   };
   // 사용자 입력 처리
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setUser((prev) => ({ ...prev, [name]: value }));
-  }, []);
+
 
   // 메시지 창
   const MessageModal = ({ message, onClose }) => (
@@ -196,12 +210,12 @@ export default function ProfileEdit() {
 
             <InputWrap>
             <Label>닉네임</Label>
-            <InputField type="text" name="nickName" value={user.nickname} onChange={handleInputChange} />
+            <InputField type="text" name="nickname" value={user.nickname} onChange={handleInputChange} />
             </InputWrap>
 
             <InputWrap>
             <Label>휴대폰</Label>
-            <InputField type="text" name="phoneNum" value={user.phone} onChange={handleInputChange} />
+            <InputField type="text" name="phone" value={user.phone} onChange={handleInputChange} />
             </InputWrap>
 
             <InputWrap>
@@ -210,21 +224,21 @@ export default function ProfileEdit() {
                     name="gender"
                     value="male"
                     onChange={handleInputChange}
-                    checked={user.gender === 'MALE'}
+                    checked={user.gender.toUpperCase() === 'MALE'}
                     label="남자"
                 />
                 <RadioInput
                     name="gender"
                     value="female"
                     onChange={handleInputChange}
-                    checked={user.gender === 'FEMALE'}
+                    checked={user.gender.toUpperCase() === 'FEMALE'}
                     label="여자"
                 />
                 <RadioInput
                     name="gender"
                     value="none"
                     onChange={handleInputChange}
-                    checked={user.gender === 'NONE'}
+                    checked={user.gender.toUpperCase() === 'NONE'}
                     label="선택 안 함"
                 />
             </InputWrap>

@@ -13,6 +13,7 @@ const SettingsPage = () => {
   const { isLoggedIn } = useAuth();
   const [username, setUsername] = useState('사용자');
   const [usernickname, setUsernickname] = useState('닉네임');
+  const [coins, setCoins] = useState(0);
 
   const isCurrentPath = (path) => location.pathname === path;
 
@@ -25,6 +26,26 @@ const SettingsPage = () => {
     const storedImageUrl = localStorage.getItem('profileImageUrl') || './assets/MyProfile.png';
     setProfileImage(storedImageUrl);
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    // 사용자의 보유 코인 정보 조회
+    const fetchCoins = async () => {
+      try {
+        const response = await axios.get(`${config.API_URL}/users/coin`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 인증 토큰 추가
+          },
+        });
+        setCoins(response.data); // 보유 코인 상태 업데이트
+      } catch (error) {
+        console.error('코인 정보 조회 실패:', error);
+      }
+    };
+
+    fetchCoins();
+  }, []);
+
+  
 
 
   const [profileImage, setProfileImage] = useState('./assets/MyProfile.png');
@@ -121,7 +142,10 @@ const SettingsPage = () => {
               <Name>{username} 님</Name>
               <VectorImage src="./assets/Vector2.png" alt="Vector" />
             </NameContainer>
-            <Nickname>{usernickname}</Nickname>
+            <NicknameAndCoinContainer>
+              <Nickname>{usernickname}</Nickname>
+              <Coin>보유 코인: {coins} </Coin>
+            </NicknameAndCoinContainer>
           </NameAndNickname>
         </ProfileSection>
 
@@ -142,9 +166,6 @@ const SettingsPage = () => {
             <MyAndAccountSection>
               <Option>
                 <OptionText onClick={() => navigate('/deactivate-account0')}>계정 탈퇴</OptionText>
-              </Option>
-              <Option>
-                <OptionText onClick={() => navigate('/terms')}>이용약관</OptionText>
               </Option>
             </MyAndAccountSection>
           </Section>
@@ -311,6 +332,12 @@ const VectorImage = styled.img`
   flex-shrink: 0;
 `;
 
+const NicknameAndCoinContainer = styled.div`
+  display: flex; // 항목들을 가로로 나열
+  align-items: center; // 항목들을 세로 중앙에 정렬
+  margin-top: 0.5rem; // 이름과의 간격 조정
+`;
+
 const Nickname = styled.h2`
   color: #636363;
   font-family: SUITE;
@@ -318,6 +345,16 @@ const Nickname = styled.h2`
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+`;
+
+const Coin = styled.h2`
+  color: #636363;
+  font-family: SUITE;
+  font-size: 1.3rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  margin-left: 5rem;
 `;
 
 const Section = styled.section`
