@@ -251,44 +251,73 @@ const PopularNoticesBox = styled.div`
 `;
 
 const ContentsBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem; // 아이템 간 간격을 조정합니다.
-  justify-content: flex-start; // 아이템을 왼쪽 정렬합니다.
-  padding: 1.25rem;
+display: flex;
+justify-content: flex-start;
+flex-wrap: wrap;
+padding: 1.25rem;
 `;
 
 const Content = styled.div`
-  display: flex;
-  gap: 1.563rem;
-  flex-wrap: wrap;
+display: flex;
+justify-content: flex-start; // flex-start를 사용하여 왼쪽 정렬합니다.
+flex-wrap: wrap;
+gap: 1rem; // 아이템 사이에 1rem의 공간을 둡니다.
+`;
+const ImageContainer = styled.div`
+  width: 282px; // 컨테이너의 폭을 NoticeItem에 맞춥니다.
+  height: 290px; // 또는 원하는 높이 값으로 설정
+  background-color: #D9D9D9;
+  position: relative;
+  overflow: hidden; // 이미지가 컨테이너를 넘어가지 않게 설정
+`;
 
-  @media (max-width: 75rem) {
-    justify-content: space-around;
-  }
+const StyledImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; // 이미지가 컨테이너에 꽉 차도록 설정
 `;
 
 const NoticeItem = styled.div`
-flex: 1 1 calc(33.333% - 1rem); // 3개의 아이템이 한 줄에 표시되도록 조정합니다. gap과 일치하도록 계산합니다.
-margin-bottom: 1rem; // 아이템 사이의 세로 간격을 추가합니다.
-max-width: calc(33.333% - 1rem); // 최대 너비를 설정합니다.
-
-img {
-  width: 100%;
+  flex: 0 0 calc(25% - 1rem);
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   height: auto;
-  object-fit: cover;
-}
+  cursor: pointer;
 
+  &:nth-child(4n) {
+    margin-right: 0; // 4번째 아이템은 오른쪽 여백을 제거합니다.
+  }
+
+  img {
+    background-color: #D9D9D9;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
 `;
 
 const Title = styled.span`
-  font-weight: bold;
-  font-size: 1.25rem;
+font-weight: bold;
+font-size: 1.25rem;
+white-space: nowrap; /* 텍스트를 한 줄로 설정 */
+overflow: hidden; /* 넘칠 경우 숨김 처리 */
+text-overflow: ellipsis; /* 넘칠 경우 말줄임표 표시 */
+max-width: 250px; /* 최대 너비 설정 */
+display: block;
 `;
 
 const Information = styled.span`
   font-size: 1.25rem;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+  display: block;
 `;
 
 const Deadline = styled.span`
@@ -394,9 +423,13 @@ const SearchResults = () => {
                         {searchResults.map(result => (
                           <StyledLink to={`/job/${result.id}`} key={result.id}>
                             <NoticeItem key={result.id}>
-                                <img src={result.logoUrl} alt={result.title} style={{ marginBottom: "20px" }} />
-                                <div>
+                              <ImageContainer>
+                                <StyledImage src={result.logoUrl} alt={result.title} />
+                                
+                              </ImageContainer>
+                              <div>
                                     <Title>[{result.title}]</Title>
+                                    <br />
                                     <Information>{result.company}</Information>
                                     <br /><br />
                                     <Deadline>{calculateRemainingDays(result.expirationDate)}</Deadline> <Views>조회 {result.viewCount.toLocaleString()}회</Views>
