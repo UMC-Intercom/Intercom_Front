@@ -257,6 +257,7 @@ const onSubmit = (e) => {
         alert('회원가입 성공');
 
         // userNickname 아래 페이지로 넘겨서 정보 보낼 때 같이 전달 plz
+        localStorage.setItem('userNickname', userNickname);
         // 2단계 api는 구현 안 된 상태라 하고 연동 예정
         navigateToSignUp2();
       })
@@ -342,10 +343,10 @@ const onSubmit = (e) => {
         <Label>닉네임</Label>
         <InputField type="text" value={nickName} onChange={(e) => setNickName(e.target.value)} />
         <CheckWrap>
-        {checkEmail !== null && (
+        {checkNickname !== null && (
                   <img
-                    src={checkEmail ? 'assets/Check2.png' : 'assets/UnChecked.png'}
-                    alt="이메일 중복 확인"
+                    src={checkNickname ? 'assets/Check2.png' : 'assets/UnChecked.png'}
+                    alt="닉네임 중복 확인"
                     style={{ width: '17px', height: '11px', marginRight: '7px', marginLeft:'49px', marginTop: '9px' }}
                   />
                 )} 중복확인

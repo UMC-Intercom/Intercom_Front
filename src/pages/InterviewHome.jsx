@@ -65,7 +65,7 @@ export default function InterviewHome() {
   return (
     <PageContainer>
       <SearchBox>
-        <SearchText>합격 후기 검색하기</SearchText>
+        <SearchText>면접 후기 검색하기</SearchText>
         <SearchInput>
           <InputField type="text" id="company" placeholder="기업명" onChange={handleSearchInputChange} />
           <InputField type="text" id="position" placeholder="직무" onChange={handleSearchInputChange} />
@@ -76,7 +76,7 @@ export default function InterviewHome() {
       <WritingContainer>
         <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
         <WritingBox onClick={navigateToInput}>
-          합격 후기를 남겨보세요
+          면접 후기를 남겨보세요
         </WritingBox>
       </WritingContainer>
 

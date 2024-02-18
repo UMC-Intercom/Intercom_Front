@@ -1,514 +1,217 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import ReactQuill, { Quill } from 'react-quill'; //npm install react-quill 필수
-import 'react-quill/dist/quill.snow.css'; // Quill 에디터의 스타일시트
-import { useNavigate } from 'react-router-dom';
+import PostQuestionModal from './PostQuestionModal';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
+export default function CoverLetterInput3() {
+  const [postModalOpen, setPostModalOpen] = useState(false); // PostQuestionModal 열림 상태
+  const location = useLocation();
+  const [formData, setFormData] = useState({
+    company: '',
+    department: '',
+    year: '',
+    semester: '',
+    gender: 'no-selected',
+    birthday: '',
+    education: '',
+    major: '',
+    gpa: '',
+    activity: '',
+    certification: [],
+    english: '',
+    score: '',
+    contents: ''
+});
 
- const TEMP_DATA_KEY = "temporaryData";
+useEffect(() => {
+  if (location.state) {
+      setFormData(location.state);
+  }
+}, [location]);
 
+  const accessToken = localStorage.getItem('accessToken');
 
- const InterviewInput3= () => {
-  const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [titleLength, setTitleLength] = useState(0);
-  const maxTitleLength = 30;
-  const [contentLength, setContentLength] = useState(0);
-  const maxContentLength = 500;
-  const quillRef = useRef(null);
-  const [posts, setPosts] = useState([]); // 글 목록 상태 추가
-
-  const handleGoBack = () => {
-    navigate(-1); // 뒤로가기 기능 실행
-  };
-//제목글자수
-  useEffect(() => {
-    setTitleLength(title.length);
-  }, [title]);
+  const handleConfirm = async () => {
+    console.log(formData);
   
-
-  //내용글자수
-  useEffect(() => {
-    const text = content.replace(/<[^>]*>?/gm, '');
-    setContentLength(text.length);
-  }, [content]);
-
-  //이미지
-  useEffect(() => {
-    const quill = quillRef.current;
-    if (quill) {
-      quill.getEditor().getModule('toolbar').addHandler('image', () => {
-        handleImageUpload();
-      });
+    try {
+      const response = await axios.post('http://localhost:8080/interviews', formData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+      })
+      console.log(response.data);
     }
-  }, []);
-  const handleImageUpload = () => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
+    catch (error) {
+      console.error(error);
+    }
   
-    input.onchange = async () => {
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-  
-      reader.onload = (e) => {
-        const img = new Image();
-        img.src = e.target.result;
-  
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-  
-          // 이미지 사이즈 조정 로직
-          const MAX_WIDTH = 400;
-          let width = img.width;
-          let height = img.height;
-  
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-  
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-  
-          const resizedImgDataUrl = canvas.toDataURL('image/jpeg');
-  
-          // 조정된 이미지를 Quill 에디터에 삽입
-          const quill = quillRef.current.getEditor();
-          const range = quill.getSelection(true);
-          quill.insertEmbed(range.index, 'image', resizedImgDataUrl);
-          quill.setSelection(range.index + 1);
-        };
-      };
-    };
-  };
-  
-  const handleTitleChange = (e) => {
-    if (e.target.value.length <= maxTitleLength) {
-      setTitle(e.target.value);
-    }  };
-   
-
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newPost = { title, content, categories: selectedCategories };
-    setPosts([...posts, newPost]); // 글 목록 상태 업데이트
-    // 나머지 로직...
+    setPostModalOpen(true);
   };
 
-  //카테고리
+  const handleClose = () => {
+    setPostModalOpen(false); // PostQuestionModal 닫기
+  };
 
-    // 선택된 카테고리들을 저장할 상태 (배열)
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState([]);
-  
-    const handleDropdownToggle = () => {
-      setIsDropdownOpen(!isDropdownOpen);
-    };
-  
-    const handleCategoryChange = (categoryId) => {
-      setSelectedCategories((prev) =>
-        prev.includes(categoryId)
-          ? prev.filter((id) => id !== categoryId)
-          : [...prev, categoryId]
-      );
-    };
-
-    const handleSave = () => {
-      const temporaryData = { title, content };
-      localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
-      alert("임시저장 되었습니다.");
-    };
-  
-    const handleCancel = () => {
-      localStorage.removeItem(TEMP_DATA_KEY);
-      alert("작성이 취소되고 글이 삭제되었습니다.");
-      navigate(-1);  
-    };
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      const fromTalkTalk = params.get('from') === 'talktalk';
-    
-      if (fromTalkTalk) {
-        const savedData = localStorage.getItem(TEMP_DATA_KEY);
-        if (savedData) {
-          const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
-          if (shouldLoadData) {
-            const { title: savedTitle, content: savedContent } = JSON.parse(savedData);
-            setTitle(savedTitle);
-            setContent(savedContent);
-          }
-        }
-      }
-    }, []);
-    
-    
   return (
-    <PageContainer>
-      <Form onSubmit={handleSubmit}>
-         <ContentContainer>
-<ImageButton onClick={handleImageUpload}>
-  <img src="./assets/Group26.png" alt="이미지 아이콘" /> 
-  이미지 첨부하기
-</ImageButton>
-<ContentCounter>
-          ({contentLength}/{maxContentLength}자)
-        </ContentCounter>
+    <SettingTitle>
+      <Container>
+        <Title>면접 후기 입력하기</Title>
+        <Form>
+          <Text>Step 3</Text>
+          <SubtitleWrap>
+            <SubTitle>후기를 작성해주세요</SubTitle>
+          </SubtitleWrap>
 
-        </ContentContainer>
-        <SaveCancelButtonContainer>
-        <Button onClick={handleCancel}>작성 취소</Button>
-        <Button onClick={handleSave}>임시저장</Button>
-        </SaveCancelButtonContainer>
-        <ButtonContainer>
-          <SubmitButton type="submit">질문 등록</SubmitButton>
-        </ButtonContainer>
-      </Form>
-    </PageContainer>
-  );
-};
-export default InterviewInput3;
+            <QuestionWrap type='text' placeholder='답변을 입력해주세요'
+            value={formData.contents}
+            onChange={(e) => setFormData({...formData, contents: e.target.value})}
+            />
 
-// Styled Components
-const PageContainer = styled.div`
-display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh; 
-`;
-const BackButtonContainer = styled.div`
-max-width: 75.125rem;`;
+        </Form>
+        <SubmitButton type="button" onClick={handleConfirm}>등록하기</SubmitButton>
+      </Container>
+      <PostQuestionModal isOpen={postModalOpen} onClose={handleClose} />
+    </SettingTitle>
+  )
+}
 
-const Form = styled.form`
-display: flex;
-flex-direction: column;
-width: 100%; // 폼의 너비를 전체로 설정
-max-width: 75.125rem; // 최대 너비 제한
-padding: 1rem; // 폼 내부의 여백
-margin-top: 5.25rem;
+const SettingTitle = styled.div``;
 
-
-`;
-const InputContainer = styled.div`
-  position: relative;
-  margin-bottom:3.94rem;
-  // 최대 너비 제한
-
-`;
-
-const TitleCounter = styled.div`
-  position: absolute;
-  width: 6.375rem;
-  height: 1.5625rem;
-  text-align: right;
-margin-top: 1.12rem;
-margin-left: 71rem;
-  font-family: SUITE;
-font-size: 1.0625rem;
-font-weight: 700;
-  color: #636363;
-`;
-const Input = styled.input`
-display: flex;
-    align-items: center; // 세로 중앙 정렬
-    width: 75.125rem;   
-    height: 3.75rem;
-  border-width: 0.2rem;;
-  border-style: solid;
-  border-color: #5B00EF;
-  border-radius: 0.8rem;
-  padding-left: 2.56rem; 
+const QuestionWrap = styled.textarea`
+  margin-left: 43px;
+  margin-bottom: 35px;
+  box-sizing: border-box;
+  width: 1119px;
+  height: 456px;
+  max-height: 456px; /* 수정된 부분: 최대 높이 지정 */
+  left: 400px;
+  top: 447px;
+  border: 3px solid #A1A1A1;
+  border-radius: 10px;
+  padding-left: 21px;
+  font-family: 'SUITE';
+  font-style: normal;
   font-weight: 700;
-    font-family: 'SUITE', sans-serif;
-    color: #000;
-    font-size: 1.25rem;
-    
-    &:focus {
-      outline: none; // 포커스 상태에서 아웃라인 제거
-      border-color: #5B00EF; // 필요한 경우 특정 색상으로 변경
-    }
+  font-size: 20px;
+  line-height: 25px;
+  margin-bottom: 43px;
+  resize: none; /* 수정된 부분: 사용자가 크기 조정할 수 없게 함 */
+  overflow-y: auto; /* 수정된 부분: 필요할 때 세로 스크롤 추가 */
+  padding-top: 10px;
 
   &::placeholder {
-    display: flex;
-    align-items: center; // 세로 중앙 정렬
-    font-size: 1.25rem;
-    font-weight: 700;
-    font-family: 'SUITE', sans-serif;
+    font-family: 'SUITE';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 30px;
     color: #A1A1A1;
   }
 `;
 
-const ContentContainer = styled.div`
-  width: 78.125rem;
-  height: 41.6875rem;
-  border: 3px solid #A1A1A1;
-  border-radius: 0.8rem;
-  margin-top: 5.13rem;;
-  position: relative; /* 이 부분을 추가하세요 */
 
-`;
-const StyledReactQuill = styled(ReactQuill)`
-
-.ql-container {
-  height: 100%;
-  border: none !important; //이렇게하면안됨 ㅠ
-  
-}
-    .ql-editor {
-      position: relative; // 상대적 위치 설정
-    top: -1.56rem;      
-      height: 32.94rem;
-    font-size: 1.25rem;
-    font-weight: 300;
-    font-family: 'SUITE', sans-serif;
-    line-height: 2.34375rem;
-    margin-left:1.58rem;
-    margin-right:1.58rem;
-    
-  }
-
-  .ql-toolbar {
-    position: relative; // 상대적 위치 설정
-    top: -4rem;
-    left: 0;
-    display: flex;
-    justify-content: center; // 중앙 정렬
-    align-items: center; // 세로 중앙 정렬
-    width: 23.9375rem;
-    height: 3rem;
-    font-family: 'SUITE', sans-serif;
-    background: #EFF0F4;
-    font-color: #636363;
-    border: none;
-    button {
-      font-size: 1.25rem;
-    }
-
-    .ql-picker-label, .ql-picker-item {
-      display: flex;
-      align-items: center; 
-      font-size: 1rem; 
-    }
-  }
-`;
-
-const ButtonContainer = styled.div`
+const SubtitleWrap = styled.div`
   display: flex;
+  justify-content: space-between;
+
+  text-align: left;
+  margin-left: 43px;
+  margin-bottom: 42px;
+
+  font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 37px;
+
+color: #636363;
+`;
+
+
+const Title = styled.div`
+font-family: SUITE;
+font-size: 1.5625rem;
+font-weight: 600;
+margin-top: 4rem;
+margin-bottom: 1rem;
+color: #636363;
+transition: all 0.3s ease-in-out;
+width: 1200px;
+text-align: left;
+`;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+
+  @media (max-width: 1024px) {
+    width: 80%; 
+    padding: 4rem; 
+  }
+  
+  @media (max-width: 768px) {
+    width: 90%; 
+    padding: 3rem; 
+  }
+  
+  @media (max-width: 480px) {
+    width: 95%; 
+    padding: 2rem; 
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 1200px; /* 폭 고정 */
+  max-height: 754px; /* 최대 높이 지정 */
+  overflow-y: auto; /* 세로 스크롤 추가 */
+  background: none;
+  border: 3px solid #e2e2e2;
+  border-radius: 0.625rem;
+`;
+
+
+const SubTitle = styled.div`;
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 30px;
+line-height: 37px;
+
+color: #636363;
 `;
 
 const SubmitButton = styled.button`
-  background-color: #5B00EF;
-  color: white;
-  border: none;
-  cursor: pointer;
-  width: 12.5rem;
-height: 4rem;
-font-size: 1.25rem;
-font-weight: 700;
-font-family: SUITE;
-margin-top:6.31rem;
-border-radius: 0.625rem;
-
-
-  &:hover {
-    background-color: #4e00d1;
-  }
-  &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
-  }
-`;
-
-const DropdownContainer = styled.div`
-  position: relative;
-  margin-left: 2.06rem;
-  border-radius: 0.625rem;
-  border: 2px solid #A1A1A1;
-  width: 21.4375rem;
-  height: 3rem;
-  `;
-
-const DropdownHeader = styled.div`
-padding: 10px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-left: 3rem;
-margin-right: 1.12rem;
-margin-top: 0.19rem;
-
-`;
-
-const DropdownIndicator = styled.span`
-display: inline-block;
-width: 1rem;
-height: 1rem;
-background-image: url('./assets/Vector3.png');
-background-size: contain;
-background-repeat: no-repeat;
-transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'none')};
-transition: transform 0.3s;
-`;
-
-const DropdownList = styled.div`
-  position: absolute;
-  width: 21.25rem;  
-  height: 27rem;
-  background-color: #fff;
-  border: 3px solid #E2E2E2;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
-const DropdownItem = styled.div`\
-width: 14.25rem;
-height: 2.25rem;
-justify-content: flex;
-border-bottom: 2px solid #E2E2E2;
-margin-left: 3rem;
-display: flex;
-align-items: center; // 체크박스와 텍스트를 세로 중앙정렬합니다.
-padding: 10px;
-
-`;
-
-const CheckboxLabel = styled.label`
-display: flex;
-margin-right: 2.5rem; // 라벨과 카테고리 이름 사이의 간격을 설정합니다.
-position: relative;
-cursor: pointer;
-
-input {
-  opacity: 0;
-  position: absolute;
-  cursor: pointer;
-}
-
-.checkmark {
-  position: absolute;
-  top: -0.5rem;;
-  left: 0;
-  width: 1.25rem;
-height: 1.25rem;
-  background-color: #eee;
-  border-radius: 4px;
-  &:after {
-    content: "";
-    position: absolute;
-    display: none;
-    left: 0.4rem;
-    top: 0.15rem;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    transform: rotate(45deg);
-  }
-}
-
-input:checked ~ .checkmark {
-  background-color: #5B00EF;
-  &:after {
-    display: block;
-  }
-}
-`;
-// ImageButton을 styled.button에서 컴포넌트로 변경
-
-const ImageButton = styled.button`
-  position: absolute;
-  bottom: 10.13rem; 
-  right: 9rem; 
-  z-index: 1000;
-  background-color: transparent;
-  color: #A1A1A1;
-  border-radius: 5px; 
-  cursor: pointer; 
-  border: none; 
-  display: flex; 
-  align-items: flex-end; /* 이미지와 텍스트를 바닥으로 정렬 */
-  justify-content: space-between; /* 내부 요소 사이에 공간 동등 분배 */
-  font-size: 1.0625rem;
+  width: 588px;
+  height: 72px;
+  background: #5B00EF;
+  border-radius: 10px;
+  font-family: 'SUITE';
+  font-style: normal;
   font-weight: 700;
-  font-family: 'SUITE', sans-serif;
-  transition: transform 0.1s, background-color 0.1s; 
-
-  img {
-    margin-right: 0.56rem; /* 아이콘과 텍스트 사이의 간격 */
-    width: 1.875rem;
-    height: 1.875rem;
-  }
-  &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
-  }
-`;
-
-
-const ContentCounter = styled.div`
-    position: absolute;
-    width: 6.375rem;
-bottom: 10.13rem; 
-right: 2.38rem;
-    color: #636363; // 글자 색상
-    font-family: SUITE;
-    font-size: 1.0625rem;
-    font-weight: 700;
-    text-align: right;
-`;
-const SaveCancelButtonContainer = styled.div`
-  position: relative;
-  margin-top: 1.69rem;
-  margin-left:62.4rem; 
-  width: 16rem; /* 너비를 자동으로 조절 */
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
-  /* 버튼 간격 조절 */
-  & > button {
-    margin-right: 1rem; /* 버튼 사이의 간격을 조절할 수 있습니다. */
-  }
-
-  /* 마지막 버튼의 오른쪽 마진 제거 */
-  & > button:last-child {
-    margin-right: 0;
-  }
-`;
-const Button = styled.button`
-  background-color: transparent; /* 버튼 기본 색상 */
-  color: #636363; /* 여기서 색상 코드 앞에 '#'가 누락되었습니다. */
-  border: 2px solid #A1A1A1;
+  font-size: 20px;
+  line-height: 25px;
+  /* identical to box height */
+  text-align: center;
+  color: #FFFFFF;
+  margin-top: 108px;
   cursor: pointer;
-  padding: 0.5rem 1rem;
-  font-family: SUITE;
-  font-size: 1.25rem;
-  font-weight: 700;
-  border-radius: 0.625rem;
-  transition: background-color 0.2s;
-  width: 7.5rem;
-  height: 3.375rem;
-
-  &:hover {
-    background-color: rgba(128, 128, 128, 0.2); /* 버튼 호버 색상 */
-  }
-  &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
-  }
 `;
-const BackButton = styled.div`
-display: flex;
-cursor: pointer;
-background-color: #5B00EF;
-color: white;
-border: none;
-padding: 10px;
-border-radius: 5px;
-margin-top: 4rem;
-margin-right: 70rem;
-margin-bottom: -5.5rem;  // 제목 입력칸과의 간격
-align-self: flex-start;  // 왼쪽 정렬
+
+const Text = styled.p`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 25px;
+  color: #5B00EF;
+  margin-top: 50px;
+  margin-left: 45px;
 `;
