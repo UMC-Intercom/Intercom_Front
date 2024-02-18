@@ -5,19 +5,32 @@ import { useNavigate, useLocation } from 'react-router-dom';
 export default function TypeTestQuestion2() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [choice, setChoice] = useState(location.state);
-    
 
-  console.log(choice);
+    const [choice, setChoice] = useState('');
 
+    useEffect(() => {
+        const receivedChoice = location.state?.choice || '';
+        setChoice(receivedChoice);
+    }, [location.state]);
+
+    const handleChange = (input) => {
+        const newChoice = choice + input;
+        setChoice(newChoice);
+        navigateToQuestion(newChoice);
+    }
+
+    const navigateToQuestion = (newChoice) => {
+        navigate('/type-test-question3', { state: { choice: newChoice } });
+    }
+  
   return (
     <Container>
         <TestWrap>
             <Text1>회사에서 새로운 사업 아이디어 제안의 기회가 생겼다.<br/>이럴 때 나는...
             </Text1>
             <Image1 src='assets/bulb.png'/>
-            <Button onClick={() => handleChoice('0')}>기존의 안정적인 업무를 유지하는 것을 선택한다.{'>'}</Button>
-        <Button onClick={() => handleChoice('1')}>새로운 사업 아이디어를 제안하고 이를 주도한다. {'>'}</Button>
+            <Button onClick={() => handleChange('0')}>기존의 안정적인 업무를 유지하는 것을 선택한다.{'>'}</Button>
+        <Button onClick={() => handleChange('1')}>새로운 사업 아이디어를 제안하고 이를 주도한다. {'>'}</Button>
         </TestWrap>
     </Container>
   )

@@ -1,31 +1,29 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 
 export default function TypeTestQuestion1() {
     const navigate = useNavigate();
     const [choice, setChoice] = useState('');
 
-    const navigateToQuestion = () => {
-        navigate('/type-test-question2', { state: { choice } });
-    };
+    const handleChange = (input) => {
+        const newChoice = choice + input;
+        setChoice(newChoice);
+        navigateToQuestion(newChoice);
+        // console.log(newChoice); 
+    }
 
-    const handleChoice = (addChoice) => {
-        setChoice(prevChoice => {
-            const updatedChoice = prevChoice + addChoice;
-            console.log(updatedChoice); 
-            return updatedChoice;
-        });
-        navigateToQuestion();
-    };
+    const navigateToQuestion = (newChoice) => {
+        navigate('/type-test-question2', { state: { choice: newChoice } });
+    }
 
     return (
         <Container>
             <TestWrap>
-                <Text1>프로젝트의 마감이 코 앞인데 아직 해결해야 할 문제가 있다.<br/>이럴 때 나는...</Text1>
-                <Image1 src='assets/golddol.png'/>
-                <Button onClick={() => handleChoice('0')}>팀원들과 회의를 통해 해결 방안을 모색한다. &nbsp; &nbsp; {'>'}</Button>
-                <Button onClick={() => handleChoice('1')}>혼자 문제를 분석하고 해결 방안을 찾는다. &nbsp; &nbsp; {'>'}</Button>
+                <Text1>프로젝트의 마감이 코 앞인데 아직 해결해야 할 문제가 있다.<br />이럴 때 나는...</Text1>
+                <Image1 src='assets/golddol.png' />
+                <Button onClick={() => handleChange('0')}>팀원들과 회의를 통해 해결 방안을 모색한다. &nbsp; &nbsp; {'>'}</Button>
+                <Button onClick={() => handleChange('1')}>혼자 문제를 분석하고 해결 방안을 찾는다. &nbsp; &nbsp; {'>'}</Button>
             </TestWrap>
         </Container>
     );

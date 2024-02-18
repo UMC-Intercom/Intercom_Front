@@ -1,19 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function TypeTestQuestion3() {
   const navigate = useNavigate();
-  const navigateToQuestion = () => navigate('/type-test-question4');
+  const location = useLocation();
 
+    const [choice, setChoice] = useState('');
+
+    useEffect(() => {
+        const receivedChoice = location.state?.choice || '';
+        setChoice(receivedChoice);
+    }, [location.state]);
+
+    const handleChange = (input) => {
+        const newChoice = choice + input;
+        setChoice(newChoice);
+        navigateToQuestion(newChoice);
+        console.log(newChoice); 
+    }
+
+    const navigateToQuestion = (newChoice) => {
+        navigate('/type-test-question4', { state: { choice: newChoice } });
+    }
   return (
     <Container>
       <TestWrap>
         <Text1>새로운 프로젝트를 맡게 되었다.<br />이럴 때 나는...
         </Text1>
         <Image1 src='assets/notebookperson.png' />
-        <Button onClick={navigateToQuestion}>자유롭게 아이디어를 제안하고 이를 실현하는 방향을 선호한다. <Arrow>&gt;</Arrow></Button>
-        <Button onClick={navigateToQuestion}>상사의 지시를 따르면서 프로젝트를 진행하는 것을 선호한다. <Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('0')}>자유롭게 아이디어를 제안하고 이를 실현하는 방향을 선호한다. <Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('1')}>상사의 지시를 따르면서 프로젝트를 진행하는 것을 선호한다. <Arrow>&gt;</Arrow></Button>
       </TestWrap>
     </Container>
   )
