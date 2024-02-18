@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation  } from 'react-router-dom';
+import { useNavigate, useLocation, Link  } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import fakeNotices from '../data/fakeNotices'; // Ensure the path to fakeNotices is correct
 import fakeInterviewData from '../data/fakeInterviewData'; 
@@ -10,7 +10,6 @@ import fakeCoverletterData from '../data/fakeCoverletterData';
 import axios from "axios";
 import config from '../path/config';
 import TalkPagination from "./TalkPagination";
-import {Link} from "./join";
 
 const ITEMS_PER_PAGE = 4;
 const NOTICES_PER_PAGE = 9;
@@ -181,7 +180,7 @@ const Scrap = () => {
                             <Title>공고({totalElements})</Title>
                             <NoticesContent>
                                 {data.map(notice => (
-                                    <Link to={`/notice/${notice.id}`} key={notice.id}>
+                                    <StyledLink to={`/jobs/${notice.id}`} key={notice.id}>
                                     <NoticeItem key={notice.id} >
                                     <img src={notice.logoUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
                                     <div>
@@ -192,7 +191,7 @@ const Scrap = () => {
                                         <NoticeDeadline>{calculateRemainingDays(notice.expirationDate)}</NoticeDeadline> <NoticeViews> 조회 {notice.viewCounts}</NoticeViews>
                                     </div>
                                     </NoticeItem>
-                                    </Link>
+                                    </StyledLink>
                                 ))}
                                 </NoticesContent>
                             <TalkPagination
@@ -213,7 +212,7 @@ const Scrap = () => {
                                     const scoreList = item.score ? item.score.split(', ') : [];
 
                                     return (
-                                        <Link to={`/interviews/${item.id}`} key={item.id}>
+                                        <StyledLink to={`/interviews/${item.id}`} key={item.id}>
                                         <InterviewItem key={item.id}>
                                             <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
                                             <div className="details">
@@ -230,7 +229,7 @@ const Scrap = () => {
                                                 스크랩 {item.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {item.viewCount}
                                             </div>
                                         </InterviewItem>
-                                        </Link>
+                                        </StyledLink>
                                     );
                                 })}
                             </InterviewListContainer>
@@ -251,7 +250,7 @@ const Scrap = () => {
                                 const scoreList = item.score ? item.score.split(', ') : [];
 
                                 return (
-                                    <Link to={`/coverletter/${item.id}`} key={item.id}>
+                                    <StyledLink to={`/coverletters/${item.id}`} key={item.id}>
                                     <InterviewItem key={item.id}>
                                         <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
                                         <div className="details">
@@ -268,7 +267,7 @@ const Scrap = () => {
                                             스크랩 {item.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {item.viewCount}
                                         </div>
                                     </InterviewItem>
-                                    </Link>
+                                    </StyledLink>
                                 );
                             })}
                         </InterviewListContainer>
@@ -281,17 +280,17 @@ const Scrap = () => {
                     )}
                     
                     {view === 'talk' && (
-                        <Content> 
+                        <Content>
                             <Title>톡톡 글({totalElements})</Title>
                             <TalkListContainer>
                             {data.map(item => (
-                                <Link to={`/talks/${item.id}`} key={item.id}>
                                 <SearchResultItem key={item.id}>
+                                    <StyledLink to={`/talks/${item.id}`}>
                                     <p className="title">{item.title}</p>
                                     <p className="content">{(item.content && item.content.replace(/<img[^>]*>/g,"").replace(/<[^>]*>?/gm, '')) || "내용이 없습니다."}</p>
                                     <p className="response">답변: {item.commentCount}&nbsp;&nbsp;&nbsp;댓글: {item.replyCount}&nbsp;&nbsp;&nbsp;조회수: {item.viewCount}&nbsp;&nbsp;&nbsp;좋아요: {item.likeCount}</p>
-                                </SearchResultItem>
-                                </Link>
+                                    </StyledLink >
+                                    </SearchResultItem>
                             ))}
                             </TalkListContainer>
                             <TalkPagination
@@ -596,4 +595,9 @@ const Arrow = styled.img`
   margin-top: 0.5rem;
   margin-left: 1rem;
   margin-right: 1rem;
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
 `;
