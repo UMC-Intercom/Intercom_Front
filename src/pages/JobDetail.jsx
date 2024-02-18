@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import TalkPagination from "./TalkPagination";
 
 // JobDetail 컴포넌트 정의
 const JobDetail = () => {
@@ -21,6 +22,13 @@ const JobDetail = () => {
   const handleCoverLetterClick = () => {
       setView('coverletter'); 
   };
+
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalElements, setTotalElements] = useState([]);
+  const ITEMS_PER_PAGE = 4;
+  const indexOfLast = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
 
   useEffect(() => {
     const fetchJobDetail = async () => {
@@ -118,7 +126,7 @@ const JobDetail = () => {
   const fetchResumes = async (department) => {
     try {
       const response = await axios.get(`http://localhost:8080/search/resumes`, {
-        params: { department, page: 1 }, // 페이지 번호는 API 설계에 따라 조정
+        params: { department, page: currentPage }, // 페이지 번호는 API 설계에 따라 조정
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
       setResumes(response.data.content);
@@ -136,6 +144,10 @@ const JobDetail = () => {
     return <div>로딩 중...</div>;
   }
 
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+  };
   
   // JobDetailsResponseDto에 맞춰서 상세 정보 표시
   return (
@@ -223,6 +235,11 @@ const JobDetail = () => {
               );
             })}
           </InterviewListContainer>
+          <TalkPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+          />
         </Content>
       )}
 
@@ -257,8 +274,14 @@ const JobDetail = () => {
               );
             })}
           </InterviewListContainer>
+          <TalkPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+          />
         </Content>
-      )}  
+
+      )}
       </JobDetailContainer>
   );
 };
