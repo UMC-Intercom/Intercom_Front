@@ -19,10 +19,10 @@ export default function CoverLetterInput2() {
         major: '',
         gpa: '',
         activity: '',
-        certifications: '',
+        certifications: [],
         english: '',
         score: '',
-        content: ''
+        contents: ''
     });
 
     useEffect(() => {
@@ -44,13 +44,11 @@ export default function CoverLetterInput2() {
     const handleChange = (e, field, index) => {
         const { name, value } = e.target;
         if (field === 'certifications') {
-            const newCertifications = [...(formData.certifications || '').split(',')];
-
-
+            const newCertifications = [...formData.certifications];
             newCertifications[index] = value;
             setFormData(prevData => ({
                 ...prevData,
-                certifications: newCertifications.join(',')
+                certifications: newCertifications
             }));
         } else if (field === 'gpa') {
             setFormData(prevData => ({
@@ -124,7 +122,7 @@ export default function CoverLetterInput2() {
                             <InputField
                                 type="text"
                                 style={{ marginLeft: index !== 0 ? '12.6rem' : '0' }}
-                                value={(formData.certifications || '').split(',')[index] || ''}
+                                value={formData.certifications[index] || ''}
                                 onChange={(e) => handleChange(e, 'certifications', index)}
                             />
                             <PassSearch>
