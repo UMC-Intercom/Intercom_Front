@@ -161,7 +161,7 @@ const ProfileIcon = styled.img`
 `;
 
 const Username = styled.div`
-  width: 4.92188rem;
+  width: auto;
   height: 1.73613rem;
   margin-left: 0.39rem;
   flex-shrink: 0;

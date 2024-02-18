@@ -275,7 +275,7 @@ const ProfileImage = styled.img`
 `;
 
 const UserName = styled.span`
-width: 5rem;
+width: auto;
 height: 1.75rem;
 color: #5B00EF;
 text-align: right;
