@@ -28,11 +28,24 @@ export default function InterviewHome() {
   const ITEMS_PER_PAGE = 10;
   const indexOfLast = currentPage * ITEMS_PER_PAGE;
   const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+  const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 상태
 
   const fetchPosts = async (page) => {
+    let url = `${config.API_URL}/interviews?page=${currentPage}`;
+
+    if (!isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/interviews/scrap-counts?page=${currentPage}`;
+    }
+    if (isSearchMode && sortByDateActive) {
+      url = `${config.API_URL}/interviews/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+    else if (isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/interviews/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+
     try{
-      const sortBy = sortByDateActive ? '' : '/scrap-counts';
-      const response = await axios.get(`${config.API_URL}/interviews${sortBy}?page=${currentPage}`);
+      // const sortBy = sortByDateActive ? '' : '/scrap-counts';
+      const response = await axios.get(url);
 
       setSortedData(response.data.content);
       setTotalPages(response.data.totalPages);
@@ -45,6 +58,8 @@ export default function InterviewHome() {
   useEffect(() => {
     fetchPosts(currentPage);
   }, [currentPage, sortByDateActive]);
+
+
 
   const handleResultClick = (item) => {
     setSelectedItem(item);
@@ -79,8 +94,22 @@ export default function InterviewHome() {
   };
 
   const handleSearch = async () => {
+    // 빈칸 검색 시 검색 모드 종료 및 상태 초기화
+    if (!searchQuery.company.trim() && ! searchQuery.position.trim) {
+      resetSearch();
+      return;
+    }
+
+    let url;
+    if (sortByDateActive) {
+      url = `${config.API_URL}/interviews/search`;
+    }
+    else if (sortByLikesActive) {
+      url = `${config.API_URL}/interviews/scrap-counts`;
+    }
+
     try {
-      const response = await axios.get(`${config.API_URL}/interviews/search`, {
+      const response = await axios.get(url, {
         params: {
           company: searchQuery.company,
           department: searchQuery.position,
@@ -88,12 +117,19 @@ export default function InterviewHome() {
         }
       });
 
+      setIsSearchMode(true);
       setSortedData(response.data.content);
       setTotalPages(response.data.totalPages);
       setTotalElements(response.data.totalElements);
     } catch (error) {
       console.error('Failed to search interviews:', error);
     }
+  };
+
+  const resetSearch = () => {
+    // setSearchTerm('');
+    setIsSearchMode(false);
+    setCurrentPage(1);
   };
 
   return (
