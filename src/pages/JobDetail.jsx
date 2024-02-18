@@ -16,11 +16,13 @@ const JobDetail = () => {
 
   const [view, setView] = useState('coverletter');
   const handleInterviewClick = () => {
+    setCurrentPage(1);
     setView('interview'); // 면접 후기 보기로 설정
   };
 
   const handleCoverLetterClick = () => {
-      setView('coverletter'); 
+    setCurrentPage(1);
+    setView('coverletter');
   };
 
   const [totalPages, setTotalPages] = useState(0);
@@ -58,7 +60,7 @@ const JobDetail = () => {
         fetchResumes(job.industry);
       }
     }
-  }, [view, job?.industry, accessToken]);
+  }, [view, job?.industry, accessToken, currentPage]);
 
   useEffect(() => {
     const fetchJobDetail = async () => {
@@ -118,6 +120,7 @@ const JobDetail = () => {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
       setInterviews(response.data.content);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('Error fetching interviews:', error);
     }
@@ -130,6 +133,7 @@ const JobDetail = () => {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
       setResumes(response.data.content);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error('Error fetching resumes:', error);
     }
