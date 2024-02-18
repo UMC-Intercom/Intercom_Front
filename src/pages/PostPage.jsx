@@ -32,63 +32,33 @@ const PostPage = () => {
             navigate('/join', { state: { from: location } });
             return;
         }
-        axios.get(`http://localhost:8080/talks/${postId}`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
-            },
-        })
-            .then(response => {
-                setPost(response.data);
-                if (response.data.mentorField != null) {
-                    setIsMentor(true); 
-                } else {
-                    setIsMentor(false); // response가 null인 경우 현직자 여부를 false로 설정
-                }
-            })
-            .catch(error => {
-                setIsMentor(false); // 에러 발생 시 현직자 여부를 false로 설정
-                console.error('Error fetching post:', error);
-            });
 
-            //스크랩여부 가져오깅
-            axios.get(`http://localhost:8080/scraps/talks/${postId}`, { 
-                headers: { Authorization: `Bearer ${accessToken}` } 
-            })
-            .then(response => setIsScrapped(response.data))
-            .catch(error => console.error('Error fetching scrap status:', error));
-           
-           
-            const fetchCounts = async () => {
-                try {
-                    const likesResponse = await axios.get(`http://localhost:8080/talks/${postId}`, {
-                        headers: { 'Authorization': `Bearer ${accessToken}` },
-                    });
-                    const commentsResponse = await axios.get(`http://localhost:8080/talks/${postId}`, {
-                        headers: { 'Authorization': `Bearer ${accessToken}` },
-                    });
-    
-                    setLikesCount(likesResponse.data.likeCount);
-                    setCommentsCount(commentsResponse.data.commentCount);
-                } catch (error) {
-                    console.error('Counts fetching error:', error);
-                }
-            };
-            
-            const checkLikeStatus = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:8080/likes/talks/${postId}`, {
-                        headers: { 'Authorization': `Bearer ${accessToken}` },
-                    });
-                    setLiked(response.data); // 응답에 따라 liked 상태 설정
-                } catch (error) {
-                    console.error('Error checking like status:', error);
-                }
-            };
-        
-            fetchCounts();
-            checkLikeStatus();
-    }, [postId, isLoggedIn, navigate, location, accessToken]);
-    
+        const fetchData = async () => {
+            try {
+                const headers = { 'Authorization': `Bearer ${accessToken}` };
+                const postDetailsRequest = axios.get(`http://localhost:8080/talks/${postId}`, { headers });
+                const scrapStatusRequest = axios.get(`http://localhost:8080/scraps/talks/${postId}`, { headers });
+                const likeStatusRequest = axios.get(`http://localhost:8080/likes/talks/${postId}`, { headers });
+
+                const [postDetailsResponse, scrapStatusResponse, likeStatusResponse] = await axios.all([
+                    postDetailsRequest,
+                    scrapStatusRequest,
+                    likeStatusRequest
+                ]);
+
+                setPost(postDetailsResponse.data);
+                setIsMentor(postDetailsResponse.data.mentorField != null);
+                setIsScrapped(scrapStatusResponse.data);
+                setLiked(likeStatusResponse.data);
+                setLikesCount(postDetailsResponse.data.likeCount);
+                setCommentsCount(postDetailsResponse.data.commentCount);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
     if (!post) {
         return <div>Loading post...</div>;
     }
@@ -160,9 +130,10 @@ const PostPage = () => {
   const categories = post.category ? post.category.split(',') : [];
 
   // 분리된 카테고리를 map 함수로 순회하며 렌더링
-  const renderedCategories = categories.map((category, index) => (
-      <Category key={index}>{category.trim()}</Category>
-  ));
+  const renderedCategories = categories.length > 0 ? categories.map((category, index) => (
+    <Category key={index}>{category.trim()}</Category>
+)) : null;
+
     const timeAgo = post.createdAt ? formatDistanceToNow(parseISO(post.createdAt), { addSuffix: true, locale: ko }) : '시간 정보 없음';
 
     return (
@@ -186,22 +157,22 @@ const PostPage = () => {
                 </TitleWrapper>
                 <Content dangerouslySetInnerHTML={{ __html: post.content }} />
                 <PostingInfoContainer>
-                <ProfileImage src={post.imageUrls && post.imageUrls.length > 0 ? post.imageUrls[0] : defaultProfileImg} alt="Profile" />
+                <ProfileImage src={post.imageUrls && post.imageUrls.length > 0 ? post.imageUrls[0] : defaultProfileImg} alt="Profile" style={{ border: '3px solid #E2E2E2' }} />
                     <User>{post.writer}</User>
                     <WrittenTime>{timeAgo}</WrittenTime>
+            
                 </PostingInfoContainer>
-                {post && <ActionButtons
-  postId={postId}
-  liked={liked}
-  toggleLike={toggleLike}
-  likesCount={likesCount}
-  handleCommentsClick={handleCommentsClick}
-  commentsCount={commentsCount}
-/>
-}
-                <Categories>
-                {renderedCategories}
-                </Categories>
+                <BottomWrapper>
+                {categories.length > 0 && <Categories>{renderedCategories}</Categories>}
+                <ActionButtons
+                    postId={postId}
+                    liked={liked}
+                    toggleLike={toggleLike}
+                    likesCount={likesCount}
+                    handleCommentsClick={handleCommentsClick}
+                    commentsCount={commentsCount}
+                />
+            </BottomWrapper>
             </PostContainer>
             {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)} postId={postId}/>}
             <ReplyList talkId={postId} accessToken={accessToken} />
@@ -219,8 +190,6 @@ cursor: pointer;
 const Categories = styled.div`
     display: flex;
     flex-wrap: wrap;
-    margin-top: 18px;
-    margin-left: 103px;
     
 `;
 const TitleWrapper = styled.div`
@@ -228,7 +197,6 @@ const TitleWrapper = styled.div`
     align-items: center;
     justify-content: space-between; /* 양 끝으로 요소 정렬 */
     width: 100%; /* 전체 너비 사용 */
-    margin-bottom: 1rem;
 `;
 
 const LeftContainer = styled.div`
@@ -241,16 +209,22 @@ const RightContainer = styled.div`
     align-items: center;
 `;
 const MentorLabel = styled.span`
+display: flex;
     background-color: #9FAEFF;
     color: #FFFFFF;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.5rem;
+    border-radius:15px;
     font-weight: bold;
+    width: 81px;
+    height: 42.23px;
+    font-size: 20px;
+    align-items: center;
+  justify-content: center;
 `;
 
 
 const Category = styled.span`
-  display: inline-flex;
+display: flex;
+flex-wrap: wrap;
   min-width: 80px; 
   height: 40px;
   background-color: white;
@@ -263,14 +237,14 @@ const Category = styled.span`
   align-items: center;
   justify-content: center;
   margin-right: 16px;
-  margin-top: 10px;
 `;
 
 
 const PostingInfoContainer = styled.div`
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-top: 1rem;
+    margin-bottom:0.5rem;
 `;
 const User=styled.div`
 margin-right: 11px;
@@ -284,6 +258,13 @@ font-size: 17px;
 font-weight: 600;
 color: #636363;
 
+`;
+const BottomWrapper = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    width: 100%; 
+    margin-top: 10px;
 `;
 const ProfileImage = styled.img`
     width: 40px;
@@ -317,14 +298,14 @@ const PostContainer = styled.div`
 const Title = styled.h1`
     color: #000;
     font-family: SUITE;
-    font-size: 2rem;
+    font-size: 50px
     font-weight: 700;
     margin-right: 1rem;
     overflow-wrap: break-word;
 `;
 const Content = styled.div`
     font-family: SUITE;
-    font-size: 1rem;
+    font-size: 25px;
     color: #636363;
     margin-bottom: 1rem;
     overflow-wrap: break-word; 
@@ -332,7 +313,13 @@ const Content = styled.div`
         float: left;
         margin-right: 1rem;
     }
-`;;
+`;
+const ContentPreview = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%; // 최대 너비 설정
+`;
 const ButtonsContainer = styled.div`
     display: flex;
     justify-content: flex-end; 
