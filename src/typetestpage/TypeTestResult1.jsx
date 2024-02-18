@@ -39,6 +39,7 @@ color: #000000;
     li {
       margin: 40px 0px;
     }
+    margin-bottom: 50px;
 `;
 
 const TestWrap = styled.div`
@@ -72,6 +73,8 @@ line-height: 62px;
 text-align: center;
 
 color: #000000;
+
+margin-bottom: 40px;
 `;
 
 const Image2 = styled.img`

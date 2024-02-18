@@ -21,7 +21,7 @@ export default function TypeTestQuestion8() {
   }
 
   const navigateToQuestion = (newChoice) => {
-    navigate('/type-test-home', { state: { choice: newChoice } });
+    navigate('/type-test-result1', { state: { choice: newChoice } });
   }
   return (
     <Container>

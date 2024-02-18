@@ -151,10 +151,6 @@ const Header = () => {
 
 export default Header;
 
-const ModalContent = styled.div` 
-  text-align: center;
-`;
-
 const CloseButton = styled.button`
   margin-top: 10px;
   cursor: pointer;
