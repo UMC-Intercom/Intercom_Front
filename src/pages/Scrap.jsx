@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link  } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import fakeNotices from '../data/fakeNotices'; // Ensure the path to fakeNotices is correct
 import fakeInterviewData from '../data/fakeInterviewData'; 
@@ -11,6 +11,7 @@ import axios from "axios";
 import config from '../path/config';
 import TalkPagination from "./TalkPagination";
 
+
 const ITEMS_PER_PAGE = 4;
 const NOTICES_PER_PAGE = 9;
 
@@ -18,6 +19,8 @@ const Scrap = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { toggleLogin } = useAuth();
+        
+    const { jobId } = useParams();
 
     // const totalPages = Math.ceil(fakeInterviewData.length / ITEMS_PER_PAGE);
     const [totalPages, setTotalPages] = useState(0);
@@ -175,20 +178,19 @@ const Scrap = () => {
                         <Button onClick={handleTalkClick} selected={view === 'talk'}>톡톡 글</Button>
                     </ButtonContainer>
 
-                    {view === 'announcement' && (  
+                    {view === 'announcement' && (   
                         <Content> 
                             <Title>공고({totalElements})</Title>
                             <NoticesContent>
                                 {data.map(notice => (
-                                    <StyledLink to={`/jobs/${notice.id}`} key={notice.id}>
+                                    <StyledLink to={`/job/${notice.id}`} key={notice.id}>
                                     <NoticeItem key={notice.id} >
                                     <img src={notice.logoUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
                                     <div>
                                         <NoticeTitle>[{notice.title}]</NoticeTitle>
-                                        <br /><br />
                                         <Information>{notice.company}</Information>
                                         <br /><br />
-                                        <NoticeDeadline>{calculateRemainingDays(notice.expirationDate)}</NoticeDeadline> <NoticeViews> 조회 {notice.viewCounts}</NoticeViews>
+                                        <NoticeDeadline>{calculateRemainingDays(notice.expirationDate)}</NoticeDeadline> <NoticeViews> 조회 {notice.viewCount}</NoticeViews>
                                     </div>
                                     </NoticeItem>
                                     </StyledLink>
@@ -212,7 +214,7 @@ const Scrap = () => {
                                     const scoreList = item.score ? item.score.split(', ') : [];
 
                                     return (
-                                        <StyledLink to={`/interviews/${item.id}`} key={item.id}>
+                                        <StyledLink to={`/interview/${item.id}`} key={item.id}>
                                         <InterviewItem key={item.id}>
                                             <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
                                             <div className="details">
@@ -232,12 +234,13 @@ const Scrap = () => {
                                         </StyledLink>
                                     );
                                 })}
-                            </InterviewListContainer>
-                            <TalkPagination
+                                <TalkPagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={onPageChange}
-                            />
+                                />
+                            </InterviewListContainer>
+                            
                         </Content>
                     )}
 
@@ -250,7 +253,7 @@ const Scrap = () => {
                                 const scoreList = item.score ? item.score.split(', ') : [];
 
                                 return (
-                                    <StyledLink to={`/coverletters/${item.id}`} key={item.id}>
+                                    <StyledLink to={`/coverletter/${item.id}`} key={item.id}>
                                     <InterviewItem key={item.id}>
                                         <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
                                         <div className="details">
@@ -270,12 +273,13 @@ const Scrap = () => {
                                     </StyledLink>
                                 );
                             })}
-                        </InterviewListContainer>
                             <TalkPagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={onPageChange}
                             />
+                        </InterviewListContainer>
+                            
                     </Content>
                     )}
                     
@@ -292,12 +296,13 @@ const Scrap = () => {
                                     </StyledLink >
                                     </SearchResultItem>
                             ))}
-                            </TalkListContainer>
                             <TalkPagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={onPageChange}
                             />
+                            </TalkListContainer>
+                            
                         </Content>
                     )}
                 </ContentsBox>
@@ -426,13 +431,14 @@ const NoticeTitle = styled.h1`
 `;
         
 const NoticesContent = styled.div`
-    display: flex;
-    gap: 1.563rem;
-    flex-wrap: wrap;
-
-    @media (max-width: 75rem) {
-        justify-content: space-around;
-    }
+display: grid;
+grid-template-columns: repeat(3, 1fr); // 3개의 컬럼으로 나눕니다.
+grid-gap: 1rem; // 그리드 아이템 사이의 간격을 지정합니다.
+background-color: white;
+border-radius: 3%;
+padding: 1.5rem;
+margin-top: 1rem;
+width: 100%; // 컨테이너의 너비를 100%로 설정합니다.
 `;
 
 const Content = styled.div``;
@@ -565,37 +571,6 @@ const SearchResultItem = styled.div`
   }
 `;
 
-const Pagination = styled.div`
-  margin-top: 2rem;
-  display: flex;
-  justify-content: center;
-  padding: 1rem;
-`;
-
-const PageNumber = styled.span`
-  font-family: SUITE;
-  font-size: 1.25rem;
-  margin: 0 0.1rem;
-  cursor: pointer;
-  font-weight: ${({ isActive }) => (isActive ? "700" : "400")};
-  ${({ isArrow }) => isArrow && `pointer-events: none;`}
-  border-radius: 50%; // 원형 모양
-  background-color: ${({ isActive }) => (isActive ? "#E0E0E0" : "transparent")}; // 선택된 페이지에 대한 배경색
-  display: inline-block;
-  text-align: center;
-  min-width: 2rem; // 최소 너비 설정
-  height: 2rem; // 높이 설정
-  line-height: 2rem; // 텍스트를 수직 중앙으로 정렬
-`;
-
-const Arrow = styled.img`
-  width: 7px;
-  height: 15px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  margin-left: 1rem;
-  margin-right: 1rem;
-`;
 
 const StyledLink = styled(Link)`
   text-decoration: none;

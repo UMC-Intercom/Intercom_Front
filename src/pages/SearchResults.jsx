@@ -2,8 +2,14 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios'; 
 import styled from 'styled-components';
 import Select, { components } from 'react-select';
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import SearchModal from './SearchModal';
+
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
 
 const SearchBarContainer = styled.div`
   width: 75rem;
@@ -245,40 +251,34 @@ const PopularNoticesBox = styled.div`
 `;
 
 const ContentsBox = styled.div`
-  width: 75rem;
-  min-height: 27.3125rem;
-  background-color: #FFFFFF;
-  border-radius: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; // 아이템 간 간격을 조정합니다.
+  justify-content: flex-start; // 아이템을 왼쪽 정렬합니다.
+  padding: 1.25rem;
 `;
 
 const Content = styled.div`
   display: flex;
-  gap: 1.5625rem;
+  gap: 1.563rem;
   flex-wrap: wrap;
+
   @media (max-width: 75rem) {
     justify-content: space-around;
   }
 `;
 
 const NoticeItem = styled.div`
-  flex: 0 0 calc(25% - 1.25rem);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1.25rem;
-  img {
-    background-color: #D9D9D9;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-  }
-  span {
-    font-size: 1.25rem;
-    text-align: left;
-    margin-top: 1.25rem;
-  }
+flex: 1 1 calc(33.333% - 1rem); // 3개의 아이템이 한 줄에 표시되도록 조정합니다. gap과 일치하도록 계산합니다.
+margin-bottom: 1rem; // 아이템 사이의 세로 간격을 추가합니다.
+max-width: calc(33.333% - 1rem); // 최대 너비를 설정합니다.
+
+img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
 `;
 
 const Title = styled.span`
@@ -392,6 +392,7 @@ const SearchResults = () => {
                 <ContentsBox>
                     <Content>
                         {searchResults.map(result => (
+                          <StyledLink to={`/job/${result.id}`} key={result.id}>
                             <NoticeItem key={result.id}>
                                 <img src={result.logoUrl} alt={result.title} style={{ marginBottom: "20px" }} />
                                 <div>
@@ -401,6 +402,7 @@ const SearchResults = () => {
                                     <Deadline>{calculateRemainingDays(result.expirationDate)}</Deadline> <Views>조회 {result.viewCount.toLocaleString()}회</Views>
                                 </div>
                             </NoticeItem>
+                          </StyledLink>
                         ))}
                     </Content>
                 </ContentsBox>

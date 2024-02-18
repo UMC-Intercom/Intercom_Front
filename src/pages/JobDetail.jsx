@@ -281,7 +281,7 @@ const JobDetail = () => {
           />
         </Content>
 
-      )}
+      )}  
       </JobDetailContainer>
   );
 };
@@ -451,7 +451,7 @@ const InterviewListContainer = styled.div`
     flex-direction: column;
     background-color: white; // 배경색 변경
     border-radius: 3%; // 모서리 둥글게
-     border: 2px solid #E2E2E2; // 윤곽선 색 변경
+    border: 2px solid #E2E2E2; // 윤곽선 색 변경
     padding: 1.5rem; // 내부 여백
     margin-top: 1rem; // 위 여백
 `;
