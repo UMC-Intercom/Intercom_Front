@@ -11,24 +11,87 @@ export default function CoverLetterResult() {
     // const navigate = useNavigate();
     const accessToken = localStorage.getItem('accessToken');
 
-    const toggleScrap = () => {
-        setIsScrapped(!isScrapped);
-    };
+    // useEffect(() => {
+    //     if (id) { // id가 존재하는 경우에만 API 호출
+    //         const fetchResume = async () => {
+    //             try {
+    //                 const response = await axios.get(`http://localhost:8080/resumes/${id}`);
+    //                 setResume(response.data);
+    //             } catch (error) {
+    //                 console.error('Failed to fetch resumes:', error);
+    //             }
+    //         };
+    //         fetchResume();
+    //     }
+    // }, [id]);
 
     useEffect(() => {
-        if (id) { // id가 존재하는 경우에만 API 호출
-            const fetchResume = async () => {
-                try {
-                    const response = await axios.get(`http://localhost:8080/resumes/${id}`);
-                    setResume(response.data);
-                } catch (error) {
-                    console.error('Failed to fetch resumes:', error);
-                }
-            };
+        const fetchResume = async () => {
+          try {
+            // 변경된 API 경로에 맞춰서 요청
+            const response = await axios.get(`http://localhost:8080/resumes/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+              },
+            });
+      
+            setResume(response.data); // job 상태 설정
+          } catch (error) {
+            console.error('공고 상세 정보를 가져오는 데 실패했습니다:', error);
+          }
+        };
+      
+        fetchResume();
+      }, [id, accessToken]);
 
-            fetchResume();
+      useEffect(() => {
+        const fetchResume = async () => {
+          try {
+            // 변경된 API 경로에 맞춰서 요청
+            const response = await axios.get(`http://localhost:8080/resumes/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+              },
+            });
+            setResume(response.data);
+    
+            const scrapResponse = await axios.get(`http://localhost:8080/scraps/posts/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+              },
+            });
+            setIsScrapped(scrapResponse.data);
+    
+            // await fetchInterviews(response.data.industry);
+            // await fetchResumes(response.data.industry);
+          } catch (error) {
+            console.error('공고 상세 정보를 가져오는 데 실패했습니다:', error);
+          }
+        };
+    
+        fetchResume();
+      }, [id, accessToken]);
+
+    const toggleScrap = async () => {
+        try {
+          if (isScrapped) {
+            await axios.delete(`http://localhost:8080/scraps/posts/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+              },
+            });
+          } else {
+            await axios.post(`http://localhost:8080/scraps/posts/${id}`, {}, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+              },
+            });
+          }
+          setIsScrapped(!isScrapped);
+        } catch (error) {
+          console.error('스크랩 처리 중 오류가 발생했습니다:', error);
         }
-    }, [id]);
+      };
 
     return (
         <Container>
