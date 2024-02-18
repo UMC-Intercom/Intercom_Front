@@ -31,6 +31,20 @@ export default function InterviewHome() {
   const indexOfLast = currentPage * ITEMS_PER_PAGE;
   const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
   const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 상태
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const profile = localStorage.getItem('userProfile');
+
+      if (profile === "null") {
+        setUserProfile("./assets/Ellipse2.png");
+      }
+      else {
+        setUserProfile(profile);
+      }
+    }
+  }, [isLoggedIn]);
 
   const fetchPosts = async (page) => {
     let url = `${config.API_URL}/interviews?page=${currentPage}`;
@@ -158,7 +172,7 @@ export default function InterviewHome() {
         </SearchBox>
 
         <WritingContainer>
-          <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
+          <img src={userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px', borderRadius: '100%', border: '3px solid #E2E2E2' }} />
           <WritingBox onClick={navigateToInput}>
             면접 후기를 남겨보세요
           </WritingBox>
