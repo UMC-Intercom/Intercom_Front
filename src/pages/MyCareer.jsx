@@ -9,6 +9,8 @@ import axios from 'axios';
 import config from '../path/config';
 import { useAuth } from './AuthContext';
 
+
+
 const MainContainer = styled.div`
   font-family: SUITE;
   display: flex;
@@ -49,11 +51,14 @@ const ProfileBox = styled.div`
 
 const CareerBox = styled.div`
   width: 792px;
-  height: auto;
   background-color: #EFF0F4;
   border-radius: 10px;
-  padding-bottom: 50px;
+  padding-bottom: 20px; /* 조정된 padding-bottom 값 */
+  margin-bottom: 20px; /* 필요 시 하단 여백 추가 */
+  /* height: auto; 불필요한 경우 제거 */
+  overflow: hidden; /* 내부 컨텐츠가 넘칠 경우 숨김 처리 */
 `;
+
 
 const ProfileImage = styled.img`
   width: 198px;
@@ -185,9 +190,26 @@ const MajorText = styled.div`
   color: #636363;
 `;
 
+const GPA = styled.div`
+  padding-left: 25px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #636363;
+  margin-top: 5px;
+`;
+
+
+
 const UniversityText = styled.div`
   font-weight: 600;
   padding-left: 25px;
+  font-size: 20px;
+  color: #000000;
+  margin-top: 5px;
+`;
+
+const GraduateStatus = styled.div`
+  font-weight: 600;
   font-size: 20px;
   color: #000000;
   margin-top: 5px;
@@ -219,8 +241,8 @@ const EditCareerButton = styled.button`
   &:hover {
     color: #5B00EF;
   }
-  margin-top: 35px;
-  margin-right: 50px;
+  margin-top: 40px;
+  margin-left: 660px;
 `;
 
 const LanguageTitle = styled.h3`
@@ -228,7 +250,6 @@ const LanguageTitle = styled.h3`
   font-size: 25px;
   color: #636363;
   margin-left: 55px;
-  margin-top: 50px;
   margin-bottom: 10px;
 `;
 
@@ -518,12 +539,35 @@ const ProfileSection = styled.div`
   width: 100%; // 전체 너비를 차지하도록 설정
 `;
 
+const EducationContent = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: start; // 학교명이 길어져도 UI가 깨지지 않도록 수정
+  width: 100%;
+`;
 
+const LinkTitle = styled(CertificateTitle)``; // 자격증 섹션과 동일한 스타일
+
+const LinkBox = styled(CertificateBox)``; // 자격증 섹션과 동일한 스타일
+
+const LinkEntry = styled(CertificateEntry)``; // 자격증 섹션과 동일한 스타일
+
+const LinkName = styled(CertificateName)``; // 자격증 섹션과 동일한 스타일
+
+const LinkValue = styled.a`
+  font-weight: 600;
+  font-size: 20px;
+  color: #5B00EF; // 링크 색상
+  text-decoration: none; // 밑줄 제거
+
+  &:hover {
+    text-decoration: underline; // 호버 시 밑줄 표시
+  }
+`;
 
 const MyProfile = () => {
+  const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState(localStorage.getItem('careerProfileImage') || './assets/careerprofile.png');
-  const navigate = useNavigate()
-  ;
   const { isLoggedIn } = useAuth();
 
   const [userInfo, setUserInfo] = useState({
@@ -532,13 +576,15 @@ const MyProfile = () => {
     phoneNum: '',
   });
 
+  const accessToken = localStorage.getItem('accessToken');
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         // 예시: 사용자 정보를 가져오는 axios 요청
         const response = await axios.get(`${config.API_URL}/users/current-user`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Authorization': `Bearer ${accessToken}`,
           },
         });
   
@@ -637,38 +683,96 @@ const MyProfile = () => {
 };
 
 const MyCareer = () => {
+
+  const navigate = useNavigate();
   const [languages, setLanguages] = useState([]);
-const [education, setEducation] = useState({});
-const [certificates, setCertificates] = useState([]);
-const [activities, setActivities] = useState([]);
+  const [certificates, setCertificates] = useState([]);
+  const [education, setEducation] = useState({});
+  const [activities, setActivities] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [profileImage, setProfileImage] = useState('');
+  const [links, setLinks] = useState([]); // 링크 상태 초기화
 
-useEffect(() => {
-  const fetchCareerInfo = async () => {
-    try {
-      const response = await axios.get(`${config.API_URL}/careers/current-user`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      });
-
-      // 서버로부터 받은 데이터를 각 상태 변수에 저장
-      const data = response.data;
-      setLanguages(data.languages || []);
-      setEducation({ university: data.university, major: data.major, gpa: data.gpa });
-      setCertificates(data.certificates || []);
-      setActivities(data.activity || []);
-    } catch (error) {
-      console.error('Failed to fetch career info:', error);
-    }
+  const renderLinks = () => {
+    return links.map((link, index) => (
+      <CenteredContainer key={index}>
+        <LinkBox>
+          <LinkEntry>
+            {/* LinkName을 <a> 태그로 변경합니다. */}
+            <LinkName as="a" href={link.url} target="_blank" rel="noopener noreferrer">
+              {link.title}
+            </LinkName>
+          </LinkEntry>
+        </LinkBox>
+      </CenteredContainer>
+    ));
   };
+  
+  useEffect(() => {
+    const fetchCareerInfo = async () => {
+      try {
+        const response = await axios.get(`${config.API_URL}/careers`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
 
-  fetchCareerInfo();
-}, []);
+        // 서버로부터 받은 데이터를 각 상태 변수에 저장
+        const data = response.data;
+
+        setLanguages(data.english.split(', ').map((lang, index) => ({name: lang, score: data.score.split(', ')[index]})));
+        setCertificates(data.certification ? data.certification.split(', ').map(cert => ({ name: cert })) : []);
+        setEducation({
+          university: data.university,
+          major: data.major,
+          gpa: data.gpa,
+          graduateStatus: data.graduateStatus,
+        });
+        setActivities(data.activity);
+        setSkills(data.skill ? data.skill.split(', ') : []);
+        setProfileImage(data.careerProfile);
+        const linkData = data.link ? data.link.split(',').map(linkItem => {
+          const [title, url] = linkItem.split('|').map(item => item.trim());
+          return { title, url };
+        }) : [];
+        setLinks(linkData);
+      } catch (error) {
+        console.error('Failed to fetch career info:', error);
+      }
+    };
+
+    fetchCareerInfo();
+  }, []);
+
+  
+
+  useEffect(() => {
+    const fetchCareerInfo = async () => {
+      try {
+        const response = await axios.get(`${config.API_URL}/careers`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+  
+        const data = response.data;
+  
+        // nocareer 값이 true인 경우, /editCareer 페이지로 리디렉션
+        if (data.noCareer === true) {
+          navigate('/mycareer-edit'); // URL 경로 수정 필요
+        }
+      } catch (error) {
+        console.error('Failed to fetch career info:', error);
+      }
+    };
+  
+    fetchCareerInfo();
+  }, [navigate]);
+  
 
 
   const [isSkillsVisible, setIsSkillsVisible] = useState(true);
   const [isPdfDownloadMode, setIsPdfDownloadMode] = useState(false);
-  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false); 
   const contentRef = useRef(null);
   const [showDownloadCompleteModal, setShowDownloadCompleteModal] = useState(false);
@@ -702,6 +806,7 @@ useEffect(() => {
     fetchUserInfo();
   }, []);
   
+  
 
 
   const toggleSkillsVisibility = () => {
@@ -725,16 +830,17 @@ useEffect(() => {
     navigate('/mycareer-edit');
   };
 
+
   const renderActivities = () => {
-    return fakeCareerData.activity.map((act, index) => (
+    return activities.map((activity, index) => (
       <CenteredContainer key={index}>
         <ActivityBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
           <ActivityContainer>
             <ActivityDetailsContainer>
-              <ActivityName>{act.name}</ActivityName>
-              <ActivityPeriod>{`${act.start_date} ~ ${act.end_date}`}</ActivityPeriod>
+              <ActivityName>{activity.name}</ActivityName>
+              <ActivityPeriod>{`${activity.startDate || ''} ~ ${activity.endDate || ''}`}</ActivityPeriod>
             </ActivityDetailsContainer>
-            <ActivityDescription>{act.description}</ActivityDescription>
+            <ActivityDescription>{activity.description}</ActivityDescription>
           </ActivityContainer>
         </ActivityBox>
       </CenteredContainer>
@@ -823,53 +929,73 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
 
         </ProfileSection>
       )}
-        <LanguageTitleContainer>
-            <LanguageTitle>어학</LanguageTitle>
             {!isPdfDownloadMode && <EditCareerButton onClick={() => navigate('/mycareer-edit')}>편집하기</EditCareerButton>}
-          </LanguageTitleContainer>
-      {fakeCareerData.languages.map((language, index) => (
-        <CenteredContainer key={index}>
-          <LanguageBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
-            <LanguageEntry>
-              <LanguageName>{language.name}</LanguageName>
-              <VerticalLine />
-              <LanguageScore>{language.score}</LanguageScore>
-            </LanguageEntry>
-          </LanguageBox>
-        </CenteredContainer>
-      ))}
+            {languages.length > 0 && languages.some(language => language.name.trim() && language.score.trim()) && (
+              <>
+            <LanguageTitle>어학</LanguageTitle>
+    
+          {languages.map((language, index) => (
+            <CenteredContainer key={index}>
+              <LanguageBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
+                <LanguageEntry>
+                  <LanguageName>{language.name}</LanguageName>
+                  <VerticalLine />
+                  <LanguageScore>{language.score}</LanguageScore>
+                </LanguageEntry>
+              </LanguageBox>
+            </CenteredContainer>
+          ))}
           <SectionDivider />
-          <CertificateTitle>자격증</CertificateTitle>
-      {fakeCareerData.certificates.map((certificate, index) => (
-        <CenteredContainer key={index}>
-          <CertificateBox style={{ width: isPdfDownloadMode ? '670px' : '690px' }}>
-            <CertificateEntry>
-              <CertificateName>{certificate.name}</CertificateName>
-              <VerticalLine />
-              <CertificateScore>{certificate.score}</CertificateScore>
-            </CertificateEntry>
-          </CertificateBox>
-        </CenteredContainer>
-      ))}
-          <SectionDivider />
+        </>
+      )}
+        {certificates.length > 0 && (
+          <>
+            <CertificateTitle>자격증</CertificateTitle>
+            {certificates.map((certificate, index) => (
+              <CenteredContainer key={index}>
+                <CertificateBox style={{ width: isPdfDownloadMode ? '670px' : '690px' }}>
+                  <CertificateEntry>
+                    <CertificateName>{certificate.name}</CertificateName>
+                  </CertificateEntry>
+                </CertificateBox>
+              </CenteredContainer>
+            ))}
+            <SectionDivider />
+          </>
+        )}
+
           
-          
+          {education.university && (
+           <>
           <EducationTitle>학력</EducationTitle>
           <CenteredContainer>
           <EducationBox>
-          <UniversityText>{education.university}</UniversityText>
           <MajorText>{education.major}</MajorText>
-          <div>GPA: {education.gpa}</div>
+         
+          <EducationContent> {/* 여기서 flex-direction: row; 설정을 사용 */}
+          <UniversityText>{education.university} {education.graduateStatus}</UniversityText>
+    
+          <GPA>학점 | {education.gpa}</GPA>
+        
+      
+    </EducationContent>
           </EducationBox>
 
           </CenteredContainer>
           <SectionDivider />
+          </>
+          )}
 
-          
+        {activities.length > 0 && (
+        <>
       <ActivityTitle>대외활동</ActivityTitle>
         {renderActivities()}
         <SectionDivider />
+        </>
+        )}
 
+        {skills.length > 0 && (
+          <>
         <SkillsSection>
             <SkillsTitle>보유 스펙</SkillsTitle>
             <ToggleImage
@@ -881,10 +1007,22 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
           </SkillsSection>
           {isSkillsVisible && (
             <SkillBox>
-              {fakeCareerData.skill.map((skill, index) => (
+              {skills.map((skill, index) => (
                 <SkillItem key={index}>{skill}</SkillItem>
               ))}
             </SkillBox>
+          )}
+          <SectionDivider />
+            </>
+          )}
+
+          {/* 링크 섹션 렌더링 */}
+          {links.length > 0 && (
+            <>
+              <LinkTitle>링크</LinkTitle>
+              {renderLinks()}
+              <SectionDivider />
+            </>
           )}
 
         </CareerBox>
