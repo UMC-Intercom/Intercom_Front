@@ -13,7 +13,7 @@ const JobDetail = () => {
   const [interviews, setInterviews] = useState([]);
   const [resumes, setResumes] = useState([]);
 
-  const [view, setView] = useState('interview');
+  const [view, setView] = useState('coverletter');
   const handleInterviewClick = () => {
     setView('interview'); // 면접 후기 보기로 설정
   };
@@ -100,6 +100,7 @@ const JobDetail = () => {
       console.error('스크랩 처리 중 오류가 발생했습니다:', error);
     }
   };
+  
 
  // 데이터 가져오기 함수에서 파라미터 사용
   const fetchInterviews = async (department) => {
@@ -140,33 +141,59 @@ const JobDetail = () => {
   return (
     <JobDetailContainer>
       <JobHeader>
-        <div>
+          <Title>채용정보</Title>
           <JobCompany>{job.company}</JobCompany>
-          <JobTitle>{job.title}</JobTitle>
-          <ScrapButton onClick={toggleScrap}>
-            {isScraped ? '스크랩 취소' : '스크랩'}
-          </ScrapButton>
-          <Link to={job.url}>
-            <Button>공고 보기</Button>
-          </Link>
-        </div>
+          <TitleScrapContainer>
+              <JobTitle>{job.title}</JobTitle>
+              <LinkButtonContainer>
+              <ScrapContainer>
+              <ScrapButton onClick={toggleScrap}>
+              스크랩
+              </ScrapButton>
+              <img 
+                src={isScraped ? "/assets/Vector10.png" : "/assets/Vector11.png"} 
+                alt="Scrap Icon"
+                width={24}
+                height={35}
+              />
+              </ScrapContainer>
+              <Link to={job.url}>
+                <LinkButton>공고 보기</LinkButton>
+              </Link>
+              </LinkButtonContainer>
+          </TitleScrapContainer>
       </JobHeader>
       <JobDescription>
-        <p>근무지역 {job.location}</p>
-        <p>직무 {job.industry}</p>
-        <p>경력 {job.experienceLevel}</p>
-        <p>학력 {job.educationLevel}</p>
-        <p>접수 시작 마감일 {job.openingDate}~{job.expirationDate} </p>
+        <DescriptionItem>
+          <Label>근무 지역</Label>
+          <Item dangerouslySetInnerHTML={{ __html: job.location }}></Item>
+        </DescriptionItem>
+        <DescriptionItem>
+          <Label>직무</Label>
+          <Item>{job.industry}</Item>
+        </DescriptionItem>
+        <DescriptionItem>
+          <Label>경력</Label>
+          <Item>{job.experienceLevel}</Item>
+        </DescriptionItem>
+        <DescriptionItem>
+          <Label>학력</Label>
+          <Item>{job.educationLevel}</Item>
+        </DescriptionItem>
+        <DescriptionItem>
+          <Label>접수 시작 마감일</Label>
+          <Item>{job.openingDate}~{job.expirationDate}</Item>
+        </DescriptionItem>
+        
       </JobDescription>
 
       <ButtonContainer>
-        <Button onClick={handleInterviewClick} selected={view === 'interview'}>면접 후기</Button>
-        <Button onClick={handleCoverLetterClick} selected={view === 'coverletter'}>합격 자소서</Button>
+      <Button onClick={handleCoverLetterClick} selected={view === 'coverletter'}>비슷한 공고 합격 자소서</Button>
+        <Button onClick={handleInterviewClick} selected={view === 'interview'}>비슷한 공고 면접 후기</Button>
       </ButtonContainer>
 
       {view === 'interview' && (
         <Content>
-          <Title>면접 후기</Title>
           <InterviewListContainer>
             {interviews.map(interview => {
 
@@ -185,6 +212,9 @@ const JobDetail = () => {
                       <span> {interview.education}</span> /
                       <span> {interview.department}</span> /
                       <span> 학점: {interview.gpa}</span>
+
+                      <br/>
+                      <InterviewContent>{interview.content}</InterviewContent>
                     </div>
                     <div className="scrap-views">
                       스크랩 {interview.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {interview.viewCount}
@@ -198,7 +228,6 @@ const JobDetail = () => {
 
       {view === 'coverletter' && (
         <Content>
-          <Title>합격 자소서</Title>
           <InterviewListContainer>
             {resumes.map(resume => {
               const englishList = resume.english ? resume.english.split(', ') : [];
@@ -216,6 +245,10 @@ const JobDetail = () => {
                       <span> {resume.education}</span> /
                       <span> {resume.department}</span> /
                       <span> 학점: {resume.gpa}</span>
+
+                      <Resume>{resume.titles[0]}</Resume>
+                      <Resume>{resume.contents[0]}</Resume>
+
                     </div>
                     <div className="scrap-views">
                       스크랩 {resume.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {resume.viewCount}
@@ -232,9 +265,16 @@ const JobDetail = () => {
 
 export default JobDetail;
 
+const ScrapContainer = styled.div `
+  display: flex;
+  margin-top: 0rem;
+`;
 const ScrapButton = styled.button`
+  font-family: SUITE;
+  font-style: normal;
+  font-weight: 700;
+  height: 40px;
   padding: 10px 20px;
-  margin: 5px;
   border-radius: 5px;
   cursor: pointer;
   border: 1px solid #ccc;
@@ -242,74 +282,153 @@ const ScrapButton = styled.button`
   &:hover {
     background: #f7f7f7;
   }
+  margin-right: 1rem;
+  margin-bottom: rem;
 `;
 
 const JobDetailContainer = styled.div`
+    display: flex;
+    margin-left: 0rem;
     align-items: center;
+    flex-direction: column;
+    
 `;
 
 const JobHeader = styled.div`
   display: flex;
-  align-items: center;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  align-items: left;
+  flex-direction: column;
+  margin-top: 3rem;
+  width: 1200px;
 `;
 
 
 const JobTitle = styled.h1`
-  margin: 0;
-  color: #333;
-  font-size: 26px;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 50px;
+  margin-top: 1rem;
+  margin-right: auto;
+  color: #000000;
 `;
 
 const JobCompany = styled.p`
-  color: #666;
-  font-size: 18px;
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 600;
+font-size: 25px;
+color: #000000;
+margin-bottom:19px;
 `;
 
 const JobDescription = styled.div`
-  line-height: 1.6;
+  display: flex;
+  width: 1200px;
+  align-items: flex-start;
+  flex-direction: column;
   color: #666;
+  margin-top: -5rem;
+`;
+const DescriptionItem = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 0.5rem 0;
 `;
 
-const Content = styled.div``;
+const Label = styled.span`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 25px;
+  line-height: 38px;
+  min-width: 250px; // 레이블의 최소 너비를 지정
+`;
+
+const LinkButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: 9rem;
+`;
+
+const Item = styled.div`
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 25px;
+  line-height: 38px;
+  display: flex;
+  flex: 1;
+  text-align: left;
+  color: #000000;
+`;
+
+const Content = styled.div`
+`;
 
 const Title = styled.div`
-    color: #636363;
+    color: #5B00EF;
+    font-family: 'SUITE';
+    font-style: normal;
     font-size: 1.5625rem;
-    font-weight: 600;
+    font-weight: 800;
+`;
+
+const TitleScrapContainer = styled.div`
+  display: flex;
+  justify-content: space-between; // 양쪽 끝으로 정렬
+  align-items: center;
+  margin-top: -9rem;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  margin-top: 10px;
-  margin-bottom: 40px;
   width: 100%;
   align-self: flex-start;
   margin-left: calc(50% - 592px);
+  margin-top: 2rem;
 `;
 
-const Button = styled.button`
-  margin-right: 20px;
-  height: 57px;
-  background-color: ${({ selected }) => (selected ? '#5B00EF' : '#E2E2E2')};
-  border-radius: 30px;
+
+const LinkButton = styled.button`
+  margin-left: -20rem;
+  margin-top: 5rem;
+  width: 281px;
+  height: 72px;
+  background-color: #5B00EF;
+  color: white;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   padding: 0 30px;
   font-family: 'SUITE-SemiBold', sans-serif;
   font-size: 22px;
-  color: white;
   transition: background-color 0.2s;
+`;
+const Button = styled.button`
+  margin-right: 20px;
+  width: 228px;
+  height: 52px;
+  background-color: white;
+  color: ${({ selected }) => (selected ? '#5B00EF' : '#E2E2E2')};
+  border-radius: 10px;
+  border: 3px solid ${({ selected }) => (selected ? '#5B00EF' : '#E2E2E2')};
+  cursor: pointer;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 800;
+  font-size: 20px;
 `;
 
 const InterviewListContainer = styled.div`
     font-family: SUITE;
+    font-weight: 800;
     display: flex;
     width: 50rem;
     flex-direction: column;
-    background-color: #Eff0F4; // 배경색 변경
+    background-color: white; // 배경색 변경
     border-radius: 3%; // 모서리 둥글게
+     border: 2px solid #E2E2E2; // 윤곽선 색 변경
     padding: 1.5rem; // 내부 여백
     margin-top: 1rem; // 위 여백
 `;
@@ -319,7 +438,7 @@ const InterviewItem = styled.div`
     display: flex;
     flex-direction: column;
     padding: 2rem 0; // 상하 여백
-    border-bottom: 2px solid #A1A1A1; // 구분선 스타일
+    border-bottom: 2px solid #E2E2E2; // 구분선 스타일
 
     &:last-child {
     border-bottom: none; // 마지막 항목 구분선 제거
@@ -342,4 +461,20 @@ const InterviewItem = styled.div`
     font-size: 0.875rem; // 상세 정보 폰트 크기
     color: #666; // 텍스트 색상
     }
+`;
+
+const Resume = styled.div`
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 600;
+font-size: 20px;
+color: #A1A1A1;
+`;
+
+const InterviewContent = styled.div`
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 600;
+font-size: 20px;
+color: #A1A1A1;
 `;
