@@ -50,7 +50,6 @@ export default function CoverLetterHome() {
   const handleResultClick = (item) => {
     setSelectedItem(item);
     setIsModalOpen(true);
-    navigate(`/cover-letters/${item.id}`);
   };
 
   const closeModal = () => {
@@ -166,7 +165,7 @@ export default function CoverLetterHome() {
         })}
       </SearchResultWrap>
 
-      <CoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
+      <CoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} selectedItem={selectedItem} />
 
       <TalkPagination
           currentPage={currentPage}
