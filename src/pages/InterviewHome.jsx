@@ -78,18 +78,22 @@ export default function InterviewHome() {
     window.scrollTo(0,0);
   };
 
-  const handleSearch = () => {
-    let filteredData = fakeInterviewData;
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`${config.API_URL}/interviews/search`, {
+        params: {
+          company: searchQuery.company,
+          department: searchQuery.position,
+          page: currentPage // 현재 페이지도 함께 전송할 수 있도록 수정
+        }
+      });
 
-    if (searchQuery.company.trim() !== '') {
-      filteredData = filteredData.filter(item => item.company.toLowerCase().includes(searchQuery.company.toLowerCase()));
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+    } catch (error) {
+      console.error('Failed to search interviews:', error);
     }
-
-    if (searchQuery.position.trim() !== '') {
-      filteredData = filteredData.filter(item => item.department.toLowerCase().includes(searchQuery.position.toLowerCase()));
-    }
-
-    setSortedData(filteredData);
   };
 
   return (
