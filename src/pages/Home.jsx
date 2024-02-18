@@ -128,7 +128,7 @@ const toggleScrap = async (jobId) => {
 const ScrapIcon = ({ jobId, isScrapped }) => (
   <div style={{ position: 'absolute', top: '8px', right: '8px', cursor: 'pointer', zIndex: 2 }}>
     <img
-      src={isScrapped ? "/assets/SavedNotices.png" : "/assets/vector9.png"}
+      src={isScrapped ? "/assets/scrap.png" : "/assets/Vector9.png"}
       alt="Scrap"
       onClick={(event) => {
         event.stopPropagation();
@@ -288,13 +288,16 @@ const ScrapIcon = styled.div`
   top: 8px;
   right: 8px;
   cursor: pointer;
+  z-index: 2; /* 스크랩 버튼이 이미지 위에 오도록 z-index 추가 */
+  
   img {
     width: 24px;
     height: 24px;
-    
   }
 `;
+
 const NoticeItem = styled.div`
+  position: relative; /* 스크랩 버튼을 포함한 공고 아이템을 상대적으로 위치 설정 */
   flex: 0 0 calc(25% - 1.25rem);
   display: flex;
   flex-direction: column;
