@@ -91,7 +91,8 @@ function App() {
           <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />
           <Route path="/cover-letters-input3" element={<CoverLetterInput3 />} />
           <Route path="/cover-letters-result" element={<CoverLetterResult />} />
-
+          <Route path="/cover-letters/:id" element={<CoverLetterResult />} />
+          
           <Route path="/interviews" element={<InterviewHome />} />
           <Route path="/interviews-result" element={<InterviewResult />} />
           <Route path="/interviews-input1" element={<InterviewInput1 />} />

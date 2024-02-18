@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams} from 'react-router-dom';
+import config from "../path/config";
 
 export default function CoverLetterResult() {
     const [isScrapped, setIsScrapped] = useState(false);
@@ -15,23 +16,19 @@ export default function CoverLetterResult() {
     };
 
     useEffect(() => {
-    const fetchResumeDetail = async () => {
-      try {
-        // 변경된 API 경로에 맞춰서 요청
-        const response = await axios.get(`http://localhost:8080/resumes/{id}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-  
-        setResume(response.data); // job 상태 설정
-      } catch (error) {
-        console.error('공고 상세 정보를 가져오는 데 실패했습니다:', error);
-      }
-    };
-  
-    fetchResumeDetail();
-  }, [id, accessToken]);
+        if (id) { // id가 존재하는 경우에만 API 호출
+            const fetchResume = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8080/resumes/${id}`);
+                    setResume(response.data);
+                } catch (error) {
+                    console.error('Failed to fetch resumes:', error);
+                }
+            };
+
+            fetchResume();
+        }
+    }, [id]);
 
     return (
         <Container>
@@ -41,8 +38,8 @@ export default function CoverLetterResult() {
 
                 <SubTitleWrap>
                     <Subtitle>
-                        <Company>{resume.company}</Company>
-                        <DepartmentSemester>{resume.department} / {resume.year} {resume.semester}</DepartmentSemester>
+                        <Company>{resume?.company}</Company>
+                        <DepartmentSemester>{resume?.department} / {resume?.year} {resume?.semester}</DepartmentSemester>
                     </Subtitle>
 
                     <IconWrap>
@@ -57,23 +54,20 @@ export default function CoverLetterResult() {
             <SpecificationWrap>
                 <SpecificationTitle>합격 스펙:</SpecificationTitle>
                 <SpecificationInformation>
-                    {resume.education}<br />
-                    학점 {resume.gpa}<br />
-                    {resume.english}:{resume.score}
+                    {resume?.education} {resume?.major}<br />
+                    학점 {resume?.gpa}<br />
+                    {resume?.english}:{resume?.score}
                 </SpecificationInformation>
             </SpecificationWrap>
 
             <QuestionContainer>
-                <QuestionWrap>
-                    <QuestionNum>{resume.title[0]}</QuestionNum>
-                    <Question>해당 직무에 지원하게 된 동기와 이 직무를 수행하기 위한
-                        본인만의 강점에 대해 구체적 사례를 들어 설명해주십시오. 또한 이를 바탕으로 입사 후
-                        실현하고자 하는 커리어 목표에 대해서도 함께 작성해주시기 바랍니다. (1000자)
-                    </Question>
-                    <QuestionDetail>
-                        {resume.contents[0]}
-                    </QuestionDetail>
-                </QuestionWrap>
+                {resume?.titles.map((title, index) => (
+                <QuestionWrap key={index}>
+                    <QuestionNum>문항 {index + 1}</QuestionNum>
+                    <Question>{title}</Question>
+                    <QuestionDetail>{resume?.contents[index]}</QuestionDetail>
+            </QuestionWrap>
+        ))}
             </QuestionContainer>
             </CoverLetterResultWrap>
         </Container>
