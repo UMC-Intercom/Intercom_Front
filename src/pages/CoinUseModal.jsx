@@ -33,7 +33,7 @@ const CoinUseModal = ({ isOpen, selectedItem}) => {
                     <ModalContainer>
                         <ModalContent>
                             <ModalText>10코인을 사용했어요</ModalText>
-                            <Coin>잔여코인 {coins}개</Coin>
+                            <Coin>잔여코인 {coins-10}개</Coin>
                             <ModalButtons>
                                 <CancelButton onClick={navigateToCoverLetterResult}>확인</CancelButton>
                             </ModalButtons>
