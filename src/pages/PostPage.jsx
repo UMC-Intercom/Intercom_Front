@@ -26,7 +26,21 @@ const PostPage = () => {
     const [likesCount, setLikesCount] = useState(0);
     const [commentsCount, setCommentsCount] = useState(0);
     const [isScrapped, setIsScrapped] = useState(false);
-    
+    const [userProfile, setUserProfile] = useState(null);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            const profile = localStorage.getItem('userProfile');
+
+            if (profile === "null") {
+                setUserProfile("./assets/Ellipse2.png");
+            }
+            else {
+                setUserProfile(profile);
+            }
+        }
+    }, [isLoggedIn]);
+
     useEffect(() => {
         if (!isLoggedIn) {
             navigate('/join', { state: { from: location } });
@@ -157,7 +171,7 @@ const PostPage = () => {
                 </TitleWrapper>
                 <Content dangerouslySetInnerHTML={{ __html: post.content }} />
                 <PostingInfoContainer>
-                <ProfileImage src={post.imageUrls && post.imageUrls.length > 0 ? post.imageUrls[0] : defaultProfileImg} alt="Profile" style={{ border: '3px solid #E2E2E2' }} />
+                <ProfileImage src={userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', borderRadius: '100%', border: '3px solid #E2E2E2' }} />
                     <User>{post.writer}</User>
                     <WrittenTime>{timeAgo}</WrittenTime>
             

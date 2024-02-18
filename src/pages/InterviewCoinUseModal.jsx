@@ -1,18 +1,39 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import config from "../path/config";
 
 const InterviewCoinUseModal = ({ isOpen, selectedItem}) => {
     const navigate = useNavigate();
     const navigateToInterviewResult = () => navigate(`/interviews/${selectedItem.id}`);
+    const [coins, setCoins] = useState();
+
+    useEffect(() => {
+        // 사용자의 보유 코인 정보 조회
+        const fetchCoins = async () => {
+            try {
+                const response = await axios.get(`${config.API_URL}/users/coin`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 인증 토큰 추가
+                    },
+                });
+                setCoins(response.data); // 보유 코인 상태 업데이트
+            } catch (error) {
+                console.error('코인 정보 조회 실패:', error);
+            }
+        };
+
+        fetchCoins();
+    }, []);
     return (
         <>
             {isOpen && (
                 <ModalOverlay>
                     <ModalContainer>
                         <ModalContent>
-                            <ModalText>10코인을 사용했어요</ModalText>
-                            <Coin>잔여코인 n개</Coin> 
+                            <ModalText>20코인을 사용했어요</ModalText>
+                            <Coin>잔여코인 {coins-20}개</Coin>
                             <ModalButtons>
                                 <CancelButton onClick={navigateToInterviewResult}>확인</CancelButton>
                             </ModalButtons>
