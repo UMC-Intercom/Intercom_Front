@@ -279,6 +279,7 @@ const SearchModal = ({ onClose, setSearchResults}) => {
                 }
             });
             console.log(response.data);
+            setSearchResults(response.data.content);
             navigate('/search-results', { state: { searchResults: response.data.content } });
             onClose();
         } catch (error) {
