@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import languages from '../data/languages';
 import certificates from '../data/certificates'; 
@@ -1011,6 +1012,7 @@ const EditCareer = () => {
     .then(response => {
       console.log("서버 응답:", response.data);
       alert('저장되었습니다.');
+      navigate('/mycareer');
     })
     .catch(error => {
       console.error("서버로 데이터 저장 중 오류 발생:", error);
@@ -1033,7 +1035,7 @@ const EditCareer = () => {
     });
   };
   
-  
+  const navigate = useNavigate();
   
 const handleDeleteSection = (sectionName) => {
   setSectionsVisible(prevSpecs => ({

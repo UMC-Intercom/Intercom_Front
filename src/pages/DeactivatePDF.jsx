@@ -921,7 +921,7 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
         <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '757px' : '792px' }}>
         {isPdfDownloadMode && (
         <ProfileSection>
-          <IDPhoto src={profileImage} alt="ID Photo" />
+          <IDPhoto src={profileImage || "/assets/idphoto.png"} alt="ID Photo" />
           <ProfileDetailsContainer2>
             <ProfileName2>{userInfo.name}</ProfileName2>
             <ProfileDetail2>이메일 <ProfileEmailValue>{userInfo.email}</ProfileEmailValue></ProfileDetail2>
