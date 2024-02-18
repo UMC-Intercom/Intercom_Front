@@ -56,7 +56,6 @@ const TalkComment = ({ postId }) => {
         });
 
         setCommentInput(''); // 입력 필드 초기화
-        alert('댓글이 등록되었습니다.');
         fetchComments(); // 댓글 목록 새로고침
       } catch (error) {
         console.error('댓글 등록에 실패했습니다.', error);
@@ -66,15 +65,14 @@ const TalkComment = ({ postId }) => {
 
   return (
     <CommentSectionContainer>
-      <CommentInputContainer>
+       <CommentForm onSubmit={submitComment}>
         <CommentInput
-          type="text"
           value={commentInput}
           onChange={handleCommentChange}
-          placeholder="댓글을 입력하세요..."
+          placeholder="답변을 달아주세요!"
         />
-        <SubmitButton onClick={submitComment}>등록하기</SubmitButton>
-      </CommentInputContainer>
+        <SubmitButton type="submit">등록하기</SubmitButton>
+      </CommentForm>
       <CommentsContainer>
         {comments.map((comment) => (
             <React.Fragment key={comment.id}>
@@ -94,33 +92,45 @@ export default TalkComment;
 
 // Styled Components
 const CommentSectionContainer = styled.div`
-  background: #FFF;
-  border: 2px solid #E2E2E2;
-  border-radius: 0 0 1.25rem 1.25rem; /* 아래쪽 모서리에만 border-radius 적용 */
-  border-top: none; /* 위쪽 테두리 없애기 */
-  width: 75rem; /* 너비 설정 */
-  margin-left: 6.38rem; /* PostContainer와 정렬 */
-  
+background: #FFF;
+border: 2px solid #E2E2E2;
+border-radius: 1.25rem;
+border-top: none;
+display: flex;
+flex-direction: column;
+width: 75rem;
+margin-bottom: 2rem;
+padding: 2rem;
+border-top-left-radius: 0; /* 하단 좌측 모서리를 뾰족하게 하기 위한 값 설정 */
+border-top-right-radius: 0; /* 하단 우측 모서리를 뾰족하게 하기 위한 값 설정 */
+
 `;
 
-const CommentInputContainer = styled.div`
+const CommentForm = styled.form`
   display: flex;
-  justify-content: center; // 가운데 정렬
-  align-items: center; // 수직 중앙 정렬
-  margin-bottom: 114px;
-  margin-top: 78px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative; // SubmitButton을 상대적으로 배치하기 위함
 `;
-const CommentInput = styled.input`
+
+const CommentInput = styled.textarea`
   padding: 8px;
+  padding-right: 80px; // "등록하기" 버튼을 위한 공간 확보
   border: 2px solid #A1A1A1;
-  outline: none; // 테두리 변화 없애기
-  width: 993px; // 너비 조정
-  height: 138px; // 높이 조정
-  resize: none; // 크기 조절 비활성화
+  border-radius:
+  outline: none;
+  width: 993px;
+  height: 138px;
+  resize: none;
 `;
 
 
 const SubmitButton = styled.button`
+position: absolute;
+right: 59px; // 입력 칸 오른쪽 내부에 위치
+top: 85%;
+transform: translateY(-50%); 
   border-radius: 4px; /* 테두리 둥글게 설정 */
   border: none; /* 테두리 없애기 */
   background-color: #5B00EF; /* 배경색 설정 */
