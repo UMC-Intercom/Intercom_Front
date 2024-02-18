@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import fakeData from '../data/fakeData';
 import fakeInterviewData from '../data/fakeInterviewData';
 import fakeCoverletterData from '../data/fakeCoverletterData';
+import axios from 'axios';
+import config from '../path/config';
+import TalkPagination from "./TalkPagination";
 
 const WrittenContentPage = styled.div`
   display: flex;
@@ -186,6 +189,13 @@ const WrittenContentPageComponent = () => {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 
+  const ITEMS_PER_PAGE = 4;
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalElements, setTotalElements] = useState([]);
+  const indexOfLast = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+
   const handleNavigate = () => {
     navigate('/interview');
   };
@@ -199,115 +209,117 @@ const WrittenContentPageComponent = () => {
   }, []);
 
   const handleTalkClick = () => {
+    setCurrentPage(1);
     setView('talk'); // 톡톡 글 보기로 설정
   };
 
   const handleInterviewClick = () => {
+    setCurrentPage(1);
     setView('interview'); // 면접 후기 보기로 설정
   };
 
   const handleCoverLetterClick = () => {
+    setCurrentPage(1);
     setView('coverletter'); 
   };
+
+  const fetchData = async (endpoint) => {
+    try {
+      const response = await axios.get(`${config.API_URL}${endpoint}`);
+      // response.data에 있는 content를 사용하여 상태 업데이트
+      setData(response.data.content);
+    } catch (error) {
+      console.error("데이터를 불러오는 데 실패했습니다.", error);
+    }
+  };
+
+  useEffect(() => {
+    let endpoint = '';
+    switch(view) {
+      case 'talk':
+        endpoint = '/users/talk';
+        break;
+      case 'interview':
+        endpoint = '/users/interview';
+        break;
+      case 'coverletter':
+        endpoint = '/users/resume';
+        break;
+      default:
+        console.error('알 수 없는 뷰 타입입니다.');
+        return;
+    }
+
+    const accessToken = localStorage.getItem('accessToken');
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${config.API_URL}${endpoint}?page=${currentPage}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        setData(response.data.content); // 서버로부터 받은 데이터로 상태
+        setTotalPages(response.data.totalPages);
+        setTotalElements(response.data.totalElements);
+      } catch (error) {
+        console.error("데이터를 불러오는 데 실패했습니다.", error);
+      }
+    };
+
+    fetchData();
+  }, [view, currentPage]);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+};
+
+// 뷰 변경 핸들러
+const handleViewChange = (newView) => {
+  setData([]); // 뷰 변경 전 데이터 초기화
+  setCurrentPage(1);
+  setView(newView);
+};
+
+  const renderContent = () => {
+    switch(view) {
+      case 'talk':
+      case 'interview':
+      case 'coverletter':
+        return (
+          <TalkListContainer>
+            {data.map((item) => (
+              <SearchResultItem key={item.id}>
+                <p className="title">{item.title}</p>
+                <p className="content">{item.content || "내용이 없습니다."}</p>
+                <p className="response">조회수 {item.viewCount}회 &nbsp;&nbsp; 스크랩 {item.scrapCount}</p>
+              </SearchResultItem>
+            ))}
+            <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
+          </TalkListContainer>
+        );
+      default:
+        return <p>데이터를 불러올 수 없습니다.</p>;
+    }
+  };
+
 
   return (
     <WrittenContentPage>
       <Title>작성한 글</Title>
       <ButtonContainer>
-        <Button onClick={handleTalkClick} selected={view === 'talk'}>톡톡 글</Button>
-        <Button onClick={handleInterviewClick} selected={view === 'interview'}>면접 후기</Button>
-        <Button onClick={handleCoverLetterClick} selected={view === 'coverletter'}>합격 자소서</Button>
+        <Button onClick={() => handleViewChange('talk')} selected={view === 'talk'}>톡톡 글</Button>
+        <Button onClick={() => handleViewChange('interview')} selected={view === 'interview'}>면접 후기</Button>
+        <Button onClick={() => handleViewChange('coverletter')} selected={view === 'coverletter'}>합격 자소서</Button>
       </ButtonContainer>
-
-      {view === 'talk' && (
-        <TalkListContainer>
-          {data.map(item => (
-            <SearchResultItem key={item.id}>
-              <p className="title">{item.title}</p>
-              <p className="content">{item.content || "내용이 없습니다."}</p>
-              <p className="response">답변 {item.answers} &nbsp;&nbsp; 댓글 {item.comments} &nbsp;&nbsp; 조회수 {item.views} &nbsp;&nbsp; 좋아요 {item.likes}</p>
-            </SearchResultItem>
-          ))}
-        </TalkListContainer>
-      )}
-
-      {view === 'interview' && (
-        <InterviewReviewContainer>
-            <CenteredContainer>
-            <InterviewReviewContainer2>
-                {fakeInterviewData && fakeInterviewData.length > 0 && fakeInterviewData.map((data, index) => (
-                <InterviewReviewBox key={index}>
-                    <InfoBox onClick={handleNavigate}>
-                      <InfoItems>
-                        <InfoItem>
-                            <InfoContent>{data.company} |&nbsp;</InfoContent>
-                        </InfoItem>
-                        <InfoItem>
-                            <InfoContent>{data.position} |&nbsp;</InfoContent>
-                        </InfoItem>
-                        <InfoItem>
-                            <InfoContent>{data.when}</InfoContent>
-                        </InfoItem>
-                      </InfoItems>
-                      <InfoDetail>
-                        토익 어쩌고 오픽 어쩌고 사회생활 어쩌고 자격증 어쩌고 서성한 어쩌고 사회과학대 어쩌고 학점 어쩌고
-                      </InfoDetail>
-                    </InfoBox>
-                    <SectionDivider />
-                    <ReviewBox>
-                    <ReviewContent>{data.content}</ReviewContent>
-                    <ReviewStats>
-                        <span>스크랩 {data.scrap}</span>
-                        <span>조회수 {data.views}회</span>
-                    </ReviewStats>
-                    </ReviewBox>
-                </InterviewReviewBox>
-                ))}
-            </InterviewReviewContainer2>
-            </CenteredContainer>
-        </InterviewReviewContainer>
-      )}
-
-      {view === 'coverletter' && (
-        <CoverLetterContainer>
-            <CenteredContainer>
-            <InterviewReviewContainer2>
-                {fakeCoverletterData && fakeCoverletterData.length > 0 && fakeCoverletterData.map((data, index) => (
-                <InterviewReviewBox key={index}>
-                    <InfoBox onClick={handleNavigate2}>
-                      <InfoItems>
-                        <InfoItem>
-                            <InfoContent>{data.company} |&nbsp;</InfoContent>
-                        </InfoItem>
-                        <InfoItem>
-                            <InfoContent>{data.position} |&nbsp;</InfoContent>
-                        </InfoItem>
-                        <InfoItem>
-                            <InfoContent>{data.when}</InfoContent>
-                        </InfoItem>
-                      </InfoItems>
-                      <InfoDetail>
-                        토익 어쩌고 오픽 어쩌고 사회생활 어쩌고 자격증 어쩌고 서성한 어쩌고 사회과학대 어쩌고 학점 어쩌고
-                      </InfoDetail>
-                    </InfoBox>
-                    <SectionDivider />
-                    <ReviewBox>
-                    <ReviewContent>{data.content}</ReviewContent>
-                    <ReviewStats>
-                        <span>스크랩 {data.scrap}</span>
-                        <span>조회수 {data.views}회</span>
-                    </ReviewStats>
-                    </ReviewBox>
-                </InterviewReviewBox>
-                ))}
-            </InterviewReviewContainer2>
-            </CenteredContainer>
-        </CoverLetterContainer>
-      )}
-        </WrittenContentPage>
-        );
-
-        
-    };
+      {renderContent()}
+    </WrittenContentPage>
+  );
+};
 
 export default WrittenContentPageComponent;
