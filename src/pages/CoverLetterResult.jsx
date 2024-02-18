@@ -8,22 +8,7 @@ export default function CoverLetterResult() {
     const [isScrapped, setIsScrapped] = useState(false);
     const [resume , setResume] = useState(null);
     const { id } = useParams();
-    // const navigate = useNavigate();
     const accessToken = localStorage.getItem('accessToken');
-
-    // useEffect(() => {
-    //     if (id) { // id가 존재하는 경우에만 API 호출
-    //         const fetchResume = async () => {
-    //             try {
-    //                 const response = await axios.get(`http://localhost:8080/resumes/${id}`);
-    //                 setResume(response.data);
-    //             } catch (error) {
-    //                 console.error('Failed to fetch resumes:', error);
-    //             }
-    //         };
-    //         fetchResume();
-    //     }
-    // }, [id]);
 
     useEffect(() => {
         const fetchResume = async () => {
@@ -34,8 +19,7 @@ export default function CoverLetterResult() {
                 'Authorization': `Bearer ${accessToken}`,
               },
             });
-      
-            setResume(response.data); // job 상태 설정
+            setResume(response.data); 
           } catch (error) {
             console.error('공고 상세 정보를 가져오는 데 실패했습니다:', error);
           }
@@ -62,10 +46,8 @@ export default function CoverLetterResult() {
             });
             setIsScrapped(scrapResponse.data);
     
-            // await fetchInterviews(response.data.industry);
-            // await fetchResumes(response.data.industry);
           } catch (error) {
-            console.error('공고 상세 정보를 가져오는 데 실패했습니다:', error);
+            console.error('합격자소서 상세 정보를 가져오는 데 실패했습니다:', error);
           }
         };
     
