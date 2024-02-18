@@ -47,7 +47,8 @@ export default function InterviewHome() {
   }, [currentPage, sortByDateActive]);
 
   const handleResultClick = (item) => {
-    navigate(`/interviews/${item.id}`);
+    setSelectedItem(item);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
@@ -159,7 +160,7 @@ export default function InterviewHome() {
           })}
         </SearchResultWrap>
 
-        <InterviewCoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
+        <InterviewCoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} selectedItem={selectedItem} />
 
         <TalkPagination
             currentPage={currentPage}
