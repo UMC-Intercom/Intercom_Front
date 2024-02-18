@@ -25,7 +25,7 @@ const PostPage = () => {
     const [liked, setLiked] = useState(false); // '좋아요' 클릭 상태
     const [likesCount, setLikesCount] = useState(0);
     const [commentsCount, setCommentsCount] = useState(0);
-
+    const [isScrapped, setIsScrapped] = useState(false);
     
     useEffect(() => {
         if (!isLoggedIn) {
@@ -50,6 +50,14 @@ const PostPage = () => {
                 console.error('Error fetching post:', error);
             });
 
+            //스크랩여부 가져오깅
+            axios.get(`http://localhost:8080/scraps/talks/${postId}`, { 
+                headers: { Authorization: `Bearer ${accessToken}` } 
+            })
+            .then(response => setIsScrapped(response.data))
+            .catch(error => console.error('Error fetching scrap status:', error));
+           
+           
             const fetchCounts = async () => {
                 try {
                     const likesResponse = await axios.get(`http://localhost:8080/talks/${postId}`, {
@@ -91,7 +99,20 @@ const PostPage = () => {
       const handleCommentsClick = () => {
         setIsCommentsModalOpen(true);
       };
-    
+      const toggleScrap = () => {
+ 
+        if (isScrapped) {
+          // 스크랩 취소 요청
+          axios.delete(`http://localhost:8080/scraps/talks/${postId}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+            .then(() => setIsScrapped(false))
+            .catch(error => console.error('Error removing scrap:', error));
+        } else {
+          // 스크랩 추가 요청
+          axios.post(`http://localhost:8080/scraps/talks/${postId}`, {}, { headers: { Authorization: `Bearer ${accessToken}` } })
+            .then(() => setIsScrapped(true))
+            .catch(error => console.error('Error adding scrap:', error));
+        }
+      };
       const toggleLike = async () => {
         try {
             // 현재 '좋아요' 상태에 따라 요청을 달리합니다.
@@ -148,9 +169,19 @@ const PostPage = () => {
         <PageContainer>
             <PostContainer>
                 <TitleWrapper>
-                    <Title>{post.title}</Title>
-                    {isMentor && <MentorLabel>멘토</MentorLabel>}
-                  
+                <LeftContainer>
+                        <Title>{post.title}</Title>
+                        {isMentor && <MentorLabel>멘토</MentorLabel>}
+                    </LeftContainer>
+                    {isLoggedIn && ( // 로그인 상태일 때만 스크랩 버튼 표시
+                       <RightContainer>
+                       <ScrapButton 
+                           src={isScrapped ? '/assets/scrap.png' : '/assets/unscrap.png'}
+                           alt='스크랩버튼'
+                           onClick={toggleScrap}
+                       />
+                   </RightContainer>
+                    )}
                    
                 </TitleWrapper>
                 <Content dangerouslySetInnerHTML={{ __html: post.content }} />
@@ -179,7 +210,12 @@ const PostPage = () => {
 };
 
 export default PostPage;
+const ScrapButton = styled.img`
+width: 24px;
+height: 32px;
+cursor: pointer;
 
+`;
 const Categories = styled.div`
     display: flex;
     flex-wrap: wrap;
@@ -190,9 +226,20 @@ const Categories = styled.div`
 const TitleWrapper = styled.div`
     display: flex;
     align-items: center;
+    justify-content: space-between; /* 양 끝으로 요소 정렬 */
+    width: 100%; /* 전체 너비 사용 */
     margin-bottom: 1rem;
 `;
 
+const LeftContainer = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+const RightContainer = styled.div`
+    display: flex;
+    align-items: center;
+`;
 const MentorLabel = styled.span`
     background-color: #9FAEFF;
     color: #FFFFFF;

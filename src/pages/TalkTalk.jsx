@@ -24,9 +24,9 @@ const Talktalk = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [posts, setPosts] = useState([]);
-  const [currentSort, setCurrentSort] = useState('viewCounts'); // 기본값은 'viewCounts'로 설정
-
+  const [isRequesting, setIsRequesting] = useState(false); // 요청 중인지 여부를 추적하는 상태 변수 추가
   const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 상태
+  const [selectedPostId, setSelectedPostId] = useState(null); // 선택된 게시물 ID를 저장하는 상태 변수
 
 
   const fetchPosts = async (page) => {
@@ -58,7 +58,7 @@ const Talktalk = () => {
   };
   useEffect(() => {
     fetchPosts(currentPage);
-  }, [currentPage, top100Active, likesSortActive, answersSortActive, isSearchMode, searchTerm]);
+  }, [currentPage, top100Active, likesSortActive, answersSortActive, searchTerm]);
 
 
   
@@ -66,7 +66,7 @@ const Talktalk = () => {
     setCurrentPage(newPage); // 현재 페이지 상태를 업데이트
   };
 
-
+  
 
 
 useEffect(() => {
@@ -92,6 +92,25 @@ useEffect(() => {
   }
 }, [searchTerm, top100Active, allPosts]);
 
+
+useEffect(() => {
+  // 페이지 이동이 완료되면 요청 상태를 초기화
+  return () => {
+    setIsRequesting(false);
+  };
+}, [selectedPostId]); // selectedPostId가 변경될 때마다 실행
+
+const handlePostClick = async (postId) => {
+  // 이미 요청 중이라면 추가 요청 방지
+  if (isRequesting) return;
+
+  // 요청 시작 상태로 설정
+  setIsRequesting(true);
+
+    navigate(`/talks/${postId}`);
+
+  // 요청 완료 후 상태 초기화 (여기서는 useEffect 내 cleanup 함수에서 처리하는 것이 좋음)
+};
 
 
 const handleGoPosting=()=>{
@@ -248,7 +267,7 @@ return(
       searchResults.map(item => (
           <SearchResultItem
               key={item.id}
-              onClick={() => navigate(`/talks/${item.id}`)}>
+              onClick={() => handlePostClick(item.id)}> 
               <p className="title">{item.title}</p>
             <p className="content">{(item.content && item.content.replace(/<img[^>]*>/g,"").replace(/<[^>]*>?/gm, '')) || "내용이 없습니다."}</p>
             <p className="response">답변: {item.commentCount} | 댓글: {item.replyCount} | 조회수: {item.viewCount} | 좋아요: {item.likeCount}</p>
