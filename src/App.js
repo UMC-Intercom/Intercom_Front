@@ -85,6 +85,7 @@ function App() {
           <Route path="/profile-edit" element={<ProfileEdit />} />
           <Route path="/written-content" element={<WrittenContent />} />
           <Route path="/scrap" element={<Scrap />} />
+          <Route path="/mycareer-edit" element={<EditCareer />} />
 
           <Route path="/cover-letters" element={<CoverLetterInput />} />
           <Route path="/cover-letters-home" element={<CoverLetterHome />} />
