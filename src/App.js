@@ -97,6 +97,7 @@ function App() {
 
           <Route path="/interviews" element={<InterviewHome />} />
           <Route path="/interviews-result" element={<InterviewResult />} />
+          <Route path="/interviews/:id" element={<InterviewResult />} />
           <Route path="/interviews-input1" element={<InterviewInput1 />} />
           <Route path="/interviews-input2" element={<InterviewInput2 />} />
           <Route path="/interviews-input3" element={<InterviewInput3 />} />
