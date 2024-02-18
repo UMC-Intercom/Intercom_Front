@@ -29,19 +29,6 @@ const PostPage = () => {
     const [userProfile, setUserProfile] = useState(null);
 
     useEffect(() => {
-        if (isLoggedIn) {
-            const profile = localStorage.getItem('userProfile');
-
-            if (profile === "null") {
-                setUserProfile("./assets/Ellipse2.png");
-            }
-            else {
-                setUserProfile(profile);
-            }
-        }
-    }, [isLoggedIn]);
-
-    useEffect(() => {
         if (!isLoggedIn) {
             navigate('/join', { state: { from: location } });
             return;
@@ -57,6 +44,13 @@ const PostPage = () => {
                     setIsMentor(true); 
                 } else {
                     setIsMentor(false); // response가 null인 경우 현직자 여부를 false로 설정
+                }
+
+                if (response.data.writerProfileUrl === null) {
+                    setUserProfile("../assets/MyProfile.png");
+                }
+                else {
+                    setUserProfile(response.data.writerProfileUrl);
                 }
             })
             .catch(error => {
