@@ -28,16 +28,28 @@ export default function CoverLetterHome() {
   const ITEMS_PER_PAGE = 10;
   const indexOfLast = currentPage * ITEMS_PER_PAGE;
   const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
   const fetchPosts = async (page) => {
+    let url = `${config.API_URL}/resumes?page=${currentPage}`;
+
+    if (!isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/resumes/scrap-counts?page=${currentPage}`;
+    }
+    if (isSearchMode && sortByDateActive) {
+      url = `${config.API_URL}/resumes/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+    else if (isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/resumes/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
     try {
-      const sortBy = sortByDateActive ? '' : '/scrap-counts'; // 추가된 부분
-      const response = await axios.get(`${config.API_URL}/resumes${sortBy}?page=${currentPage}`);
+      //const sortBy = sortByDateActive ? '' : '/scrap-counts'; // 추가된 부분
+      const response = await axios.get(url);
 
       setSortedData(response.data.content);
       setTotalPages(response.data.totalPages);
       setTotalElements(response.data.totalElements);
-      // setSearchResults(response.data.content);
+
     } catch (error) {
       console.error('Failed to fetch posts:', error);
     }
@@ -74,23 +86,48 @@ export default function CoverLetterHome() {
     setSearchQuery({ ...searchQuery, [id]: value });
   };
 
-  const handleSearch = () => {
-    let filteredData = fakeCoverletterData;
-
-    if (searchQuery.company.trim() !== '') {
-      filteredData = filteredData.filter(item => item.company.toLowerCase().includes(searchQuery.company.toLowerCase()));
+  const handleSearch = async () => {
+    // 빈칸 검색 시 검색 모드 종료 및 상태 초기화
+    if (!searchQuery.company.trim() && ! searchQuery.position.trim) {
+      resetSearch();
+      return;
     }
 
-    if (searchQuery.position.trim() !== '') {
-      filteredData = filteredData.filter(item => item.department.toLowerCase().includes(searchQuery.position.toLowerCase()));
+    let url;
+    if (sortByDateActive) {
+      url = `${config.API_URL}/resumes/search`;
+    }
+    else if (sortByLikesActive) {
+      url = `${config.API_URL}/resumes/scrap-counts`;
     }
 
-    setSortedData(filteredData);
+    try {
+      const response = await axios.get(url, {
+        params: {
+          company: searchQuery.company,
+          department: searchQuery.position,
+          page: currentPage // 현재 페이지도 함께 전송할 수 있도록 수정
+        }
+      });
+
+      setIsSearchMode(true);
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+    } catch (error) {
+      console.error('Failed to search resumes:', error);
+    }
   };
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
+  };
+
+  const resetSearch = () => {
+    // setSearchTerm('');
+    setIsSearchMode(false);
+    setCurrentPage(1);
   };
 
   return (
