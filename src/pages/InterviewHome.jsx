@@ -47,8 +47,7 @@ export default function InterviewHome() {
   }, [currentPage, sortByDateActive]);
 
   const handleResultClick = (item) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
+    navigate(`/interviews/${item.id}`);
   };
 
   const closeModal = () => {
@@ -134,8 +133,8 @@ export default function InterviewHome() {
             const scoreList = interview.score ? interview.score.split(', ') : [];
 
             return (
-                <SearchResultBox key={index} onClick={() => handleResultClick(interview)}>
-                  <InformationContainer>
+                <SearchResultBox key={index} >
+                  <InformationContainer key = {interview.id} onClick={() => handleResultClick(interview)}>
                     <Information1>{interview.company} | {interview.department} | {interview.year} {' '} {interview.semester}</Information1>
                     <Information2>
                       {englishList.map((english, index) => (
