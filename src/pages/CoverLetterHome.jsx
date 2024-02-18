@@ -50,6 +50,7 @@ export default function CoverLetterHome() {
   const handleResultClick = (item) => {
     setSelectedItem(item);
     setIsModalOpen(true);
+    navigate(`/cover-letters/${item.id}`);
   };
 
   const closeModal = () => {
@@ -136,8 +137,9 @@ export default function CoverLetterHome() {
           const scoreList = coverLetter.score ? coverLetter.score.split(', ') : [];
 
           return (
-              <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
-                <InformationContainer>
+              // <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
+              <SearchResultBox key={index}>
+                <InformationContainer key = {coverLetter.id} onClick={() => handleResultClick(coverLetter)}>
                   <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
                   <Information2>
                     {englishList.map((english, index) => (
