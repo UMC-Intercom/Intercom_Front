@@ -179,10 +179,9 @@ const calculateRemainingDays = (expirationDate) => {
           </Icons>
         </PageIcons>
       </MenuBox>
-      <BannerImg>
-        <img src="/assets/Banner.png" alt="Banner" 
-        style={{width: "75rem"}} />
-      </BannerImg>
+      <BannerImg onClick={() => navigate('/type-test-home')}>
+      <img src="/assets/Banner.png" alt="Banner" style={{width: "75rem"}} />
+    </BannerImg>
       <PopularNoticesBox>
                 <span style={{ fontSize: "1.563rem", fontWeight: "800" }}>실시간 인기 공고</span>
                 {isLoggedIn && (
@@ -326,6 +325,7 @@ const BannerImg = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 4rem;
+  cursor: pointer;
 `;
 
 const Main = styled.div`
