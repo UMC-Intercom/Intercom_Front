@@ -7,6 +7,9 @@ import Slider from 'react-slick'; // npm install react-slick
 import "slick-carousel/slick/slick.css"; //npm install react-slick slick-carousel 
 import "slick-carousel/slick/slick-theme.css";
 
+
+
+
 const ITEMS_PER_PAGE = 24;
 const Home = () => {
   const [interests, setInterests] = useState([]);
@@ -260,8 +263,6 @@ const calculateRemainingDays = (expirationDate) => {
 
 export default Home;
 
-
-//스타일시트
 const breakpoints = {
   mobile: '480px',
   tablet: '768px'
@@ -283,7 +284,14 @@ const PopularNoticesBox = styled.div`
 
   ${mediaQueries.mobile} {
     width: 100%;
+    height:100%
     padding: 0.5rem;
+    margin-left: -25px;
+    span{
+     
+        margin-left: 13px;
+      
+    }
   }
 
   ${mediaQueries.tablet} {
@@ -297,6 +305,15 @@ const ContentsBox = styled.div`
   min-height: auto; 
   background-color: #FFFFFF;
   border-radius: 1.25rem;
+
+  ${mediaQueries.mobile} {
+    width: 100%; 
+    height: 100%; 
+    // 모바일에서는 너비를 화면 너비에 맞게 조절
+    padding: 0.5rem; // 모바일에서 패딩 줄임
+    margin: 0; // 모바일에서 좌우 마진 추가로 컨텐츠 간격 조절
+  }
+
 `;
 
 const Content = styled.div`
@@ -305,8 +322,9 @@ const Content = styled.div`
   flex-wrap: wrap;
 
   ${mediaQueries.mobile} {
-    gap: 1rem;
-    justify-content: center;
+    gap: 8px; // 모바일에서 갭 크기 줄임
+    justify-content: space-around; // 모바일에서 컨텐츠를 공간에 균일하게 분포
+    margin: 0 auto; // 모바일에서 마진으로 컨텐츠 간격 조절
   }
 
   ${mediaQueries.tablet} {
@@ -332,6 +350,16 @@ const ImageWrapper = styled.div`
     height: 100%;
     object-fit: cover;
   }
+
+    ${mediaQueries.mobile} {
+      width: 100%; // 이미지 크기 조정
+      height: auto;
+      object-fit: cover;
+    img {
+      width: 100%; // 이미지 크기 조정
+      height: auto;
+      object-fit: cover;
+  }}
 `;
 
 const ScrapIcon = styled.div`
@@ -371,15 +399,16 @@ const NoticeItem = styled.div`
     margin-top: 1.25rem;
   }
 
-
   ${mediaQueries.mobile} {
-    flex: 0 0 calc(50% - 10px); // 모바일에서 공고 아이템의 너비 조정
-    margin: 5px; // 모바일에서 공고 아이템 사이의 간격 조정
+    flex: 1 0 46%; // 모바일에서 공고 아이템의 너비 조정
+  height: 50%;
+
+  span, div {
+    align-items: left;
+    font-size: 0.75rem; // 모바일에서 텍스트 크기 조정
   }
 
-  ${mediaQueries.tablet} {
-    flex: 0 0 calc(33.333% - 1rem); // 태블릿에서 한 줄에 3개씩 나오도록 조정
-  }
+}
 
 
 
@@ -426,6 +455,8 @@ const PageIcons = styled.div`
   max-width: 58rem;
 
   ${mediaQueries.mobile} {
+
+    justify-content: center;
     margin-top: 2rem; // 모바일에서 상단 여백 줄임
   }
 `;
@@ -441,11 +472,16 @@ const Icons = styled.div`
     text-align: center;
   }
   ${mediaQueries.mobile} {
+
     img {
+      margin-right: 1.375rem;
+      margin-left: 0.375rem;
       width: 50%; // 모바일에서 아이콘 크기를 50%로 조정
     }
 
     span {
+      margin-bottom: 1rem;
+
       font-size: 0.8rem; // 모바일에서 폰트 크기를 0.8rem으로 조정
     }
   }
@@ -506,6 +542,8 @@ const InterestButton = styled.button`
   font-size: 1.063rem;
   font-weight: 700;
 
+  
+
 `;
 
 const InterestButtons = styled.div`
@@ -513,14 +551,21 @@ const InterestButtons = styled.div`
   justify-content: left;
   flex-wrap: wrap;
   margin-bottom: 20px;
+  ${mediaQueries.mobile} {
+    margin-left: 13px;
+  }
 `;
 const TextWrap = styled.div`
-  margin-bottom: 15px; `;
+  margin-bottom: 15px; 
+  `;
 
 const SecondaryTitle = styled.div`
 font-size: 17px;
 font-weight: 700;
-margin-top: 14px;`;
+margin-top: 14px;
+${mediaQueries.mobile} {
+  margin-left: 13px;
+}`;
 
 const StyledSlider = styled(Slider)`
   .slick-slide {
@@ -539,7 +584,7 @@ max-width:1300px;
 
 
 ${mediaQueries.mobile} {
-  margin-top: 40px;
+  margin-top: -20px;
   max-width: 90%;
 }
 
