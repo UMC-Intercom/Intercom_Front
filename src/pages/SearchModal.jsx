@@ -262,9 +262,9 @@ const NoOptionsMessage = props => (
     </components.NoOptionsMessage>
 );
 
-const SearchModal = ({ onClose, setSearchResults}) => {
-    const [selectedJob, setSelectedJob] = useState(null); // 상태를 단일 객체로 초기화
-    const [selectedLocation, setSelectedLocation] = useState(null); // 상태를 단일 객체로 초기화
+const SearchModal = ({ onClose, setSearchResults = () => {} }) => {
+    const [selectedJob, setSelectedJob] = useState(null); // Changed to single value
+    const [selectedLocation, setSelectedLocation] = useState(null); // Changed to single value
     const [searchInput, setSearchInput] = useState('');
     const navigate = useNavigate();
 
@@ -272,13 +272,12 @@ const SearchModal = ({ onClose, setSearchResults}) => {
         try {
             const response = await axios.get('http://localhost:8080/jobs/search', {
                 params: {
-                    jobMidCode: selectedJob ? selectedJob.value : '', // 단일 선택 반영
-                    location: selectedLocation ? selectedLocation.value : '', // 단일 선택 반영
+                    jobMidCode: selectedJob ? selectedJob.value : '', // Adjusted for single value
+                    location: selectedLocation ? selectedLocation.value : '', // Adjusted for single value
                     keyword: searchInput,
                     page: 1
                 }
             });
-            console.log(response.data);
             setSearchResults(response.data.content);
             navigate('/search-results', { state: { searchResults: response.data.content } });
             onClose();
@@ -286,6 +285,7 @@ const SearchModal = ({ onClose, setSearchResults}) => {
             console.error('Error searching for jobs:', error);
         }
     };
+
 
     const handleInputChange = (event) => {
         setSearchInput(event.target.value);
@@ -306,32 +306,31 @@ const SearchModal = ({ onClose, setSearchResults}) => {
                 </FlexContainer>
                 <SearchBarContainer>
                     <Select
-                       options={jobOptions}
-                       isMulti={false} // 단일 선택으로 설정
-                       isSearchable={false} // 검색 기능 비활성화
-                       placeholder="모집 직무"
-                       onChange={setSelectedJob} // 선택 항목을 단일 객체로 처리
-                       styles={customStyles}
-                       components={{
-                           Option: CheckboxOption,
-                           ValueContainer: CustomValueContainer,
-                           NoOptionsMessage: NoOptionsMessage,
-                       }}
+                        options={jobOptions}
+                        placeholder="모집 직무"
+                        onChange={setSelectedJob} 
+                        isSearchable={false}
+                        styles={customStyles}
+                        components={{
+                            Option: CheckboxOption, // You may want to adjust or replace this component for single selection
+                            ValueContainer: CustomValueContainer,
+                            NoOptionsMessage: NoOptionsMessage,
+                        }}
                     />
                     <GrayBar />
                     <Select
-                       options={locationOptions}
-                       isMulti={false} // 단일 선택으로 설정
-                       isSearchable={false} // 검색 기능 비활성화
-                       placeholder="근무 지역"
-                       onChange={setSelectedLocation} // 선택 항목을 단일 객체로 처리
-                       styles={customStyles}
-                       components={{
-                           Option: CheckboxOption,
-                           MenuList: CustomMenuList,
-                           ValueContainer: CustomValueContainer,
-                           NoOptionsMessage: NoOptionsMessage,
-                       }}
+                        options={locationOptions}
+                        placeholder="근무 지역"
+                        onChange={setSelectedLocation} // Adjusted for single selection
+                        styles={customStyles}
+                        isSearchable={false} 
+                        components={{
+                            Option: CheckboxOption, // You may want to adjust or replace this component for single selection
+                            MenuList: CustomMenuList,
+                            ValueContainer: CustomValueContainer,
+                            NoOptionsMessage: NoOptionsMessage,
+                            
+                        }}
                     />
                     <GrayBar />
                     <SearchIcon src="./assets/Search2.png" alt="search" />
@@ -341,5 +340,6 @@ const SearchModal = ({ onClose, setSearchResults}) => {
         </ModalContainer>
     );
 };
+
 
 export default SearchModal;
