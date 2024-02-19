@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import fakeData from '../data/fakeData';
 import fakeInterviewData from '../data/fakeInterviewData';
 import fakeCoverletterData from '../data/fakeCoverletterData';
+import axios from 'axios';
+import config from '../path/config';
+import TalkPagination from "./TalkPagination";
 
 const WrittenContentPage = styled.div`
   display: flex;
@@ -15,8 +18,8 @@ const WrittenContentPage = styled.div`
 `;
 
 const Title = styled.h2`
-  font-family: 'SUITE-SemiBold', sans-serif;
-  font-size: 25px;
+  font-family: 'SUITE';
+  font-weight: 400;
   color: #636363;
   align-self: flex-start;
   margin-left: calc(50% - 592px);
@@ -39,7 +42,7 @@ const Button = styled.button`
   border: none;
   cursor: pointer;
   padding: 0 30px;
-  font-family: 'SUITE-SemiBold', sans-serif;
+  font-family: 'SUITE';
   font-size: 22px;
   color: white;
   transition: background-color 0.2s;
@@ -47,17 +50,18 @@ const Button = styled.button`
 
 const TalkListContainer = styled.div`
   width: 1202px;
-  max-height: 958px;
+  height: auto;
   background-color: #EFF0F4;
   border-radius: 10px;
-  padding-top: 40px;
+  padding-top: 30px;
   padding-bottom: 40px;
   overflow-y: auto;
 `;
 const SearchResultItem = styled.div`
   border-bottom: 1px solid #ddd;
+  font-family: 'SUITE';
 
-  padding: 20px 0;
+  padding: 32px 0;
 
   .title, .content, .response {
     margin: 5px 0;
@@ -66,20 +70,22 @@ const SearchResultItem = styled.div`
   }
 
   .title {
-    font-family: 'SUITE-ExtraBold', sans-serif;
     font-size: 24px;
+    font-weight: 700;
   }
   .content{
     margin-top: 10px;
-    font-family: 'SUITE-SemiBold', sans-serif;
     font-size: 19px;
     color: #A1A1A1;
   }
   .response {
-    font-family: 'SUITE-Bold', sans-serif;
+    font-weight: 500;
     font-size: 16px;
     margin-top: 10px;
     color: #636363;
+  }
+  &:hover {
+    cursor: pointer;
   }
 `;
 
@@ -115,57 +121,39 @@ const InterviewReviewBox = styled.div`
   padding-bottom: 40px;
 `;
 
-const FieldBoxContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-right: 40px;
-`;
-
-const FieldBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  margin-left: 40px;
-  gap: 10px; // 아이템들 사이의 고정 간격
-  justify-content: flex-start;
-  align-items: center;
-  width: calc(100% - 110px); 
-`;
-
-const FieldItem = styled.div`
-  background-color: transparent;
-  color: #5B00EF; 
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 17px; 
-  padding: 10px 20px; 
-  margin-top: 2.2rem;
-  border-radius: 5px; 
-  border: 1.5px solid #5B00EF;
-`;
-
 const InfoBox = styled.div`
-  display: flex;
-  align-items: flex-start;
   margin-top: 25px;
   margin-bottom: 20px; 
   margin-left: 40px;
-  gap: 80px;
+  margin-right: 40px;
+  cursor: pointer;
+`;
+
+const InfoItems = styled.div`
+  display: flex;
+  align-items: flex-start;
+  padding-top: 32px;
 `;
 
 const InfoItem = styled.div`
+  font-family: 'SUITE';
   display: flex;
   flex-direction: column;
+  margin-top: 7px;
 `;
 
-const InfoTitle = styled.span`
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 15px;
-  color: #A1A1A1;
-  margin-bottom: 5px;
+const InfoDetail = styled.div`
+  color: #636363;
+  font-family: 'SUITE';
+  font-size: 19px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 7px;
 `;
 
 const InfoContent = styled.span`
-  font-family: 'SUITE-Bold', sans-serif;
+  font-family: 'SUITE';
+  font-weight: 700;
   font-size: 24px;
 `;
 
@@ -181,27 +169,8 @@ const ReviewBox = styled.div`
   margin-right: 40px;
 `;
 
-const ReviewTitle = styled.h3`
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 15px;
-  color: #A1A1A1;
-  margin-bottom: -15px;
-`;
-
-const ReviewContentHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: -25px;
-`;
-
-const ReviewContentTitle = styled.p`
-  font-family: 'SUITE-Bold', sans-serif;
-  font-size: 24px;
-`;
-
 const ReviewContent = styled.p`
-  font-family: 'SUITE-SemiBold', sans-serif;
+  font-family: 'SUITE';
   font-size: 19px;
   color: #636363;
   margin-bottom: 20px;
@@ -210,30 +179,11 @@ const ReviewContent = styled.p`
 const ReviewStats = styled.div`
   display: flex;
   justify-content: flex-start;
-  font-family: 'SUITE-Bold', sans-serif;
+  font-family: 'SUITE';;
   font-size: 16px;
   color: #636363;
   & > span {
     margin-right: 20px;
-  }
-`;
-
-const EditButton = styled.img`
-  cursor: pointer;
-  width: 19.73px; // Set a specific size for your image
-  align-self: flex-end;
-`;
-
-const ViewMoreButton = styled.button`
-  font-family: 'SUITE-SemiBold', sans-serif;
-  font-size: 16px;
-  color: #A1A1A1; // Adjust the color to match your design
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    color: #5B00EF;
   }
 `;
 
@@ -243,6 +193,13 @@ const WrittenContentPageComponent = () => {
   const [view, setView] = useState('talk'); // 'talk', 'interview' 중 하나를 상태로 관리
   const [data, setData] = useState([]);
   const navigate = useNavigate();
+
+  const ITEMS_PER_PAGE = 4;
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalElements, setTotalElements] = useState([]);
+  const indexOfLast = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
 
   const handleNavigate = () => {
     navigate('/interview');
@@ -257,135 +214,237 @@ const WrittenContentPageComponent = () => {
   }, []);
 
   const handleTalkClick = () => {
+    setCurrentPage(1);
     setView('talk'); // 톡톡 글 보기로 설정
   };
 
   const handleInterviewClick = () => {
+    setCurrentPage(1);
     setView('interview'); // 면접 후기 보기로 설정
   };
 
   const handleCoverLetterClick = () => {
+    setCurrentPage(1);
     setView('coverletter'); 
   };
+
+  const fetchData = async (endpoint) => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}${endpoint}`);
+      // response.data에 있는 content를 사용하여 상태 업데이트
+      setData(response.data.content);
+    } catch (error) {
+      console.error("데이터를 불러오는 데 실패했습니다.", error);
+    }
+  };
+
+  useEffect(() => {
+    let endpoint = '';
+    switch(view) {
+      case 'talk':
+        endpoint = '/users/talk';
+        break;
+      case 'interview':
+        endpoint = '/users/interview';
+        break;
+      case 'coverletter':
+        endpoint = '/users/resume';
+        break;
+      default:
+        console.error('알 수 없는 뷰 타입입니다.');
+        return;
+    }
+
+    const accessToken = localStorage.getItem('accessToken');
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}${endpoint}?page=${currentPage}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+        setData(response.data.content); // 서버로부터 받은 데이터로 상태
+        setTotalPages(response.data.totalPages);
+        setTotalElements(response.data.totalElements);
+      } catch (error) {
+        console.error("데이터를 불러오는 데 실패했습니다.", error);
+      }
+    };
+
+    fetchData();
+  }, [view, currentPage]);
+
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0);
+};
+
+// 뷰 변경 핸들러
+const handleViewChange = (newView) => {
+  setData([]); // 뷰 변경 전 데이터 초기화
+  setCurrentPage(1);
+  setView(newView);
+};
+
+const stripHtmlTags = (str) => {
+  if (!str) return '';
+  return str.replace(/<[^>]*>/g, '');
+};
+
+// 톡톡 글 상세 페이지로 이동하는 함수
+const navigateToTalkDetail = (id) => {
+  navigate(`/talks/${id}`); // `/talks/:id` 형태의 URL로 가정
+};
+
+
+const handleNavigateToDetail = (id, type) => {
+  // Depending on the type, navigate to the appropriate route
+  const basePath = type === 'interview' ? '/interviews' : '/cover-letters';
+  navigate(`${basePath}/${id}`);
+};
+
+
+
+  const renderContent = () => {
+    switch(view) {
+      case 'talk':
+        return (
+          <TalkListContainer>
+            {data.map((item) => (
+              <SearchResultItem key={item.id} onClick={() => navigateToTalkDetail(item.id)}>
+                <p className="title">{item.title}</p>
+                <p className="content">{stripHtmlTags(item.content) || "내용이 없습니다."}</p>
+                <p className="response">조회수 {item.viewCount}회 &nbsp;&nbsp; 스크랩 {item.scrapCount}</p>
+              </SearchResultItem>
+            ))}
+            <TalkPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+           />
+          </TalkListContainer>
+        );
+        case 'interview':
+          return (
+            <InterviewReviewContainer>
+              <CenteredContainer>
+              <InterviewReviewContainer2>
+              {data.map((item, index) => (
+                <InterviewReviewBox key={index}>
+                  <InfoBox onClick={() => handleNavigateToDetail(item.id, 'interview')}>
+                    <InfoItems>
+                      <InfoItem>
+                        <InfoContent>{item.company} |&nbsp;</InfoContent>
+                      </InfoItem>
+                      <InfoItem>
+                        <InfoContent>{item.department} |&nbsp;</InfoContent>
+                      </InfoItem>
+                      <InfoItem>
+                        <InfoContent>{item.year} {item.semester}</InfoContent>
+                      </InfoItem>
+                    </InfoItems>
+                    <InfoDetail>
+                      {item.english}:{item.score} / {item.certification} / {item.education} / {item.major} / 학점:{item.gpa} / 대외활동 경험: {item.activity}
+                    </InfoDetail>
+                  </InfoBox>
+                  <SectionDivider />
+                  <ReviewBox>
+                    <ReviewContent> {item.contents}</ReviewContent>
+                    <ReviewStats>
+                      <span>스크랩 {item.scrapCount}</span>
+                      <span>조회수 {item.viewCount}회</span>
+                    </ReviewStats>
+                  </ReviewBox>
+                </InterviewReviewBox>
+              ))}
+               {data.length > 0 && (
+                <TalkPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                />
+              )}
+              </InterviewReviewContainer2>
+              </CenteredContainer>
+            </InterviewReviewContainer>
+          );
+
+        
+        
+          // eslint-disable-next-line no-fallthrough
+          case 'coverletter':
+            return (
+              <CoverLetterContainer>
+                <CenteredContainer>
+                  <InterviewReviewContainer2>
+                    {data && data.length > 0 && data.map((item, index) => (
+                      <InterviewReviewBox key={index}>
+                        <InfoBox onClick={() => handleNavigateToDetail(item.id, 'coverletter')}>
+                          <InfoItems>
+                            <InfoItem>
+                              <InfoContent>{item.company} |&nbsp;</InfoContent>
+                            </InfoItem>
+                            <InfoItem>
+                              <InfoContent>{item.department} |&nbsp;</InfoContent>
+                            </InfoItem>
+                            <InfoItem>
+                              <InfoContent>{item.year} {item.semester}</InfoContent>
+                            </InfoItem>
+                          </InfoItems>
+                          <InfoDetail>
+                            {item.english}:{item.score} / {item.certification} / {item.education} / {item.major} / 학점:{item.gpa} / 대외활동 경험: {item.activity}
+                          </InfoDetail>
+                        </InfoBox>
+                        <SectionDivider />
+                        <ReviewBox>
+                          {/* Iterate over titles and contents and display each pair */}
+                          {item.titles && item.contents && item.titles.map((title, idx) => (
+                            <div key={idx}>
+                              <ReviewContent><strong>{title}</strong></ReviewContent>
+                              <ReviewContent>{item.contents[idx]}</ReviewContent>
+                            </div>
+                          ))}
+                          <ReviewStats>
+                            <span>스크랩 {item.scrapCount}</span>
+                            <span>조회수 {item.viewCount}회</span>
+                          </ReviewStats>
+                        </ReviewBox>
+                      </InterviewReviewBox>
+                    ))}
+                    {data.length > 0 && (
+                      <TalkPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={onPageChange}
+                      />
+                    )}
+                  </InterviewReviewContainer2>
+                </CenteredContainer>
+              </CoverLetterContainer>
+            );
+          
+
+          
+       
+      // eslint-disable-next-line no-fallthrough
+      default:
+        return <p>데이터를 불러올 수 없습니다.</p>;
+    }
+  };
+
 
   return (
     <WrittenContentPage>
       <Title>작성한 글</Title>
       <ButtonContainer>
-        <Button onClick={handleTalkClick} selected={view === 'talk'}>톡톡 글</Button>
-        <Button onClick={handleInterviewClick} selected={view === 'interview'}>면접 후기</Button>
-        <Button onClick={handleCoverLetterClick} selected={view === 'coverletter'}>합격 자소서</Button>
+        <Button onClick={() => handleViewChange('talk')} selected={view === 'talk'}>톡톡 글</Button>
+        <Button onClick={() => handleViewChange('interview')} selected={view === 'interview'}>면접 후기</Button>
+        <Button onClick={() => handleViewChange('coverletter')} selected={view === 'coverletter'}>합격 자소서</Button>
       </ButtonContainer>
-
-      {view === 'talk' && (
-        <TalkListContainer>
-          {data.map(item => (
-            <SearchResultItem key={item.id}>
-              <p className="title">{item.title}</p>
-              <p className="content">{item.content || "내용이 없습니다."}</p>
-              <p className="response">답변: {item.answers} | 댓글: {item.comments} | 조회수: {item.views} | 좋아요: {item.likes}</p>
-            </SearchResultItem>
-          ))}
-        </TalkListContainer>
-      )}
-
-      {view === 'interview' && (
-        <InterviewReviewContainer>
-            <CenteredContainer>
-            <InterviewReviewContainer2>
-                {fakeInterviewData && fakeInterviewData.length > 0 && fakeInterviewData.map((data, index) => (
-                <InterviewReviewBox key={index}>
-                    <FieldBoxContainer>
-                    <FieldBox>
-                        {data.field.map((fieldItem, fieldIndex) => (
-                        <FieldItem key={fieldIndex}>{fieldItem}</FieldItem>
-                        ))}
-                    </FieldBox>
-                    <EditButton src="./assets/Edit2.png" onClick={handleNavigate2} alt="Edit" />
-                    </FieldBoxContainer>
-                    <InfoBox>
-                    <InfoItem>
-                        <InfoTitle>기업 이름</InfoTitle>
-                        <InfoContent>{data.company}</InfoContent>
-                    </InfoItem>
-                    <InfoItem>
-                        <InfoTitle>지원 포지션</InfoTitle>
-                        <InfoContent>{data.position}</InfoContent>
-                    </InfoItem>
-                    <InfoItem>
-                        <InfoTitle>질문 수</InfoTitle>
-                        <InfoContent>{data.question}</InfoContent>
-                    </InfoItem>
-                    </InfoBox>
-                    <SectionDivider />
-                    <ReviewBox>
-                    <ReviewTitle>면접 후기</ReviewTitle>
-                    <ReviewContentHeader>
-                        <ReviewContentTitle>{data.interview.q1}</ReviewContentTitle>
-                        <ViewMoreButton onClick={handleNavigate}>더보기</ViewMoreButton>
-                    </ReviewContentHeader>
-                    <ReviewContent>{data.interview.content}</ReviewContent>
-                    <ReviewStats>
-                        <span>댓글 {data.comments}</span>
-                        <span>스크랩 {data.scrap}</span>
-                        <span>조회수 {data.views}회</span>
-                    </ReviewStats>
-                    </ReviewBox>
-                </InterviewReviewBox>
-                ))}
-            </InterviewReviewContainer2>
-            </CenteredContainer>
-        </InterviewReviewContainer>
-      )}
-
-      {view === 'coverletter' && (
-        <CoverLetterContainer>
-            <CenteredContainer>
-            <InterviewReviewContainer2>
-                {fakeCoverletterData && fakeCoverletterData.length > 0 && fakeCoverletterData.map((data, index) => (
-                <InterviewReviewBox key={index}>
-                    <FieldBoxContainer>
-                    <FieldBox>
-                        {data.field.map((fieldItem, fieldIndex) => (
-                        <FieldItem key={fieldIndex}>{fieldItem}</FieldItem>
-                        ))}
-                    </FieldBox>
-                    <EditButton src="./assets/Edit2.png" onClick={handleNavigate2} alt="Edit" />
-                    </FieldBoxContainer>
-                    <InfoBox>
-                    <InfoItem>
-                        <InfoTitle>기업 이름</InfoTitle>
-                        <InfoContent>{data.company}</InfoContent>
-                    </InfoItem>
-                    <InfoItem>
-                        <InfoTitle>지원 포지션</InfoTitle>
-                        <InfoContent>{data.position}</InfoContent>
-                    </InfoItem>
-                    </InfoBox>
-                    <SectionDivider />
-                    <ReviewBox>
-                    <ReviewTitle>면접 후기</ReviewTitle>
-                    <ReviewContentHeader>
-                        <ReviewContentTitle>{data.coverletter.title}</ReviewContentTitle>
-                        <ViewMoreButton onClick={handleNavigate2}>더보기</ViewMoreButton>
-                    </ReviewContentHeader>
-                    <ReviewContent>{data.coverletter.content}</ReviewContent>
-                    <ReviewStats>
-                        <span>댓글 {data.comments}</span>
-                        <span>스크랩 {data.scrap}</span>
-                        <span>조회수 {data.views}회</span>
-                    </ReviewStats>
-                    </ReviewBox>
-                </InterviewReviewBox>
-                ))}
-            </InterviewReviewContainer2>
-            </CenteredContainer>
-        </CoverLetterContainer>
-      )}
-        </WrittenContentPage>
-        );
-
-        
-    };
+      {renderContent()}
+    </WrittenContentPage>
+  );
+};
 
 export default WrittenContentPageComponent;

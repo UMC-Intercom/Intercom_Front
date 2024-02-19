@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Select, { components } from 'react-select';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ModalContainer = styled.div`
     position: fixed;
@@ -122,23 +123,48 @@ const CheckboxOption = ({ innerProps, label, isSelected }) => (
 );
 
 const jobOptions = [
-    { value: 'sales', label: '영업/고객상담' },
-    { value: 'management', label: '경영/사무' },
-    { value: 'marketing', label: '마케팅/경영/홍보' },
-    { value: 'production', label: '생산/제조' },
-    { value: 'research', label: '연구개발/설계' },
-    { value: 'it', label: 'IT/인터넷' },
-    { value: 'design', label: '디자인' },
+    { value: '기획·전략', label: '기획·전략' },
+    { value: 'IT개발·데이터', label: 'IT개발·데이터' },
+    { value: '상품기획·MD', label: '상품기획·MD' },
+    { value: '의료', label: '의료' },
+    { value: '마케팅·홍보·조사', label: '마케팅·홍보·조사' },
+    { value: '디자인', label: '디자인' },
+    { value: '운전·운송·배송', label: '운전·운송·배송' },
+    { value: '연구·R&D', label: '연구·R&D' },
+    { value: '회계·세무·재무', label: '회계·세무·재무' },
+    { value: '영업·판매·무역', label: '영업·판매·무역' },
+    { value: '서비스', label: '서비스' },
+    { value: '교육', label: '교육' },
+    { value: '인사·노무·HRD', label: '인사·노무·HRD' },
+    { value: '고객상담·TM', label: '고객상담·TM' },
+    { value: '생산', label: '생산' },
+    { value: '미디어·문화·스포츠', label: '미디어·문화·스포츠' },
+    { value: '총무·법무·사무', label: '총무·법무·사무' },
+    { value: '구매·자재·물류', label: '구매·자재·물류' },
+    { value: '건설·건축', label: '건설·건축' },
+    { value: '금융·보험', label: '금융·보험' },
 ];
+
+
 
 const locationOptions = [
     { value: 'all', label: '지역 제한 없음' },
-    { value: 'seoul', label: '서울' },
-    { value: 'gyeonggi', label: '경기' },
-    { value: 'incheon', label: '인천' },
-    { value: 'busan', label: '부산' },
-    { value: 'daegu', label: '대구' },
-    { value: 'daejeon', label: '대전' },
+    { value: '서울', label: '서울' },
+    { value: '부산', label: '부산' },
+    { value: '대구', label: '대구' },
+    { value: '인천', label: '인천' },
+    { value: '광주', label: '광주' },
+    { value: '대전', label: '대전' },
+    { value: '울산', label: '울산' },
+    { value: '경기', label: '경기' },
+    { value: '강원', label: '강원' },
+    { value: '충북', label: '충북' },
+    { value: '충남', label: '충남' },
+    { value: '전북', label: '전북' },
+    { value: '전남', label: '전남' },
+    { value: '경북', label: '경북' },
+    { value: '경남', label: '경남' },
+    { value: '제주', label: '제주' },
 ];
 
 const CustomValue = styled.div`
@@ -197,7 +223,8 @@ const customStyles = {
     placeholder: (provided) => ({
         ...provided,
         color: '#636363',
-        fontFamily: 'SUITE' //폰트 바꿈
+        fontFamily: 'SUITE',
+        fontWeight: '700',
     }),
     option: (provided, state) => ({
         ...provided,
@@ -221,7 +248,7 @@ const customStyles = {
         marginTop: '20px',
         boxShadow: 'none',
         padding: '10px',
-        maxHeight: '400px',
+        maxHeight: '600px',
     }),
     menuList: (provided) => ({
         ...provided,
@@ -235,21 +262,29 @@ const NoOptionsMessage = props => (
     </components.NoOptionsMessage>
 );
 
-const SearchModal = ({ onClose }) => {
-    const [selectedJobs, setSelectedJobs] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState([]);
+const SearchModal = ({ onClose, setSearchResults}) => {
+    const [selectedJob, setSelectedJob] = useState(null); // 상태를 단일 객체로 초기화
+    const [selectedLocation, setSelectedLocation] = useState(null); // 상태를 단일 객체로 초기화
     const [searchInput, setSearchInput] = useState('');
     const navigate = useNavigate();
 
-    const handleSearch = () => {
-        navigate('/search-results', {
-            state: {
-                selectedJobs,
-                selectedLocation,
-                searchInput
-            }
-        });
-        onClose();
+    const handleSearch = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/jobs/search`, {
+                params: {
+                    jobMidCode: selectedJob ? selectedJob.value : '', // 단일 선택 반영
+                    location: selectedLocation ? selectedLocation.value : '', // 단일 선택 반영
+                    keyword: searchInput,
+                    page: 1
+                }
+            });
+            console.log(response.data);
+            setSearchResults(response.data.content);
+            navigate('/search-results', { state: { searchResults: response.data.content } });
+            onClose();
+        } catch (error) {
+            console.error('Error searching for jobs:', error);
+        }
     };
 
     const handleInputChange = (event) => {
@@ -271,34 +306,32 @@ const SearchModal = ({ onClose }) => {
                 </FlexContainer>
                 <SearchBarContainer>
                     <Select
-                        options={jobOptions}
-                        isMulti
-                        placeholder="모집 직무"
-                        onChange={setSelectedJobs}
-                        styles={customStyles}
-                        components={{
-                            Option: CheckboxOption,
-                            ValueContainer: CustomValueContainer,
-                            NoOptionsMessage: NoOptionsMessage,
-                        }}
-                        closeMenuOnSelect={false}
-                        hideSelectedOptions={false}
+                       options={jobOptions}
+                       isMulti={false} // 단일 선택으로 설정
+                       isSearchable={false} // 검색 기능 비활성화
+                       placeholder="모집 직무"
+                       onChange={setSelectedJob} // 선택 항목을 단일 객체로 처리
+                       styles={customStyles}
+                       components={{
+                           Option: CheckboxOption,
+                           ValueContainer: CustomValueContainer,
+                           NoOptionsMessage: NoOptionsMessage,
+                       }}
                     />
                     <GrayBar />
                     <Select
-                        options={locationOptions}
-                        isMulti
-                        placeholder="근무 지역"
-                        onChange={setSelectedLocation}
-                        styles={customStyles}
-                        components={{
-                            Option: CheckboxOption,
-                            MenuList: CustomMenuList,
-                            ValueContainer: CustomValueContainer,
-                            NoOptionsMessage: NoOptionsMessage,
-                        }}
-                        closeMenuOnSelect={false}
-                        hideSelectedOptions={false}
+                       options={locationOptions}
+                       isMulti={false} // 단일 선택으로 설정
+                       isSearchable={false} // 검색 기능 비활성화
+                       placeholder="근무 지역"
+                       onChange={setSelectedLocation} // 선택 항목을 단일 객체로 처리
+                       styles={customStyles}
+                       components={{
+                           Option: CheckboxOption,
+                           MenuList: CustomMenuList,
+                           ValueContainer: CustomValueContainer,
+                           NoOptionsMessage: NoOptionsMessage,
+                       }}
                     />
                     <GrayBar />
                     <SearchIcon src="./assets/Search2.png" alt="search" />

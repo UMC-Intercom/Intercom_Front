@@ -1,0 +1,25 @@
+const fields = [
+    { name: "기획·전략"},
+    { name: "마케팅·홍보·조사"},
+    { name: "회계·세부·재무"},
+    { name: "인사·노무·HRD"},
+    { name: "총무·법무·사무"},
+    { name: "IT개발·데이터"},
+    { name: "디자인"},
+    { name: "영업·판매·무역"},
+    { name: "고객상담·TM"},
+    { name: "구매·자재·물류"},
+    { name: "상품기획·MD"},
+    { name: "운전·운송·배송"},
+    { name: "서비스"},
+    { name: "생산"},
+    { name: "건설·건축"},
+    { name: "의료"},
+    { name: "연구·R&D"},
+    { name: "교육"},
+    { name: "미디어·문화·스포츠"},
+    { name: "금융·보험"},
+    { name: "공공·복지"},
+];
+  
+export default fields;

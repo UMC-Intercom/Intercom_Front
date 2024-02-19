@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import ReactQuill, { Quill } from 'react-quill'; //npm install react-quill 필수
 import 'react-quill/dist/quill.snow.css'; // Quill 에디터의 스타일시트
 import { useNavigate } from 'react-router-dom';
+import CurrentEmployCheckingModal from './CurrentEmployCheckingModal';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const categories = [
   { id: 1, name: '영업/고객상담' },
@@ -27,6 +30,29 @@ const categories = [
   const maxContentLength = 500;
   const quillRef = useRef(null);
   const [posts, setPosts] = useState([]); // 글 목록 상태 추가
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVerified, setIsVerified] = useState(false); // 현직자 인증 상태
+  const [hasDeferredModal, setHasDeferredModal] = useState(false);
+  const [imageUrls, setImageUrls] = useState([]);
+  const [tempSavedPostId, setTempSavedPostId] = useState(null);
+
+
+
+
+
+//현직자인증모달띄우기
+const handleShowModal = () => {
+  setIsModalOpen(true);
+};
+
+useEffect(() => {
+  // 컴포넌트가 마운트될 때 로컬 스토리지에서 hasDeferredModal 상태를 불러옴
+  const storedHasDeferredModal = localStorage.getItem('hasDeferredModal');
+  if (storedHasDeferredModal) {
+    setHasDeferredModal(storedHasDeferredModal === 'true');
+  }
+}, []);
+
 
   const handleGoBack = () => {
     navigate(-1); // 뒤로가기 기능 실행
@@ -52,7 +78,9 @@ const categories = [
       });
     }
   }, []);
-  const handleImageUpload = () => {
+
+  const handleImageUpload = (e) => {
+    e.stopPropagation(); 
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/*');
@@ -71,7 +99,6 @@ const categories = [
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
   
-          // 이미지 사이즈 조정 로직
           const MAX_WIDTH = 400;
           let width = img.width;
           let height = img.height;
@@ -87,80 +114,265 @@ const categories = [
   
           const resizedImgDataUrl = canvas.toDataURL('image/jpeg');
   
-          // 조정된 이미지를 Quill 에디터에 삽입
+          // 에디터에 이미지 삽입
           const quill = quillRef.current.getEditor();
           const range = quill.getSelection(true);
           quill.insertEmbed(range.index, 'image', resizedImgDataUrl);
           quill.setSelection(range.index + 1);
+  
+          // 이미지 Data URL을 상태에 저장
+          handleImageUploadSuccess(resizedImgDataUrl);
         };
       };
     };
   };
+
+  const handleImageUploadSuccess = (dataUrl) => {
+    setImageUrls((prevUrls) => [...prevUrls, dataUrl]);
+  };
   
   const handleTitleChange = (e) => {
+    e.preventDefault();
     if (e.target.value.length <= maxTitleLength) {
       setTitle(e.target.value);
     }  };
-   
 
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newPost = { title, content, categories: selectedCategories };
-    setPosts([...posts, newPost]); // 글 목록 상태 업데이트
-    // 나머지 로직...
-  };
+   const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
 
+// 제출 및 현직자 인증
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // 필수 입력값 검증
+  if (!title.trim() || !content.trim()) {
+    alert('제목과 내용을 입력해주세요.');
+    return;
+  }
+
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/talks/check-mentor`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
+      },
+    });
+
+    const field = response.data;  // 현직자의 경우 분야 반환
+    console.log("** res: ", field)
+
+
+    if (field !== "") {
+      // 인증된 경우, 글 작성 로직 실행
+      postSubmission();
+    }
+    else {
+      // 인증 안 된 경우 현직자 인증 모달 표시
+      setIsModalOpen(true);
+    }
+  } catch (error) {
+    if (error.response) {
+      const responseData = error.response.data; // 서버 응답 데이터에 접근
+      const { status, error: errorMessage } = responseData; // 응답 데이터에서 status와 error 추출
+
+      console.error('Error during mentor check:', errorMessage);
+      alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
+
+  
+    } else {
+      // 응답 오류 객체가 없는 경우의 처리
+      console.error('Error during mentor check:', error);
+      alert('응답오류 객체가 없음');
+    }
+  }
+};
+
+//찐제출
+    const postSubmission = async () => {
+      // FormData 객체 생성 및 필드 추가
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+
+      const categoryNames = selectedCategories.map(categoryId => {
+        const category = categories.find(c => c.id === categoryId);
+        return category ? category.name : null;
+      }).filter(Boolean);
+
+      const categoriesString = categoryNames.join(',');
+      formData.append('category', categoriesString);
+      imageUrls.forEach((url, index) => {
+        const blob = dataURLtoBlob(url);
+        const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
+        formData.append('images[]', file);
+      });
+
+      try {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/talks`, formData, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+    
+        if (response.status === 200 || response.status === 201) {
+          alert('글이 성공적으로 등록되었습니다.');
+          navigate('/post-success', { state: { postId: response.data.id } });
+        } else {
+          throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
+        }
+      } catch (error) {
+        console.error('글 등록 중 오류 발생:', error);
+        alert('글 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    };
+
+
+    const handleCloseModal = () => {
+      setIsVerified(true); // 인증을 건너뛰고 글 작성을 계속할 수 있도록 상태 변경
+      setIsModalOpen(false); // 모달 닫기
+      postSubmission(); // 현직자 인증을 건너뛰고 글 작성 로직 실행
+    };
+
+
+
+
+    
+// Data URL을 Blob으로 변환하는 함수
+function dataURLtoBlob(dataUrl) {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while(n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new Blob([u8arr], {type: mime});
+}
+    
   //카테고리
 
     // 선택된 카테고리들을 저장할 상태 (배열)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState([]);
-  
+    const [selectedCategoryNames, setSelectedCategoryNames] = useState([]);   
+   
     const handleDropdownToggle = () => {
       setIsDropdownOpen(!isDropdownOpen);
     };
   
+  
     const handleCategoryChange = (categoryId) => {
-      setSelectedCategories((prev) =>
-        prev.includes(categoryId)
-          ? prev.filter((id) => id !== categoryId)
-          : [...prev, categoryId]
-      );
+      setSelectedCategories((prevSelectedCategories) => {
+        const isSelected = prevSelectedCategories.includes(categoryId);
+        if (isSelected) {
+          // 카테고리 선택 해제 시, 해당 카테고리 ID 및 이름 제거
+          const updatedCategories = prevSelectedCategories.filter(id => id !== categoryId);
+          const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
+          setSelectedCategoryNames(updatedCategoryNames);
+          return updatedCategories;
+        } else {
+          // 카테고리 선택 시, 해당 카테고리 ID 추가 및 이름 업데이트
+          const updatedCategories = [...prevSelectedCategories, categoryId];
+          const updatedCategoryNames = updatedCategories.map(id => categories.find(category => category.id === id).name);
+          setSelectedCategoryNames(updatedCategoryNames);
+          return updatedCategories;
+        }
+      });
     };
 
-    const handleSave = () => {
-      const temporaryData = { title, content };
-      localStorage.setItem(TEMP_DATA_KEY, JSON.stringify(temporaryData));
-      alert("임시저장 되었습니다.");
-    };
-  
-    const handleCancel = () => {
-      localStorage.removeItem(TEMP_DATA_KEY);
-      alert("작성이 취소되고 글이 삭제되었습니다.");
-      navigate(-1);  
-    };
-    useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      const fromTalkTalk = params.get('from') === 'talktalk';
     
-      if (fromTalkTalk) {
-        const savedData = localStorage.getItem(TEMP_DATA_KEY);
-        if (savedData) {
-          const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
-          if (shouldLoadData) {
-            const { title: savedTitle, content: savedContent } = JSON.parse(savedData);
-            setTitle(savedTitle);
-            setContent(savedContent);
-          }
+
+    let selectedCategoriesHeader = '카테고리 선택';
+    if (selectedCategoryNames.length > 0) {
+    if (selectedCategoryNames.length <= 2) {
+      // 2개 이하 선택 시 모든 카테고리 이름 나열
+      selectedCategoriesHeader = selectedCategoryNames.join(', ');
+    } else {
+      // 3개 이상 선택 시 첫 2개 나열 후 나머지는 "외 N개"로 표시
+      selectedCategoriesHeader = `${selectedCategoryNames.slice(0, 2).join(', ')} 외 ${selectedCategoryNames.length - 2}개`;
+    }
+  }
+
+  const handleSave = async () => {
+  const formData = new FormData();
+  formData.append('title', title);
+  formData.append('content', content);
+  
+  const categoryNames = selectedCategories.map(categoryId => {
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.name : null;
+  }).filter(Boolean);
+
+  const categoriesString = categoryNames.join(',');
+  formData.append('category', categoriesString); 
+
+  // 이미지 파일 추가
+  imageUrls.forEach((url, index) => {
+    const blob = dataURLtoBlob(url);
+    const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
+    formData.append('images[]', file);
+  });
+
+  try {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/talks/temporary-save`, formData, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (response.status === 200 || response.status === 201) {
+      alert('글이 임시 저장되었습니다.');
+    } else {
+      throw new Error('Unexpected response status: ' + response.status);
+    }
+  } catch (error) {
+    console.error('Error during temporary save:', error);
+    alert('임시 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+  }
+};
+
+
+  const handleCancel = () => {
+    setTitle('');
+    setContent('');
+    setSelectedCategories([]);
+    setImageUrls([]);
+  
+    localStorage.removeItem(TEMP_DATA_KEY);
+  
+    navigate(-1);
+    alert("작성 내용이 초기화되었으며, 이전 페이지로 돌아갑니다.");
+  };
+  
+const location = useLocation();
+
+useEffect(() => {
+  if (location.pathname === '/posting') {
+    const params = new URLSearchParams(window.location.search);
+    const fromTalkTalk = params.get('from') === 'talktalk';
+
+    if (fromTalkTalk) {
+      const savedData = localStorage.getItem(TEMP_DATA_KEY);
+      if (savedData) {
+        const shouldLoadData = window.confirm("임시저장된 글이 있습니다. 불러오시겠습니까?");
+        if (shouldLoadData) {
+          const { id: tempSavedPostId, title: savedTitle, content: savedContent } = JSON.parse(savedData);
+          setTempSavedPostId(tempSavedPostId);
+          setTitle(savedTitle);
+          setContent(savedContent);
         }
       }
-    }, []);
-    
+    }
+  }
+}, [location.pathname]);
+
     
   return (
     <PageContainer>
       <BackButtonContainer>
-        <BackButton onClick={handleGoBack}>뒤로가기</BackButton> 
+      <BackButton onClick={handleGoBack}>&lt; 뒤로가기</BackButton>
       </BackButtonContainer>
       <Form onSubmit={handleSubmit}>
       <InputContainer>
@@ -180,7 +392,7 @@ const categories = [
                value={content}
                onChange={setContent}
             />
-<ImageButton onClick={handleImageUpload}>
+<ImageButton  type="button" onClick={handleImageUpload}> {/*폼안에있으므로 버튼형식 확실히 해야 인식 잘댐 */}
   <img src="./assets/Group26.png" alt="이미지 아이콘" /> 
   이미지 첨부하기
 </ImageButton>
@@ -190,32 +402,43 @@ const categories = [
 
       <DropdownContainer>
         <DropdownHeader onClick={handleDropdownToggle}>
-          카테고리 선택
+        {selectedCategoriesHeader}
           <DropdownIndicator isOpen={isDropdownOpen}></DropdownIndicator>
         </DropdownHeader>
         {isDropdownOpen && (
           <DropdownList>
-            {categories.map((category) => (
-              <DropdownItem key={category.id}>
-                <CheckboxLabel>
-               <input type="checkbox" checked={selectedCategories.includes(category.id)} onChange={() => handleCategoryChange(category.id)} />
-                <span className="checkmark"></span>
-                </CheckboxLabel>
-                {category.name}
-              </DropdownItem>
-            ))}
+           {categories.map((category) => (
+          <DropdownItem key={category.id}>
+            <CheckboxLabel>
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes(category.id)}
+                onChange={() => handleCategoryChange(category.id)}
+              />
+              <span className="checkmark"></span>
+            </CheckboxLabel>
+            {category.name}
+          </DropdownItem>
+        ))}
           </DropdownList>
         )}
       </DropdownContainer>
         </ContentContainer>
         <SaveCancelButtonContainer>
-        <Button onClick={handleCancel}>작성 취소</Button>
-        <Button onClick={handleSave}>임시저장</Button>
+        <Button  type="button" onClick={handleCancel}>작성 취소</Button>
+        <Button  type="button" onClick={handleSave}>임시저장</Button>
         </SaveCancelButtonContainer>
         <ButtonContainer>
           <SubmitButton type="submit">질문 등록</SubmitButton>
         </ButtonContainer>
       </Form>
+      {isModalOpen && (
+  <CurrentEmployCheckingModal
+    isOpen={isModalOpen}
+    onClose={handleCloseModal} // "나중에 하기" 버튼 클릭 시 호출될 함수
+  />
+)}
+
     </PageContainer>
   );
 };
@@ -229,7 +452,7 @@ display: flex;
   min-height: 100vh; 
 `;
 const BackButtonContainer = styled.div`
-max-width: 75.125rem;`;
+max-width: 77.125rem;`;
 
 const Form = styled.form`
 display: flex;
@@ -262,7 +485,7 @@ font-weight: 700;
 `;
 const Input = styled.input`
 display: flex;
-    align-items: center; // 세로 중앙 정렬
+    align-items: center; 
     width: 75.125rem;   
     height: 3.75rem;
   border-width: 0.2rem;;
@@ -276,13 +499,13 @@ display: flex;
     font-size: 1.25rem;
     
     &:focus {
-      outline: none; // 포커스 상태에서 아웃라인 제거
-      border-color: #5B00EF; // 필요한 경우 특정 색상으로 변경
+      outline: none;
+      border-color: #5B00EF; 
     }
 
   &::placeholder {
     display: flex;
-    align-items: center; // 세로 중앙 정렬
+    align-items: center;
     font-size: 1.25rem;
     font-weight: 700;
     font-family: 'SUITE', sans-serif;
@@ -296,8 +519,7 @@ const ContentContainer = styled.div`
   border: 3px solid #A1A1A1;
   border-radius: 0.8rem;
   margin-top: 5.13rem;;
-  position: relative; /* 이 부분을 추가하세요 */
-
+  position: relative; 
 `;
 const StyledReactQuill = styled(ReactQuill)`
 
@@ -307,7 +529,7 @@ const StyledReactQuill = styled(ReactQuill)`
   
 }
     .ql-editor {
-      position: relative; // 상대적 위치 설정
+      position: relative; 
     top: -1.56rem;      
       height: 32.94rem;
     font-size: 1.25rem;
@@ -321,12 +543,12 @@ const StyledReactQuill = styled(ReactQuill)`
   }
 
   .ql-toolbar {
-    position: relative; // 상대적 위치 설정
+    position: relative;
     top: -4rem;
     left: 0;
     display: flex;
-    justify-content: center; // 중앙 정렬
-    align-items: center; // 세로 중앙 정렬
+    justify-content: center; 
+    align-items: center; 
     width: 23.9375rem;
     height: 3rem;
     font-family: 'SUITE', sans-serif;
@@ -368,7 +590,7 @@ border-radius: 0.625rem;
     background-color: #4e00d1;
   }
   &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
+    transform: scale(0.95); 
   }
 `;
 
@@ -404,6 +626,8 @@ transition: transform 0.3s;
 `;
 
 const DropdownList = styled.div`
+margin-top:7px;
+margin-left:-1px;
   position: absolute;
   width: 21.25rem;  
   height: 27rem;
@@ -412,21 +636,21 @@ const DropdownList = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
-const DropdownItem = styled.div`\
+const DropdownItem = styled.div`
 width: 14.25rem;
 height: 2.25rem;
 justify-content: flex;
 border-bottom: 2px solid #E2E2E2;
 margin-left: 3rem;
 display: flex;
-align-items: center; // 체크박스와 텍스트를 세로 중앙정렬합니다.
+align-items: center; 
 padding: 10px;
 
 `;
 
 const CheckboxLabel = styled.label`
 display: flex;
-margin-right: 2.5rem; // 라벨과 카테고리 이름 사이의 간격을 설정합니다.
+margin-right: 2.5rem; 
 position: relative;
 cursor: pointer;
 
@@ -478,20 +702,20 @@ const ImageButton = styled.button`
   cursor: pointer; 
   border: none; 
   display: flex; 
-  align-items: flex-end; /* 이미지와 텍스트를 바닥으로 정렬 */
-  justify-content: space-between; /* 내부 요소 사이에 공간 동등 분배 */
+  align-items: flex-end; 
+  justify-content: space-between; 
   font-size: 1.0625rem;
   font-weight: 700;
   font-family: 'SUITE', sans-serif;
   transition: transform 0.1s, background-color 0.1s; 
 
   img {
-    margin-right: 0.56rem; /* 아이콘과 텍스트 사이의 간격 */
+    margin-right: 0.56rem; 
     width: 1.875rem;
     height: 1.875rem;
   }
   &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
+    transform: scale(0.95); 
   }
 `;
 
@@ -501,7 +725,7 @@ const ContentCounter = styled.div`
     width: 6.375rem;
 bottom: 10.13rem; 
 right: 2.38rem;
-    color: #636363; // 글자 색상
+    color: #636363;
     font-family: SUITE;
     font-size: 1.0625rem;
     font-weight: 700;
@@ -511,24 +735,22 @@ const SaveCancelButtonContainer = styled.div`
   position: relative;
   margin-top: 1.69rem;
   margin-left:62.4rem; 
-  width: 16rem; /* 너비를 자동으로 조절 */
+  width: 16rem; 
   height: auto;
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
-  /* 버튼 간격 조절 */
+  justify-content: flex-end;
   & > button {
-    margin-right: 1rem; /* 버튼 사이의 간격을 조절할 수 있습니다. */
+    margin-right: 1rem; 
   }
 
-  /* 마지막 버튼의 오른쪽 마진 제거 */
   & > button:last-child {
     margin-right: 0;
   }
 `;
 const Button = styled.button`
-  background-color: transparent; /* 버튼 기본 색상 */
-  color: #636363; /* 여기서 색상 코드 앞에 '#'가 누락되었습니다. */
+  background-color: transparent; 
+  color: #636363; 
   border: 2px solid #A1A1A1;
   cursor: pointer;
   padding: 0.5rem 1rem;
@@ -541,22 +763,26 @@ const Button = styled.button`
   height: 3.375rem;
 
   &:hover {
-    background-color: rgba(128, 128, 128, 0.2); /* 버튼 호버 색상 */
+    background-color: rgba(128, 128, 128, 0.2); 
   }
   &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
+    transform: scale(0.95); 
   }
 `;
 const BackButton = styled.div`
 display: flex;
+font-size:16px;
+font-weight: 700;
 cursor: pointer;
-background-color: #5B00EF;
-color: white;
+background-color: #fff;
+color: #5B00EF;
 border: none;
 padding: 10px;
 border-radius: 5px;
 margin-top: 4rem;
 margin-right: 70rem;
-margin-bottom: -5.5rem;  // 제목 입력칸과의 간격
-align-self: flex-start;  // 왼쪽 정렬
+font-family: SUITE;
+
+margin-bottom: -5.5rem;  
+align-self: flex-start;  
 `;

@@ -1,12 +1,21 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import fakeUserData from '../data/fakeUserData';
+import axios from 'axios';
  
 
 export default function ProfileEdit() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(fakeUserData);
+  const [user, setUser] = useState({
+    email: '', // 예: 'user@example.com'
+    name: '',
+    nickname: '',
+    phoneNum: '',
+    gender: '',
+    birthYear: '',
+    birthMonth: '',
+    birthDay: '',
+  });
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -44,40 +53,102 @@ export default function ProfileEdit() {
     setIsPwdMatched(newPassword === currConfirmPwd);
   }, [newPassword]);
 
-  // 폼 제출 처리
-  const handleSubmit = useCallback((e) => {
-    e.preventDefault();
-    const isPasswordFieldsEmpty = newPassword === '' && confirmNewPassword === '';
-  
-    if (isPasswordFieldsEmpty) {
-      // 다른 정보만 변경하고 비밀번호는 변경하지 않는 경우
-      const updatedUser = { ...user };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setMessage('회원 정보가 저장되었습니다.');
-    } else if (isValidPwd1 && isValidPwd2 && isValidPwd3 && isPwdMatched) {
-      // 모든 유효성 검사를 통과한 경우
-      const updatedUser = { ...user, password: newPassword };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      setMessage('회원 정보가 저장되었습니다.');
-    } else {
-        // 비밀번호 유효성 검사 실패 시
-        if (!isValidPwd1) {
-            setMessage('비밀번호는 8자 이상이며 소문자를 포함해야 합니다.');
-        } else if (!isValidPwd2) {
-            setMessage('비밀번호는 대문자를 포함해야 합니다.');
-        } else if (!isValidPwd3) {
-            setMessage('비밀번호는 특수 문자(!@#$%^*+=-)를 포함해야 합니다.');
-        } else if (!isPwdMatched) {
-            setMessage('새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.');
-        }
-    }
-  }, [user, newPassword, confirmNewPassword, isValidPwd1, isValidPwd2, isValidPwd3, isPwdMatched, navigate]);
+  useEffect(() => {
+    // 현재 사용자 데이터를 가져오는 함수
+   const fetchUserData = async () => {
+     try {
+       const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/current-user`, {
+         headers: {
+           Authorization: `Bearer ${localStorage.getItem('accessToken')}`, 
+         },
+       });
+       const data = response.data;
+       //const birthdayParts = data.birthday.split('-');
+      const birthdayParts = data.birthday.split('-');
+       setUser({
+         ...user,
+         email: data.email,
+         name: data.name,
+         nickname: data.nickname, // 여기를 수정했습니다
+         phone: data.phone, // 여기를 수정했습니다
+         gender: data.gender,
+         birthYear: birthdayParts[0],
+         birthMonth: birthdayParts[1],
+         birthDay: birthdayParts[2],
+       }); 
+     } catch (error) {
+       console.error('사용자의 정보를 찾을 수 없습니다', error);
+     }
+   };
+ 
+   fetchUserData();
+ }, []);
+   // 사용자 입력 처리
+const handleInputChange = useCallback((e) => {
+  const { name, value } = e.target;
+  setUser((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+}, []);
 
+  // 폼 제출 처리
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // 새 비밀번호가 입력된 경우 유효성 검사 실행
+    if (newPassword) {
+      if (!isValidPwd1 || !isValidPwd2 || !isValidPwd3 || newPassword !== confirmNewPassword) {
+        let errorMessage = '비밀번호 유효성 검사에 실패했습니다.';
+        if (!isValidPwd1) {
+          errorMessage = '비밀번호는 8자 이상이며 소문자를 포함해야 합니다.';
+        } else if (!isValidPwd2) {
+          errorMessage = '비밀번호는 대문자를 포함해야 합니다.';
+        } else if (!isValidPwd3) {
+          errorMessage = '비밀번호는 특수 문자(!@#$%^*+=-)를 포함해야 합니다.';
+        } else if (newPassword !== confirmNewPassword) {
+          errorMessage = '새 비밀번호와 새 비밀번호 확인이 일치하지 않습니다.';
+        }
+        setMessage(errorMessage);
+        return;
+      }
+    }
+  
+    // 서버 요청 데이터 준비
+    // 서버 요청 데이터 준비
+  let updateData = {
+    name: user.name,
+    nickname: user.nickname,
+    phone: user.phone,
+    gender: user.gender,
+    birthday: `${user.birthYear}-${user.birthMonth.padStart(2, '0')}-${user.birthDay.padStart(2, '0')}`, // LocalDate 형식에 맞춤
+  };
+
+  // 새 비밀번호가 입력된 경우에만 updateData에 추가
+  if (newPassword && isPwdMatched) {
+    updateData.password = newPassword;
+  }
+  
+    // 서버 요청 로직
+    try {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/users/update`, updateData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+      if (response.status === 204) { // No Content
+        localStorage.setItem('userName', updateData.name);
+        localStorage.setItem('userNickname', updateData.nickname);
+        setMessage('회원 정보가 성공적으로 업데이트되었습니다.');
+        navigate('/settings');
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage('회원 정보 업데이트 중 오류가 발생했습니다. 서버 로그를 확인해주세요.');
+    }
+  };
   // 사용자 입력 처리
-  const handleInputChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setUser((prev) => ({ ...prev, [name]: value }));
-  }, []);
+
 
   // 메시지 창
   const MessageModal = ({ message, onClose }) => (
@@ -96,8 +167,19 @@ export default function ProfileEdit() {
   };
 
   const getDaysInMonth = (year, month) => {
-    return new Date(year, month, 0).getDate();
+    return new Date(year, month - 1, 0).getDate();
   };
+
+  const daysInMonth = useMemo(() => {
+    if (!user.birthYear || !user.birthMonth) {
+      return 31; // 기본값으로 가정
+    }
+    return getDaysInMonth(user.birthYear, user.birthMonth);
+  }, [user.birthYear, user.birthMonth]);
+
+  
+
+  
 
   return (
     <SettingTitle>
@@ -128,12 +210,12 @@ export default function ProfileEdit() {
 
             <InputWrap>
             <Label>닉네임</Label>
-            <InputField type="text" name="nickName" value={user.nickName} onChange={handleInputChange} />
+            <InputField type="text" name="nickname" value={user.nickname} onChange={handleInputChange} />
             </InputWrap>
 
             <InputWrap>
             <Label>휴대폰</Label>
-            <InputField type="text" name="phoneNum" value={user.phoneNum} onChange={handleInputChange} />
+            <InputField type="text" name="phone" value={user.phone} onChange={handleInputChange} />
             </InputWrap>
 
             <InputWrap>
@@ -142,21 +224,21 @@ export default function ProfileEdit() {
                     name="gender"
                     value="male"
                     onChange={handleInputChange}
-                    checked={user.gender === 'male'}
+                    checked={user.gender.toUpperCase() === 'MALE'}
                     label="남자"
                 />
                 <RadioInput
                     name="gender"
                     value="female"
                     onChange={handleInputChange}
-                    checked={user.gender === 'female'}
+                    checked={user.gender.toUpperCase() === 'FEMALE'}
                     label="여자"
                 />
                 <RadioInput
                     name="gender"
                     value="none"
                     onChange={handleInputChange}
-                    checked={user.gender === 'none'}
+                    checked={user.gender.toUpperCase() === 'NONE'}
                     label="선택 안 함"
                 />
             </InputWrap>
@@ -164,25 +246,25 @@ export default function ProfileEdit() {
             <InputWrap>
             <Label>생년월일</Label>
             <Select name="birthYear" value={user.birthYear} onChange={handleInputChange}>
-                {Array.from({ length: new Date().getFullYear() - 1900 }, (_, index) => (
-                    <option key={index} value={1900 + index}>
-                    {1900 + index}
-                    </option>
-                ))}
+              {Array.from({ length: new Date().getFullYear() - 1900 }, (_, index) => (
+                <option key={index} value={1900 + index}>
+                  {1900 + index}
+                </option>
+              ))}
             </Select>년
             <Select name="birthMonth" value={user.birthMonth} onChange={handleInputChange}>
-                {[...Array(12)].map((_, i) => (
-                    <option key={i} value={i + 1}>
-                    {i + 1}
-                    </option>
-                ))}
+              {[...Array(12)].map((_, i) => (
+                <option key={i} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
             </Select>월
             <Select name="birthDay" value={user.birthDay} onChange={handleInputChange}>
-                {[...Array(getDaysInMonth(user.birthYear, user.birthMonth))].map((_, i) => (
-                    <option key={i} value={i + 1}>
-                    {i + 1}
-                    </option>
-                ))}
+              {[...Array(daysInMonth)].map((_, i) => (
+                <option key={i} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
             </Select>일
             </InputWrap>
 

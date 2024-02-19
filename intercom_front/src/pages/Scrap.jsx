@@ -1,22 +1,44 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation  } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import fakeNotices from '../data/fakeNotices'; // Ensure the path to fakeNotices is correct
 import fakeInterviewData from '../data/fakeInterviewData'; 
 import fakeData from '../data/fakeData';
 import fakeCoverletterData from '../data/fakeCoverletterData';
+import axios from "axios";
+import config from '../path/config';
+import TalkPagination from "./TalkPagination";
 
 
+const ITEMS_PER_PAGE = 4;
+const NOTICES_PER_PAGE = 9;
 
 const Scrap = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { toggleLogin } = useAuth();
+        
+    const { jobId } = useParams();
+
+    // const totalPages = Math.ceil(fakeInterviewData.length / ITEMS_PER_PAGE);
+    const [totalPages, setTotalPages] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalElements, setTotalElements] = useState([]);
+    const indexOfLast = currentPage * ITEMS_PER_PAGE;
+    const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+    const currentInterviews = fakeInterviewData.slice(indexOfFirst, indexOfLast);
+    const currentTalks = fakeData.slice(indexOfFirst, indexOfLast);
+
+    const totalNoticePages = Math.ceil(fakeNotices.length / NOTICES_PER_PAGE);
+ 
+    const indexOfLastNotice = currentPage * NOTICES_PER_PAGE;
+    const indexOfFirstNotice = indexOfLastNotice - NOTICES_PER_PAGE;
+    const currentNotices = fakeNotices.slice(indexOfFirstNotice, indexOfLastNotice);
 
     const isCurrentPath = (path) => location.pathname === path;
-
+    
     const handleLogout = () => {
         toggleLogin();
         navigate('/');
@@ -25,38 +47,108 @@ const Scrap = () => {
     const [view, setView] = useState('announcement');
     const [data, setData] = useState([]);
 
+    const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+
     useEffect(() => {
         if (view === 'announcement') {
-            setData(fakeNotices);
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/jobs?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const jobDto = response.data;
+                    setData(jobDto.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching job scraps:', error);
+                });
         }
         else if (view === 'interview') {
-          setData(fakeInterviewData);
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/interviews?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const interviewData = response.data;
+                    setData(interviewData.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching interview data:', error);
+                });
         }
         else if (view === 'coverletter') {
-            setData(fakeCoverletterData);
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/resumes?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const coverletterData = response.data;
+                    setData(coverletterData.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching coverletter data:', error);
+                });
         }
         else if (view === 'talk') {
-            setData(fakeData);
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/talks?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const talkData = response.data;
+                    setData(talkData.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching talk data:', error);
+                });
         }
-      }, [view]);
+      }, [currentPage, view]);
 
     const handleAnnouncementClick = () => {
         setView('announcement'); // 공고 글 보기로 설정
+        setCurrentPage(1);
     };
     
     const handleInterviewClick = () => {
         setView('interview'); // 면접 후기 보기로 설정
+        setCurrentPage(1);
     };
     
     const handleCoverLetterClick = () => {
-        setView('coverletter'); 
+        setView('coverletter');
+        setCurrentPage(1);
     };
 
     const handleTalkClick = () => {
         setView('talk');
+        setCurrentPage(1);
     };
-    
-        
+
+    const calculateRemainingDays = (expirationDate) => {
+        const today = new Date();
+        const expiration = new Date(expirationDate);
+        const timeDiff = expiration - today;
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        return daysDiff > 0 ? `D-${daysDiff}` : '기한 만료';
+    };
+
+    const onPageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo(0, 0);
+    };
+
     return (
         <ScrapContainer>
             <MenuContainer>
@@ -86,86 +178,131 @@ const Scrap = () => {
                         <Button onClick={handleTalkClick} selected={view === 'talk'}>톡톡 글</Button>
                     </ButtonContainer>
 
-                    {view === 'announcement' && (  
+                    {view === 'announcement' && (   
                         <Content> 
-                            <Title>공고({fakeNotices.length})</Title>
+                            <Title>공고({totalElements})</Title>
                             <NoticesContent>
-                                {fakeNotices.map(notice => (
+                                {data.map(notice => (
+                                    <StyledLink to={`/job/${notice.id}`} key={notice.id}>
                                     <NoticeItem key={notice.id} >
-                                    <img src={notice.imageUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
+                                    <img src={notice.logoUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
                                     <div>
-                                        <NoticeTitle>[{notice.title}]</NoticeTitle> 
-                                        <Information>{notice.information}</Information>
-                                        <br />
-                                        <br />
-                                        <NoticeDeadline>D-{notice.deadline} </NoticeDeadline> <NoticeViews> 조회 {notice.views}</NoticeViews>
+                                        <NoticeTitle>[{notice.title}]</NoticeTitle>
+                                        <Information>{notice.company}</Information>
+                                        <br /><br />
+                                        <NoticeDeadline>{calculateRemainingDays(notice.expirationDate)}</NoticeDeadline> <NoticeViews> 조회 {notice.viewCount}</NoticeViews>
                                     </div>
                                     </NoticeItem>
+                                    </StyledLink>
                                 ))}
-                            </NoticesContent>
+                                </NoticesContent>
+                            <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
                         </Content>   
                     )}
 
                     {view === 'interview' && (
                         <Content> 
-                            <Title>면접 후기({fakeInterviewData.length})</Title>
+                            <Title>면접 후기({totalElements})</Title>
                             <InterviewListContainer>
-                                {data.map(item => (
-                                    <InterviewItem key={item.id}>
-                                    <div className="header">
-                                        <span className="category">{item.field}</span>
-                                        <h2 className="title">{item.company} {item.position}</h2>
-                                    </div>
-                                    {item.interview && ( // 여기서 interview 객체가 있는지 확인합니다.
-                                        <div className="body">
-                                        <p className="content">{item.interview.q1}</p> {/* 이제 안전하게 접근할 수 있습니다. */}
-                                        <p className="details">
-                                            댓글: {item.comments} | 스크랩: {item.scrap} | 조회수: {item.views}
-                                        </p>
-                                        </div>
-                                        )}
-                                    </InterviewItem>
-                                ))}
+                                {data.map(item => {
+
+                                    const englishList = item.english ? item.english.split(', ') : [];
+                                    const scoreList = item.score ? item.score.split(', ') : [];
+
+                                    return (
+                                        <StyledLink to={`/interviews/${item.id}`} key={item.id}>
+                                        <InterviewItem key={item.id}>
+                                            <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
+                                            <div className="details">
+                                                {englishList.map((english, index) => (
+                                                    <span key={index}> {english}: {scoreList[index]}, </span>
+                                                ))} /
+                                                <span> 대외활동: {item.activity}</span> /
+                                                <span> {item.certification}</span> /
+                                                <span> {item.education}</span> /
+                                                <span> {item.department}</span> /
+                                                <span> 학점: {item.gpa}</span>
+                                            </div>
+                                            <div className="scrap-views">
+                                                스크랩 {item.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {item.viewCount}
+                                            </div>
+                                        </InterviewItem>
+                                        </StyledLink>
+                                    );
+                                })}
+                                <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                                />
                             </InterviewListContainer>
+                            
                         </Content>
                     )}
 
                     {view === 'coverletter' && (
                         <Content> 
-                            <Title>합격 자소서({fakeInterviewData.length})</Title>
-                            <InterviewListContainer>
-                                {data.map(item => (
+                        <Title>합격 자소서({totalElements})</Title>
+                        <InterviewListContainer>
+                            {data.map(item => {
+                                const englishList = item.english ? item.english.split(', ') : [];
+                                const scoreList = item.score ? item.score.split(', ') : [];
+
+                                return (
+                                    <StyledLink to={`/cover-letters/${item.id}`} key={item.id}>
                                     <InterviewItem key={item.id}>
-                                    <div className="header">
-                                        <span className="category">{item.field}</span>
-                                        <h2 className="title">{item.company} {item.position}</h2>
-                                    </div>
-                                    {item.interview && ( // 여기서 interview 객체가 있는지 확인합니다.
-                                        <div className="body">
-                                        <p className="content">{item.interview.q1}</p> {/* 이제 안전하게 접근할 수 있습니다. */}
-                                        <p className="details">
-                                            댓글: {item.comments} | 스크랩: {item.scrap} | 조회수: {item.views}
-                                        </p>
+                                        <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
+                                        <div className="details">
+                                            {englishList.map((english, index) => (
+                                                <span key={index}> {english}: {scoreList[index]}, </span>
+                                            ))} /
+                                            <span> 대외활동: {item.activity}</span> /
+                                            <span> {item.certification}</span> /
+                                            <span> {item.education}</span> /
+                                            <span> {item.department}</span> /
+                                            <span> 학점: {item.gpa}</span>
                                         </div>
-                                        )}
+                                        <div className="scrap-views">
+                                            스크랩 {item.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {item.viewCount}
+                                        </div>
                                     </InterviewItem>
-                                ))}
-                            </InterviewListContainer>
-                        </Content>
+                                    </StyledLink>
+                                );
+                            })}
+                            <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
+                        </InterviewListContainer>
+                            
+                    </Content>
                     )}
                     
                     {view === 'talk' && (
-                        <Content> 
-                            <Title>톡톡 글({fakeData.length})</Title>
+                        <Content>
+                            <Title>톡톡 글({totalElements})</Title>
                             <TalkListContainer>
                             {data.map(item => (
                                 <SearchResultItem key={item.id}>
-                                <p className="title">{item.title}</p>
-                                <p className="content">{item.content || "내용이 없습니다."}</p>
-                                <p className="response">답변: {item.answers} | 댓글: {item.comments} | 조회수: {item.views} | 좋아요: {item.likes}</p>
-                                </SearchResultItem>
+                                    <StyledLink to={`/talks/${item.id}`}>
+                                    <p className="title">{item.title}</p>
+                                    <p className="content">{(item.content && item.content.replace(/<img[^>]*>/g,"").replace(/<[^>]*>?/gm, '')) || "내용이 없습니다."}</p>
+                                    <p className="response">답변: {item.commentCount}&nbsp;&nbsp;&nbsp;댓글: {item.replyCount}&nbsp;&nbsp;&nbsp;조회수: {item.viewCount}&nbsp;&nbsp;&nbsp;좋아요: {item.likeCount}</p>
+                                    </StyledLink >
+                                    </SearchResultItem>
                             ))}
+                            <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
                             </TalkListContainer>
+                            
                         </Content>
                     )}
                 </ContentsBox>
@@ -294,13 +431,14 @@ const NoticeTitle = styled.h1`
 `;
         
 const NoticesContent = styled.div`
-    display: flex;
-    gap: 1.563rem;
-    flex-wrap: wrap;
-
-    @media (max-width: 75rem) {
-        justify-content: space-around;
-    }
+display: grid;
+grid-template-columns: repeat(3, 1fr); // 3개의 컬럼으로 나눕니다.
+grid-gap: 1rem; // 그리드 아이템 사이의 간격을 지정합니다.
+background-color: white;
+border-radius: 3%;
+padding: 1.5rem;
+margin-top: 1rem;
+width: 100%; // 컨테이너의 너비를 100%로 설정합니다.
 `;
 
 const Content = styled.div``;
@@ -348,95 +486,93 @@ const NoticeViews = styled.span`
 `;
 
 const InterviewListContainer = styled.div`
-  margin-top: 1rem;
-  background-color: #fff; // 면접 후기 배경색
-  border-radius: 10px; // 모서리 둥글게
-  padding: 20px; // 패딩
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // 그림자 효과
-  overflow-y: auto; // 내용이 많을 경우 스크롤
-  max-height: 600px; // 최대 높이 설정
+    font-family: SUITE;
+    display: flex;
+    width: 50rem;
+    flex-direction: column;
+    background-color: #Eff0F4; // 배경색 변경
+    border-radius: 3%; // 모서리 둥글게
+    padding: 1.5rem; // 내부 여백
+    margin-top: 1rem; // 위 여백
 `;
 
 const InterviewItem = styled.div`
-  border-bottom: 1px solid #ececec; // 항목 사이의 구분선
-  padding: 20px 0; // 상하 패딩
-
-  &:last-child {
-    border-bottom: none; // 마지막 항목에는 구분선 없음
-  }
-
-  .header {
+    font-family: SUITE;
     display: flex;
-    align-items: center;
-    margin-bottom: 10px; // 헤더와 내용 사이의 여백
-  }
+    flex-direction: column;
+    padding: 2rem 0; // 상하 여백
+    border-bottom: 2px solid #A1A1A1; // 구분선 스타일
 
-  .category {
-    font-size: 0.875rem; // 카테고리 폰트 크기
-    background-color: #e0e0e0; // 카테고리 배경색
-    border-radius: 20px; // 카테고리 둥글게
-    padding: 5px 15px; // 카테고리 내부 여백
-    color: #555; // 카테고리 텍스트 색상
-    margin-right: 10px; // 카테고리와 제목 사이 여백
-  }
+    &:last-child {
+    border-bottom: none; // 마지막 항목 구분선 제거
+    }
 
-  .title {
-    font-weight: bold; // 제목 굵게
-    font-size: 1.25rem; // 제목 폰트 크기
-    flex-grow: 1; // 제목이 남은 공간을 모두 차지
-  }
+    .company-position {
+    font-size: 1.5625rem;
+    color: #000000; // 텍스트 색상
+    font-weight: bold; // 굵기
+    margin-bottom: 0.5rem; // 여백
+    }
 
-  .content {
-    font-size: 1rem; // 내용 폰트 크기
-    color: #666; // 내용 텍스트 색상
-    line-height: 1.5; // 줄 간격
-    margin-bottom: 10px; // 내용과 상세정보 사이 여백
-  }
+    .details {
+    font-size: 0.875rem; // 상세 정보 폰트 크기
+    color: #666; // 텍스트 색상
+    margin-bottom: 2rem;
+    }
 
-  .details {
-    font-size: 0.875rem; // 상세정보 폰트 크기
-    color: #999; // 상세정보 텍스트 색상
-  }
+    .scrap-views {
+    font-size: 0.875rem; // 상세 정보 폰트 크기
+    color: #666; // 텍스트 색상
+    }
 `;
 
         
 
 const TalkListContainer = styled.div`
-    margin-top: 1rem;
-  width: 1202px;
-  max-height: 958px;
-  background-color: #EFF0F4;
-  border-radius: 10px;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  overflow-y: auto;
+    font-family: SUITE;
+    display: flex;
+    width: 50rem;
+    flex-direction: column;
+    background-color: #Eff0F4; // 배경색 변경
+    border-radius: 3%; // 모서리 둥글게
+    padding: 1.5rem; // 내부 여백
+    margin-top: 1rem; // 위 여백
 `;
 
 const SearchResultItem = styled.div`
-  border-bottom: 1px solid #ddd;
+  border-bottom: 2px solid #E2E2E2;
 
   padding: 20px 0;
 
   .title, .content, .response {
     margin: 5px 0;
-    padding-left: 70px;
-    padding-right: 70px;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 
   .title {
-    font-family: 'SUITE-ExtraBold', sans-serif;
-    font-size: 24px;
+    font-family: SUITE;
+    font-Weight: 700;
+    font-size: 1.5625rem;
+    color: #000000;
   }
   .content{
-    margin-top: 10px;
-    font-family: 'SUITE-SemiBold', sans-serif;
-    font-size: 19px;
+    margin-top: 1rem;
+    font-family: SUITE;
+    font-size: 1.2rem;
     color: #A1A1A1;
   }
   .response {
-    font-family: 'SUITE-Bold', sans-serif;
-    font-size: 16px;
-    margin-top: 10px;
+    font-family: SUITE;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 1rem;
     color: #636363;
   }
+`;
+
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
 `;

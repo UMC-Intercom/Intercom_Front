@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from 'react';
+import axios from 'axios'; 
 import styled from 'styled-components';
 import Select, { components } from 'react-select';
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import SearchModal from './SearchModal';
+
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
 
 const SearchBarContainer = styled.div`
   width: 75rem;
@@ -101,23 +108,46 @@ const CustomValueContainer = ({ children, getValue, ...props }) => {
 };
 
 const jobOptions = [
-  { value: 'sales', label: '영업/고객상담' },
-  { value: 'management', label: '경영/사무' },
-  { value: 'marketing', label: '마케팅/경영/홍보' },
-  { value: 'production', label: '생산/제조' },
-  { value: 'research', label: '연구개발/설계' },
-  { value: 'it', label: 'IT/인터넷' },
-  { value: 'design', label: '디자인' },
+  { value: '기획·전략', label: '기획·전략' },
+  { value: 'IT개발·데이터', label: 'IT개발·데이터' },
+  { value: '상품기획·MD', label: '상품기획·MD' },
+  { value: '의료', label: '의료' },
+  { value: '마케팅·홍보·조사', label: '마케팅·홍보·조사' },
+  { value: '디자인', label: '디자인' },
+  { value: '운전·운송·배송', label: '운전·운송·배송' },
+  { value: '연구·R&D', label: '연구·R&D' },
+  { value: '회계·세무·재무', label: '회계·세무·재무' },
+  { value: '영업·판매·무역', label: '영업·판매·무역' },
+  { value: '서비스', label: '서비스' },
+  { value: '교육', label: '교육' },
+  { value: '인사·노무·HRD', label: '인사·노무·HRD' },
+  { value: '고객상담·TM', label: '고객상담·TM' },
+  { value: '생산', label: '생산' },
+  { value: '미디어·문화·스포츠', label: '미디어·문화·스포츠' },
+  { value: '총무·법무·사무', label: '총무·법무·사무' },
+  { value: '구매·자재·물류', label: '구매·자재·물류' },
+  { value: '건설·건축', label: '건설·건축' },
+  { value: '금융·보험', label: '금융·보험' },
 ];
 
 const locationOptions = [
   { value: 'all', label: '지역 제한 없음' },
-  { value: 'seoul', label: '서울' },
-  { value: 'gyeonggi', label: '경기' },
-  { value: 'incheon', label: '인천' },
-  { value: 'busan', label: '부산' },
-  { value: 'daegu', label: '대구' },
-  { value: 'daejeon', label: '대전' },
+  { value: '서울', label: '서울' },
+  { value: '부산', label: '부산' },
+  { value: '대구', label: '대구' },
+  { value: '인천', label: '인천' },
+  { value: '광주', label: '광주' },
+  { value: '대전', label: '대전' },
+  { value: '울산', label: '울산' },
+  { value: '경기', label: '경기' },
+  { value: '강원', label: '강원' },
+  { value: '충북', label: '충북' },
+  { value: '충남', label: '충남' },
+  { value: '전북', label: '전북' },
+  { value: '전남', label: '전남' },
+  { value: '경북', label: '경북' },
+  { value: '경남', label: '경남' },
+  { value: '제주', label: '제주' },
 ];
 
 const CustomMenuList = props => (
@@ -210,37 +240,6 @@ const ResultCount = styled.span`
   font-family: SUITE; // 검색개수 폰트수정
 `;
 
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 0.3125rem;
-  margin-bottom: 0.3125rem;
-`;
-
-const StyledButton = styled.button`
-  border: 1.5px solid gray;
-  border-radius: 5px;
-  color: gray;
-  background-color: transparent;
-  width: 7.8125rem;
-  height: 2.5rem;
-  font-size: 1rem;
-  font-family: SUITE; //정렬버튼 폰트수정
-  cursor: pointer;
-  transition: all 0.3s ease;
-  &:not(:first-child) {
-    margin-left: 0.625rem;
-  }
-  &:hover {
-    border-color: #5B00EF;
-    color: #5B00EF;
-  }
-  &.selected {
-    border-color: #5B00EF;
-    color: #5B00EF;
-    background-color: transparent;
-  }
-`;
 
 const PopularNoticesBox = styled.div`
   width: 75rem;
@@ -252,28 +251,44 @@ const PopularNoticesBox = styled.div`
 `;
 
 const ContentsBox = styled.div`
-  width: 75rem;
-  min-height: 27.3125rem;
-  background-color: #FFFFFF;
-  border-radius: 1.25rem;
+display: flex;
+justify-content: flex-start;
+flex-wrap: wrap;
+gap: 1rem;
 `;
 
 const Content = styled.div`
-  display: flex;
-  gap: 1.5625rem;
-  flex-wrap: wrap;
-  @media (max-width: 75rem) {
-    justify-content: space-around;
-  }
+display: flex;
+justify-content: flex-start; // flex-start를 사용하여 왼쪽 정렬합니다.
+flex-wrap: wrap;
+gap: 1rem; // 아이템 사이에 1rem의 공간을 둡니다.
+`;
+
+const ImageContainer = styled.div`
+  width: 282px; // 컨테이너의 폭을 NoticeItem에 맞춥니다.
+  height: 280px; // 또는 원하는 높이 값으로 설정
+  background-color: #D9D9D9;
+  position: relative;
+  overflow: hidden; // 이미지가 컨테이너를 넘어가지 않게 설정
+`;
+
+const StyledImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; // 이미지가 컨테이너에 꽉 차도록 설정
 `;
 
 const NoticeItem = styled.div`
-  flex: 0 0 calc(25% - 1.25rem);
+  flex: 0 0 calc(25% - 1rem); // 한 줄에 4개씩 표시되도록 수정합니다.
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 1.25rem;
+  height: auto;
+  cursor: pointer;
+
+  // 이 부분은 기존대로 유지합니다.
   img {
     background-color: #D9D9D9;
     width: 100%;
@@ -281,21 +296,26 @@ const NoticeItem = styled.div`
     aspect-ratio: 1 / 1;
     object-fit: cover;
   }
-  span {
-    font-size: 1.25rem;
-    text-align: left;
-    margin-top: 1.25rem;
-  }
 `;
 
 const Title = styled.span`
-  font-weight: bold;
-  font-size: 1.25rem;
+font-weight: bold;
+font-size: 1.25rem;
+white-space: nowrap; /* 텍스트를 한 줄로 설정 */
+overflow: hidden; /* 넘칠 경우 숨김 처리 */
+text-overflow: ellipsis; /* 넘칠 경우 말줄임표 표시 */
+max-width: 250px; /* 최대 너비 설정 */
+display: block;
 `;
 
 const Information = styled.span`
   font-size: 1.25rem;
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+  display: block;
 `;
 
 const Deadline = styled.span`
@@ -307,85 +327,23 @@ const Views = styled.span`
   color: #636363;
 `;
 
-const fakeNotices = [
-    {
-      id: 1,
-      imageUrl: "/assets/notice1.jpg",
-      title: "가짜 공고 냠냠냠",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-      id: 2,
-      imageUrl: "/assets/notice2.jpg",
-      title: "가짜 공고 냉돌이",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-      id: 3,
-      imageUrl: "/assets/notice3.jpg",
-      title: "가짜 공고 냥돌냥",
-      information: "2024년 상반기 체험형 청년인턴",
-      deadline:15,
-      views:1202
-    },
-    {
-        id: 4,
-        imageUrl: "/assets/notice4.jpg",
-        title: "가짜 공고 돌돌이",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    }, 
-    {
-        id: 5,
-        imageUrl: "/assets/notice5.jpg",
-        title: "가짜 공고 냠냠냠",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-        id: 6,
-        imageUrl: "/assets/notice6.jpg",
-        title: "가짜 공고 냉돌이",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-        id: 7,
-        imageUrl: "/assets/notice7.jpg",
-        title: "가짜 공고 냥돌냥",
-        information: "2024년 상반기 체험형 청년인턴",
-        deadline:15,
-        views:1202
-    },
-      {
-          id: 8,
-          imageUrl: "/assets/notice8.jpg",
-          title: "가짜 공고 돌돌이",
-          information: "2024년 상반기 체험형 청년인턴",
-          deadline:15,
-          views:1202
-        },
-  ];
-
-
 const SearchResults = () => {
   const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { selectedJobs, selectedLocation, searchInput } = location.state || {};
+  const [searchResults, setSearchResults] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isButtonSelected, setIsButtonSelected] = useState({
     button1: false,
     button2: false,
     button3: false,
   });
-  
+
+  useEffect(() => {
+    if (location.state?.searchResults) {
+      setSearchResults(location.state.searchResults);
+    }
+  }, [location.state?.searchResults]);
 
   const handleSearchBarClick = () => {
     setIsModalOpen(true);
@@ -401,6 +359,14 @@ const SearchResults = () => {
       ...isButtonSelected,
       [buttonName]: !isButtonSelected[buttonName],
     });
+  };
+
+  const calculateRemainingDays = (expirationDate) => {
+    const today = new Date();
+    const expiration = new Date(expirationDate);
+    const timeDiff = expiration - today;
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return daysDiff > 0 ? `D-${daysDiff}` : '기한 만료';
   };
 
   return (
@@ -447,50 +413,38 @@ const SearchResults = () => {
         </SearchBarWrapper>
 
         <PopularNoticesBox>
-            <SearchResultTextWrapper>
-                <SearchResultText>검색 결과</SearchResultText>
-                <ResultCount>(35)</ResultCount>
-            </SearchResultTextWrapper>
+                <SearchResultTextWrapper>
+                    <SearchResultText>검색 결과</SearchResultText>
+                    <ResultCount>({searchResults.length})</ResultCount>
+                </SearchResultTextWrapper>
 
-            <ButtonWrapper>
-                <StyledButton
-                    className={isButtonSelected.button1 ? "selected" : ""}
-                    onClick={() => handleButtonClick("button1")}
-                >
-                    UX/UI/GUI
-                </StyledButton>
-                <StyledButton
-                    className={isButtonSelected.button2 ? "selected" : ""}
-                    onClick={() => handleButtonClick("button2")}
-                >
-                    그래픽 디자인
-                </StyledButton>
-                <StyledButton
-                    className={isButtonSelected.button3 ? "selected" : ""}
-                    onClick={() => handleButtonClick("button3")}
-                >
-                    마케팅
-                </StyledButton>
-            </ButtonWrapper>
+                <ContentsBox>
+                        {searchResults.map(result => (
+                          <StyledLink to={`/job/${result.id}`} key={result.id}>
+                            <NoticeItem key={result.id}>
+                              <ImageContainer>
+                                <StyledImage src={result.logoUrl} alt={result.title} />
+                                
+                              </ImageContainer>
+                              <div>
+                                    <Title>[{result.title}]</Title>
+                                    <br />
+                                    <Information>{result.company}</Information>
+                                    <br />
+                                    <Deadline>{calculateRemainingDays(result.expirationDate)}</Deadline> <Views>조회 {result.viewCount.toLocaleString()}회</Views>
+                                </div>
+                            </NoticeItem>
+                          </StyledLink>
+                        ))}
+                </ContentsBox>
+            </PopularNoticesBox>
 
-            <ContentsBox>
-                <Content>
-                    {fakeNotices.map(notice => (
-                        <NoticeItem key={notice.id}>
-                            <img src={notice.imageUrl} alt={notice.title} style={{marginBottom:"20px"}}/>
-                            <div>
-                                <Title>[{notice.title}]</Title>
-                                <Information>{notice.information}</Information>
-                                <br /><br />
-                                <Deadline>D-{notice.deadline}</Deadline> <Views>조회 {notice.views}</Views>
-                            </div>
-                        </NoticeItem>
-                    ))}
-                </Content>
-            </ContentsBox>
-        </PopularNoticesBox>
-
-        {isModalOpen && <SearchModal onClose={() => setIsModalOpen(false)} />}
+            {isModalOpen && (
+              <SearchModal
+                onClose={() => setIsModalOpen(false)}
+                setSearchResults={setSearchResults} // setSearchResults 함수를 SearchModal에 prop으로 전달합니다.
+              />
+            )}
     </div>
 );
 };
