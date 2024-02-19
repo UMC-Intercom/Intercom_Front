@@ -14,7 +14,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
         },
         content: {
           width: '33.125rem',
-          height: '48.5rem',
+          height: '30rem',
           borderRadius: '1.25rem',
           border: '2px solid #E2E2E2',
           display: 'flex',
@@ -30,6 +30,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
             <Text1>톡톡</Text1>
             <Text2>{notification.user} 님이 {notification.type === 'comment' ? '댓글을' : '좋아요를'} 남겼습니다</Text2>
             <Text3>{notification.content}</Text3>
+            <Text4>4분전</Text4>
             <hr />
           </NotificationItem>
         ))}
@@ -40,6 +41,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
 
 const ModalContent = styled.div`
   text-align: center;
+  margin-top:50px;
 `;
 
 const NotificationItem = styled.div`
@@ -49,25 +51,24 @@ const NotificationItem = styled.div`
   text-align: left;
 `;
 
-const Text1 = styled.p`
-width: 2.9375rem;
-height: 1.125rem;
-flex-shrink: 0;
-
-color: #5B00EF;
+const Text1 = styled.div`
 /* B5 */
-font-family: SUITE;
-font-size: 1.0625rem;
+font-family: 'SUITE';
 font-style: normal;
 font-weight: 600;
-line-height: normal;
+font-size: 17px;
+line-height: 21px;
+
+color: #5B00EF;
+
+
 
 margin-top: -2rem;
+margin-bottom:11px;
 `
 
-const Text2 = styled.p`
+const Text2 = styled.div`
 width: 21.9375rem;
-height: 1.25rem;
 flex-shrink: 0;
 
 color: #000;
@@ -78,10 +79,10 @@ font-size: 1.25rem;
 font-style: normal;
 font-weight: 700;
 line-height: normal;
+margin-bottom:14px;
 `
-const Text3 = styled.p`
+const Text3 = styled.div`
 width: 27.4375rem;
-height: 3.5rem;
 flex-shrink: 0;
 
 color: #636363;
@@ -91,5 +92,18 @@ font-size: 1.25rem;
 font-style: normal;
 font-weight: 600;
 line-height: 1.875rem; /* 150% */
+margin-bottom:10px;
+`
+
+const Text4 = styled.div`
+/* B4 */
+font-family: 'SUITE';
+font-style: normal;
+font-weight: 700;
+font-size: 17px;
+line-height: 21px;
+
+color: #636363;
+margin-bottom:20px;
 `
 export default NotificationModal;
