@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import fakeCoverletterData from '../data/fakeSearchCoverLetterData';
 import CoinUseQuestionModal from './CoinUseQuestionModal';
 import axios from "axios";
-import config from "../path/config";
 import TalkPagination from "./TalkPagination";
 import { useAuth } from './AuthContext';
 
@@ -48,16 +47,16 @@ export default function CoverLetterHome() {
   
 
   const fetchPosts = async (page) => {
-    let url = `${config.API_URL}/resumes?page=${currentPage}`;
+    let url = `${process.env.REACT_APP_API_URL}/resumes?page=${currentPage}`;
 
     if (!isSearchMode && sortByLikesActive) {
-      url = `${config.API_URL}/resumes/scrap-counts?page=${currentPage}`;
+      url = `${process.env.REACT_APP_API_URL}/resumes/scrap-counts?page=${currentPage}`;
     }
     if (isSearchMode && sortByDateActive) {
-      url = `${config.API_URL}/resumes/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+      url = `${process.env.REACT_APP_API_URL}/resumes/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
     }
     else if (isSearchMode && sortByLikesActive) {
-      url = `${config.API_URL}/resumes/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+      url = `${process.env.REACT_APP_API_URL}/resumes/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
     }
     try {
       //const sortBy = sortByDateActive ? '' : '/scrap-counts'; // 추가된 부분
@@ -124,10 +123,10 @@ export default function CoverLetterHome() {
 
     let url;
     if (sortByDateActive) {
-      url = `${config.API_URL}/resumes/search`;
+      url = `${process.env.REACT_APP_API_URL}/resumes/search`;
     }
     else if (sortByLikesActive) {
-      url = `${config.API_URL}/resumes/scrap-counts`;
+      url = `${process.env.REACT_APP_API_URL}/resumes/scrap-counts`;
     }
 
     try {

@@ -22,7 +22,7 @@ const emailFromPreviousPage = location.state?.email; // 이메일 값 받아오�
 
     if (password === confirmPassword) {
         try {
-          const response = await axios.put(`${config.API_URL}/users/reset-password`, {
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/users/reset-password`, {
             email: emailFromPreviousPage, // 이메일 상태 사용
             password: password,
           });

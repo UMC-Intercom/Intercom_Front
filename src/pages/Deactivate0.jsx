@@ -26,7 +26,7 @@ const Deactivate0 = () => {
 
     try {
       // 비밀번호 인증 요청 보내기
-      await axios.post('/users/withdraw/validate', {
+      await axios.post(`${process.env.REACT_APP_API_URL}/users/withdraw/validate`, {
         password: password,
       }, {
         headers: {

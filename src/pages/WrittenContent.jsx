@@ -230,7 +230,7 @@ const WrittenContentPageComponent = () => {
 
   const fetchData = async (endpoint) => {
     try {
-      const response = await axios.get(`${config.API_URL}${endpoint}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}${endpoint}`);
       // response.data에 있는 content를 사용하여 상태 업데이트
       setData(response.data.content);
     } catch (error) {
@@ -259,7 +259,7 @@ const WrittenContentPageComponent = () => {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${config.API_URL}${endpoint}?page=${currentPage}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}${endpoint}?page=${currentPage}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },

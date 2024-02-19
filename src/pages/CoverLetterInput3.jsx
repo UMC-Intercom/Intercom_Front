@@ -55,7 +55,7 @@ export default function CoverLetterInput3() {
     console.log(formData);
   
     try {
-      const response = await axios.post('http://www.umcintercom.site/resumes', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/resumes`, formData, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },

@@ -14,7 +14,7 @@ export default function CoverLetterResult() {
         const fetchResume = async () => {
           try {
             // 변경된 API 경로에 맞춰서 요청
-            const response = await axios.get(`http://www.umcintercom.site/resumes/${id}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/resumes/${id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },
@@ -32,14 +32,14 @@ export default function CoverLetterResult() {
         const fetchResume = async () => {
           try {
             // 변경된 API 경로에 맞춰서 요청
-            const response = await axios.get(`http://www.umcintercom.site/resumes/${id}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/resumes/${id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },
             });
             setResume(response.data);
     
-            const scrapResponse = await axios.get(`http://www.umcintercom.sitescraps/posts/${id}`, {
+            const scrapResponse = await axios.get(`${process.env.REACT_APP_API_URL}/posts/${id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },
@@ -57,13 +57,13 @@ export default function CoverLetterResult() {
     const toggleScrap = async () => {
         try {
           if (isScrapped) {
-            await axios.delete(`http://localhost:8080/scraps/posts/${id}`, {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/scraps/posts/${id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },
             });
           } else {
-            await axios.post(`http://localhost:8080/scraps/posts/${id}`, {}, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/scraps/posts/${id}`, {}, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },

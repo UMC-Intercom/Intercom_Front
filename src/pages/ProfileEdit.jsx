@@ -57,7 +57,7 @@ export default function ProfileEdit() {
     // 현재 사용자 데이터를 가져오는 함수
    const fetchUserData = async () => {
      try {
-       const response = await axios.get('/users/current-user', {
+       const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/current-user`, {
          headers: {
            Authorization: `Bearer ${localStorage.getItem('accessToken')}`, 
          },
@@ -131,7 +131,7 @@ const handleInputChange = useCallback((e) => {
   
     // 서버 요청 로직
     try {
-      const response = await axios.put('/users/update', updateData, {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/users/update`, updateData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },

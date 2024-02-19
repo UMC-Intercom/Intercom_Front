@@ -31,7 +31,7 @@ export default function FindingEmail() {
   const findEmail = () => {
     if (!isValidNumber) return;
 
-    axios.post(`${config.API_URL}/users/find-email`, { phone: phoneNumber })
+    axios.post(`${process.env.REACT_APP_API_URL}/users/find-email`, { phone: phoneNumber })
       .then(response => {
         // 서버에서 응답으로 사용자 정보를 받았다고 가정
         navigate('/findedemail', { state: { user: response.data } });

@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import fakeUserData from '../data/fakeUserData';
+
 
 const Deactivate3 = () => {
     const navigate = useNavigate();
-    const { name } = fakeUserData;
 
     const handleNextDeactivate = () => {
         navigate('/deactivate-account4');

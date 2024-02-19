@@ -105,7 +105,7 @@ const AdoptedTag = styled.div`
 
 const fetchCurrentUser = async (accessToken) => {
   try {
-    const response = await axios.get('http://localhost:8080/users/current-user', {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/current-user`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
@@ -140,7 +140,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 
     const checkAdoptionStatus = async () => {
       try {
-          const response = await axios.get(`http://localhost:8080/comments/check-adopt/${talkId}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/check-adopt/${talkId}`);
           setIsAdopted(response.data);
       } catch (error) {
           console.error('Error checking adoption status:', error);
@@ -151,7 +151,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
     useEffect(() => {
       const checkAdoptionStatus = async () => {
           try {
-              const response = await axios.get(`http://localhost:8080/comments/check-adopt/${talkId}`);
+              const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/check-adopt/${talkId}`);
               setIsAdopted(response.data);
           } catch (error) {
               console.error('Error checking adoption status:', error);
@@ -165,7 +165,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 
   const handleAdopt = async (commentId) => {
     try {
-      await axios.post(`http://localhost:8080/comments/${commentId}/adopt`, {}, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/comments/${commentId}/adopt`, {}, {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
       setAdoptedCommentId(commentId); // 채택된 댓글 ID 업데이트
@@ -235,7 +235,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 
     const handleNestedReplySubmit = async ( parentId, content) => {
       try {
-        const response = await axios.post('http://localhost:8080/comments/reply', {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/comments/reply`, {
           talkId:talkId,
           parentId,
           content
@@ -259,7 +259,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 
     const fetchReplies = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/comments/talk/${talkId}`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/talk/${talkId}`, {
                     headers: { 'Authorization': `Bearer ${accessToken}` },
                 });    
                 const comments = response.data.filter(reply => !reply.parentId || reply.parentId === null);
@@ -297,7 +297,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
         useEffect(() => {
           const fetchReplies = async () => {
             try {
-              const response = await axios.get(`http://localhost:8080/comments/talk/${talkId}`, {
+              const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/talk/${talkId}`, {
                 headers: { 'Authorization': `Bearer ${accessToken}` },
               });
               // 채택된 답변을 상단에 배치하는 정렬 로직
@@ -322,12 +322,12 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 
         try {
             if (!reply.liked) {
-                await axios.post(`http://localhost:8080/likes/comments/${commentId}`, {}, {
+                await axios.post(`${process.env.REACT_APP_API_URL}/likes/comments/${commentId}`, {}, {
                     headers: { 'Authorization': `Bearer ${accessToken}` },
                 });
                 updatedReply.likeCount += 1;
                 } else {
-                await axios.delete(`http://localhost:8080/likes/comments/${commentId}`, {
+                await axios.delete(`${process.env.REACT_APP_API_URL}/likes/comments/${commentId}`, {
                     headers: { 'Authorization': `Bearer ${accessToken}` },
                 });
                 updatedReply.likeCount -= 1;

@@ -270,7 +270,7 @@ const SearchModal = ({ onClose, setSearchResults}) => {
 
     const handleSearch = async () => {
         try {
-            const response = await axios.get('http://www.umcintercom.site/jobs/search', {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/jobs/search`, {
                 params: {
                     jobMidCode: selectedJob ? selectedJob.value : '', // 단일 선택 반영
                     location: selectedLocation ? selectedLocation.value : '', // 단일 선택 반영

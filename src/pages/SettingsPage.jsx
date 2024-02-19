@@ -31,7 +31,7 @@ const SettingsPage = () => {
     // 사용자의 보유 코인 정보 조회
     const fetchCoins = async () => {
       try {
-        const response = await axios.get(`${config.API_URL}/users/coin`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/coin`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 인증 토큰 추가
           },
@@ -54,7 +54,7 @@ const SettingsPage = () => {
     const formData = new FormData();
     formData.append('file', file);
   
-    axios.post(`${config.API_URL}/users/default-profile`, formData, {
+    axios.post(`${process.env.REACT_APP_API_URL}/users/default-profile`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 인증 토큰 추가

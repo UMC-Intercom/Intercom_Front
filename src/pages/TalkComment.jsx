@@ -11,7 +11,7 @@ const TalkComment = ({ postId }) => {
   // 댓글 목록을 서버에서 조회하는 함수를 useEffect 밖으로 이동
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`http://www.umcintercom.site/comments/talk/${postId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/talk/${postId}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
@@ -46,7 +46,7 @@ const TalkComment = ({ postId }) => {
   const submitComment = async () => {
     if (commentInput.trim() !== '') {
       try {
-        await axios.post(`http://www.umcintercom.site/comments`, {
+        await axios.post(`${process.env.REACT_APP_API_URL}/comments`, {
           talkId : postId,
           content: commentInput,
         }, {

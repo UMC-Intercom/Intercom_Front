@@ -60,7 +60,7 @@ const ReplyToggle = ({ talkId }) => {
     if (!newReply.trim()) return;
     try {
       const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
-      await axios.post(`http://www.umcintercom.site/comments/talk/${talkId}`, { content: newReply }, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/comments/talk/${talkId}`, { content: newReply }, {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
       setNewReply(''); // 입력 필드 초기화

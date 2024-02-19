@@ -34,7 +34,7 @@ export default function FindingPassword() {
       return;
     }
 
-    axios.post(`${config.API_URL}/users/check-email`, { email })
+    axios.post(`${process.env.REACT_APP_API_URL}/users/check-email`, { email })
       .then(response => {
         navigate('/settingPwd', { state: { email: email } });
       })

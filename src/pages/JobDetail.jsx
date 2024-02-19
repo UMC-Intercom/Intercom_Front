@@ -36,7 +36,7 @@ const JobDetail = () => {
     const fetchJobDetail = async () => {
       try {
         // 변경된 API 경로에 맞춰서 요청
-        const response = await axios.get(`http://www.umcintercom.site/jobs/${jobId}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/jobs/${jobId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -66,14 +66,14 @@ const JobDetail = () => {
     const fetchJobDetail = async () => {
       try {
         // 변경된 API 경로에 맞춰서 요청
-        const response = await axios.get(`http://www.umcintercom.site/jobs/${jobId}`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/jobs/${jobId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
         });
         setJob(response.data);
 
-        const scrapResponse = await axios.get(`http://www.umcintercom.site/scraps/jobs/${jobId}`, {
+        const scrapResponse = await axios.get(`${process.env.REACT_APP_API_URL}/scraps/jobs/${jobId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -93,13 +93,13 @@ const JobDetail = () => {
   const toggleScrap = async () => {
     try {
       if (isScraped) {
-        await axios.delete(`http://www.umcintercom.site/scraps/jobs/${jobId}`, {
+        await axios.delete(`${process.env.REACT_APP_API_URL}/scraps/jobs/${jobId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
         });
       } else {
-        await axios.post(`http://www.umcintercom.site/scraps/jobs/${jobId}`, {}, {
+        await axios.post(`${process.env.REACT_APP_API_URL}/scraps/jobs/${jobId}`, {}, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -115,7 +115,7 @@ const JobDetail = () => {
  // 데이터 가져오기 함수에서 파라미터 사용
   const fetchInterviews = async (department) => {
     try {
-      const response = await axios.get(`http://www.umcintercom.site/search/interviews`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/search/interviews`, {
         params: { department, page: 1 }, // 페이지 번호는 API 설계에 따라 조정
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
@@ -128,7 +128,7 @@ const JobDetail = () => {
 
   const fetchResumes = async (department) => {
     try {
-      const response = await axios.get(`http://www.umcintercom.site/search/resumes`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/search/resumes`, {
         params: { department, page: currentPage }, // 페이지 번호는 API 설계에 따라 조정
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });

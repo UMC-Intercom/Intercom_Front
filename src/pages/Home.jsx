@@ -24,7 +24,7 @@ const Home = () => {
   
       try {
         // axios 요청 헤더에 토큰을 포함시켜 관심 정보를 요청합니다.
-        const response = await axios.get('/users/interests', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/interests`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -43,7 +43,7 @@ const Home = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get(`/jobs/by-count?page=${currentPage}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/jobs/by-count?page=${currentPage}`);
         setJobs(response.data.content);
         setTotalPages(response.data.totalPages);
       } catch (error) {
@@ -69,7 +69,7 @@ const handleInterestClick = async (interest) => {
     fetchJobs(); 
   } else {
     setSelectedInterest(interest);
-    const response = await axios.get(`/jobs/by-category?interest=${interest}&page=${currentPage}`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/jobs/by-category?interest=${interest}&page=${currentPage}`, {
       headers: { 'Authorization': `Bearer ${accessToken}` },
     });
     setJobs(response.data.content);
@@ -79,7 +79,7 @@ const handleInterestClick = async (interest) => {
 
 const incrementViewCount = async (jobId) => {
   try {
-    await axios.get(`/jobs/${jobId}`, {}, {
+    await axios.get(`${process.env.REACT_APP_API_URL}/jobs/${jobId}`, {}, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
@@ -94,7 +94,7 @@ const incrementViewCount = async (jobId) => {
 // 공고 목록을 가져오기
 const fetchJobs = async () => {
   try {
-    const response = await axios.get(`/jobs/by-count?page=${currentPage}`, {
+    const response = await axios.get(`${process.env.REACT_APP_API_URL}/jobs/by-count?page=${currentPage}`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
@@ -113,11 +113,11 @@ const toggleScrap = async (jobId) => {
 
   try {
     if (!isScrapped) {
-      await axios.post(`h/scraps/jobs/${jobId}`, {}, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/scraps/jobs/${jobId}`, {}, {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
     } else {
-      await axios.delete(`/scraps/jobs/${jobId}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/scraps/jobs/${jobId}`, {
         headers: { 'Authorization': `Bearer ${accessToken}` },
       });
     }

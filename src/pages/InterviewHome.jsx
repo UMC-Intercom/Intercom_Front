@@ -50,16 +50,16 @@ export default function InterviewHome() {
   
 
   const fetchPosts = async (page) => {
-    let url = `${config.API_URL}/interviews?page=${currentPage}`;
+    let url = `${process.env.REACT_APP_API_URL}/interviews?page=${currentPage}`;
 
     if (!isSearchMode && sortByLikesActive) {
-      url = `${config.API_URL}/interviews/scrap-counts?page=${currentPage}`;
+      url = `${process.env.REACT_APP_API_URL}/interviews/scrap-counts?page=${currentPage}`;
     }
     if (isSearchMode && sortByDateActive) {
-      url = `${config.API_URL}/interviews/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+      url = `${process.env.REACT_APP_API_URL}/interviews/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
     }
     else if (isSearchMode && sortByLikesActive) {
-      url = `${config.API_URL}/interviews/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+      url = `${process.env.REACT_APP_API_URL}/interviews/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
     }
 
     try{
@@ -133,10 +133,10 @@ export default function InterviewHome() {
 
     let url;
     if (sortByDateActive) {
-      url = `${config.API_URL}/interviews/search`;
+      url = `${process.env.REACT_APP_API_URL}/interviews/search`;
     }
     else if (sortByLikesActive) {
-      url = `${config.API_URL}/interviews/scrap-counts`;
+      url = `${process.env.REACT_APP_API_URL}/interviews/scrap-counts`;
     }
 
     try {

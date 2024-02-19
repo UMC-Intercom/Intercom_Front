@@ -14,7 +14,7 @@ const Deactivate5 = () => {
       const token = localStorage.getItem('accessToken');
 
       // 회원 탈퇴 요청 보내기
-      await axios.delete('/users/withdraw', {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/users/withdraw`, {
         headers: {
           // 요청 헤더에 인증 토큰 포함
           Authorization: `Bearer ${token}`,

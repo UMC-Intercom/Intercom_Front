@@ -33,7 +33,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://www.umcintercom.site",
   "eslintConfig": {
     "extends": [
       "react-app",

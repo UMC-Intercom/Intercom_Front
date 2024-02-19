@@ -53,9 +53,9 @@ const PostPage = () => {
         const fetchData = async () => {
             try {
                 const headers = { 'Authorization': `Bearer ${accessToken}` };
-                const postDetailsRequest = axios.get(`http://www.umcintercom.site/talks/${postId}`, { headers });
-                const scrapStatusRequest = axios.get(`http://www.umcintercom.site/scraps/talks/${postId}`, { headers });
-                const likeStatusRequest = axios.get(`http://www.umcintercom.site/likes/talks/${postId}`, { headers });
+                const postDetailsRequest = axios.get(`${process.env.REACT_APP_API_URL}/talks/${postId}`, { headers });
+                const scrapStatusRequest = axios.get(`${process.env.REACT_APP_API_URL}/scraps/talks/${postId}`, { headers });
+                const likeStatusRequest = axios.get(`${process.env.REACT_APP_API_URL}/likes/talks/${postId}`, { headers });
 
                 const [postDetailsResponse, scrapStatusResponse, likeStatusResponse] = await axios.all([
                     postDetailsRequest,
@@ -98,12 +98,12 @@ const PostPage = () => {
 
         if (isScrapped) {
             // 스크랩 취소 요청
-            axios.delete(`http://www.umcintercom.site/scraps/talks/${postId}`, { headers: { Authorization: `Bearer ${accessToken}` } })
+            axios.delete(`${process.env.REACT_APP_API_URL}/scraps/talks/${postId}`, { headers: { Authorization: `Bearer ${accessToken}` } })
                 .then(() => setIsScrapped(false))
                 .catch(error => console.error('Error removing scrap:', error));
         } else {
             // 스크랩 추가 요청
-            axios.post(`http://www.umcintercom.site/scraps/talks/${postId}`, {}, { headers: { Authorization: `Bearer ${accessToken}` } })
+            axios.post(`${process.env.REACT_APP_API_URL}/scraps/talks/${postId}`, {}, { headers: { Authorization: `Bearer ${accessToken}` } })
                 .then(() => setIsScrapped(true))
                 .catch(error => console.error('Error adding scrap:', error));
         }
@@ -113,7 +113,7 @@ const PostPage = () => {
             // 현재 '좋아요' 상태에 따라 요청을 달리합니다.
             if (!liked) {
                 // 좋아요가 안 되어 있으면 추가하는 요청
-                const response = await axios.post(`http://www.umcintercom.site/likes/talks/${postId}`, {}, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/likes/talks/${postId}`, {}, {
                     headers: { 'Authorization': `Bearer ${accessToken}` },
                 });
                 if (response.status === 200) {
@@ -122,7 +122,7 @@ const PostPage = () => {
                 }
             } else {
                 // 좋아요가 되어 있으면 삭제하는 요청
-                const response = await axios.delete(`http://www.umcintercom.site/likes/talks/${postId}`, {
+                const response = await axios.delete(`${process.env.REACT_APP_API_URL}/likes/talks/${postId}`, {
                     headers: { 'Authorization': `Bearer ${accessToken}` },
                 });
                 if (response.status === 200) {

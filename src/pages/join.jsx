@@ -186,7 +186,7 @@ const Join = () => {
     // 형식: axios.post(url, data, config)
     // data는 서버에 보낼 데이터, config는 아래 코드 + 토큰 정보까지 추가해서 보내면 됨
     axios
-        .post(`${config.API_URL}/users/login`, {  // url
+        .post(`${process.env.REACT_APP_API_URL}/users/login`, {  // url
           email: email,           // data
           password: password
         }, {
@@ -207,7 +207,7 @@ const Join = () => {
           localStorage.setItem('userProfile', res.data.defaultProfile);
           // defaultProfile이 null이 아닐 때만 URL을 저장하고, 그렇지 않으면 기본 이미지 경로를 저장
           // 여기서 프로필 이미지 URL을 가져오는 GET 요청을 추가
-          return axios.get(`${config.API_URL}/users/default-profile`, {
+          return axios.get(`${process.env.REACT_APP_API_URL}/users/default-profile`, {
             headers: { 'Authorization': `Bearer ${res.data.token}` }
             });
           // toggleLogin();

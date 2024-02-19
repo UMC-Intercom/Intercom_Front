@@ -51,7 +51,7 @@ const Scrap = () => {
 
     useEffect(() => {
         if (view === 'announcement') {
-            axios.get(`${config.API_URL}/scraps/jobs?page=${currentPage}`, {
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/jobs?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                 }
@@ -67,7 +67,7 @@ const Scrap = () => {
                 });
         }
         else if (view === 'interview') {
-            axios.get(`${config.API_URL}/scraps/interviews?page=${currentPage}`, {
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/interviews?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                 }
@@ -83,7 +83,7 @@ const Scrap = () => {
                 });
         }
         else if (view === 'coverletter') {
-            axios.get(`${config.API_URL}/scraps/resumes?page=${currentPage}`, {
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/resumes?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                 }
@@ -99,7 +99,7 @@ const Scrap = () => {
                 });
         }
         else if (view === 'talk') {
-            axios.get(`${config.API_URL}/scraps/talks?page=${currentPage}`, {
+            axios.get(`${process.env.REACT_APP_API_URL}/scraps/talks?page=${currentPage}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                 }

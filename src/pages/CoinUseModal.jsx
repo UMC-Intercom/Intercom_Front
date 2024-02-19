@@ -13,7 +13,7 @@ const CoinUseModal = ({ isOpen, selectedItem}) => {
         // 사용자의 보유 코인 정보 조회
         const fetchCoins = async () => {
             try {
-                const response = await axios.get(`${config.API_URL}/users/coin`, {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/coin`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // 인증 토큰 추가
                     },

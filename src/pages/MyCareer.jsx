@@ -589,7 +589,7 @@ const MyProfile = () => {
     const fetchUserInfo = async () => {
       try {
         // 예시: 사용자 정보를 가져오는 axios 요청
-        const response = await axios.get(`${config.API_URL}/users/current-user`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/current-user`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -625,7 +625,7 @@ const MyProfile = () => {
       const formData = new FormData();
       formData.append('file', file); // 'file'은 서버에서 요구하는 필드명입니다.
   
-      axios.post(`${config.API_URL}/users/career-profile`, formData, {
+      axios.post(`${process.env.REACT_APP_API_URL}/users/career-profile`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
@@ -722,7 +722,7 @@ const MyCareer = () => {
   useEffect(() => {
     const fetchCareerInfo = async () => {
       try {
-        const response = await axios.get(`${config.API_URL}/careers`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/careers`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -758,7 +758,7 @@ const MyCareer = () => {
   useEffect(() => {
     const fetchCareerInfo = async () => {
       try {
-        const response = await axios.get(`${config.API_URL}/careers`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/careers`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -794,7 +794,7 @@ const MyCareer = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await axios.get(`${config.API_URL}/users/current-user`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/current-user`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           },

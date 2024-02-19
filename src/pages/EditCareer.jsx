@@ -830,7 +830,7 @@ const EditCareer = () => {
     const fetchCareerData = async () => {
       try {
         // 서버에서 사용자의 커리어 정보를 불러오는 GET 요청
-        const response = await axios.get(`${config.API_URL}/careers`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/careers`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
           },
@@ -1029,7 +1029,7 @@ const updateLink = (index, field, value) => {
     };
   
     // 서버에 POST 요청 보내기
-    axios.post(`${config.API_URL}/careers`, payload, {
+    axios.post(`${process.env.REACT_APP_API_URL}/careers`, payload, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         'Content-Type': 'application/json',

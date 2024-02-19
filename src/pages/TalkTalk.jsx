@@ -30,11 +30,11 @@ const Talktalk = () => {
 
 
   const fetchPosts = async (page) => {
-    let url = 'http://www.umcintercom.site/talks';
+    let url = `${process.env.REACT_APP_API_URL}/talks`;
 
     // 검색 모드일 경우
     if (isSearchMode) {
-      url = `http://www.umcintercom.site/talks/search?title=${searchTerm}&page=${page}`;
+      url = `${process.env.REACT_APP_API_URL}/talks/search?title=${searchTerm}&page=${page}`;
     } else {
       if (top100Active) {
         url += '/view-counts';
@@ -143,7 +143,7 @@ const handleGoPosting=()=>{
     setAnswersSortActive(false);
     // 검색 실행
     try {
-      const response = await axios.get(`http://www.umcintercom.site/talks/search?title=${tempSearchTerm}&page=1`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/talks/search?title=${tempSearchTerm}&page=1`);
       setSearchResults(response.data.content); // 검색 결과 업데이트
     } catch (error) {
       console.error('검색 요청 중 오류가 발생했습니다:', error);
