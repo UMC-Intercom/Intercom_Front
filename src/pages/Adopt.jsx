@@ -62,7 +62,7 @@ const Adopt = ({ commentId, accessToken, adoptionStatus, onAdoptSuccess }) => {
             }
         } catch (error) {
             console.error('채택 처리 중 오류 발생:', error);
-            alert('채택 처리 중 문제가 발생했습니다.');
+            alert('본인의 글은 채택할 수 없어요!.');
         } finally {
             setIsLoading(false); // 로딩 상태 해제
         }
