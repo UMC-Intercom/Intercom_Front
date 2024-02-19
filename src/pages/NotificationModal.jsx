@@ -57,15 +57,20 @@ const NotificationModal = ({ isOpen, onClose }) => {
                             <Text2>{notification.writer} 님이 {notification.commentId ? '댓글을' : '좋아요를'} 남겼습니다</Text2>
                             <Text3>{notification.commentId ? notification.comment : notification.talkTitle}</Text3>
                             <Text4>
-                                {formatDistanceToNow(parseISO(notification.createdAt), {
-                                    addSuffix: true,
-                                    locale: ko,
-                                })}
+                                {
+                                    notification.createdAt && !isNaN(parseISO(notification.createdAt).getTime())
+                                        ? formatDistanceToNow(parseISO(notification.createdAt), {
+                                            addSuffix: true,
+                                            locale: ko,
+                                        })
+                                        : '날짜 정보 없음'
+                                }
                             </Text4>
                             <hr />
                         </NotificationItem>
                     </StyledLink>
                 ))}
+
             </ModalContent>
 
         </Modal>
