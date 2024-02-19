@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import axios from 'axios';
+import {Link} from "react-router-dom";
+import {formatDistanceToNow, parseISO} from "date-fns";
+import ko from "date-fns/locale/ko";
 
 const NotificationModal = ({ isOpen, onClose }) => {
   const [notifications, setNotifications] = useState([]);
   const accessToken = localStorage.getItem('accessToken');
-  
+
   useEffect(() => {
       const fetchNotifications = async () => {
           try {
@@ -51,13 +54,20 @@ const NotificationModal = ({ isOpen, onClose }) => {
     >
 <ModalContent>
   {notifications.map(notification => (
-    <NotificationItem key={notification.id}>
-      <Text1>톡톡</Text1>
-      <Text2>{notification.writer} 님이 {notification.commentId ? '댓글을' : '좋아요를'} 남겼습니다</Text2>
-      <Text3>{notification.comment}</Text3>
-      <Text4>4분전</Text4>
-      <hr />
-    </NotificationItem>
+      <StyledLink to={`/talks/${notification.talkId}`} key={notification.id} onClick={onClose}>
+          <NotificationItem key={notification.id}>
+              <Text1>톡톡</Text1>
+              <Text2>{notification.writer} 님이 {notification.commentId ? '댓글을' : '좋아요를'} 남겼습니다</Text2>
+              <Text3>{notification.commentId ? notification.comment : notification.talkTitle}</Text3>
+              <Text4>
+                  {formatDistanceToNow(parseISO(notification.createdAt), {
+                      addSuffix: true,
+                      locale: ko,
+                  })}
+              </Text4>
+              <hr />
+          </NotificationItem>
+      </StyledLink>
   ))}
 </ModalContent>
 
@@ -132,4 +142,10 @@ line-height: 21px;
 color: #636363;
 margin-bottom:20px;
 `
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
+
 export default NotificationModal;
