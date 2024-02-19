@@ -104,7 +104,11 @@ const handlePostClick = async (postId) => {
   if (isRequesting || selectedPostId === postId) return;
   setIsRequesting(true);
   setSelectedPostId(postId);
-  navigate(`/talks/${postId}`);
+  if (!isLoggedIn) {
+    navigate('/join', { state: { from: location } });
+  } else {
+    navigate(`/talks/${postId}`);
+  }
   setIsRequesting(false);
 };
 

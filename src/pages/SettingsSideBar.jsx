@@ -13,7 +13,7 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
   const location = useLocation();
   const { toggleLogin } = useAuth();
   const { isLoggedIn } = useAuth();
-  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: './assets/MyProfile.png'});
+  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: '/assets/MyProfile.png'});
 
 
   const handleLogout = () => {

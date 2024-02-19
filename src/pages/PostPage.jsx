@@ -29,11 +29,6 @@ const PostPage = () => {
     const [userProfile, setUserProfile] = useState([]);
 
     useEffect(() => {
-        if (!isLoggedIn) {
-            navigate('/join', { state: { from: location } });
-            return;
-        }
-
         const fetchData = async () => {
             try {
                 const headers = { 'Authorization': `Bearer ${accessToken}` };
@@ -55,7 +50,7 @@ const PostPage = () => {
                 setCommentsCount(postDetailsResponse.data.commentCount);
 
                 if (postDetailsResponse.data.writerProfileUrl === null) {
-                    setUserProfile("./assets/MyProfile.png");
+                    setUserProfile("/assets/MyProfile.png");
                 }
                 else {
                     setUserProfile(postDetailsResponse.data.writerProfileUrl);
@@ -153,7 +148,6 @@ const PostPage = () => {
                         <Title>{post.title}</Title>
                         {isMentor && <MentorLabel>멘토</MentorLabel>}
                     </LeftContainer>
-                    {isLoggedIn && ( // 로그인 상태일 때만 스크랩 버튼 표시
                         <RightContainer>
                             <ScrapButton
                                 src={isScrapped ? '/assets/scrap.png' : '/assets/unscrap.png'}
@@ -161,7 +155,7 @@ const PostPage = () => {
                                 onClick={toggleScrap}
                             />
                         </RightContainer>
-                    )}
+                    
 
                 </TitleWrapper>
                 <Content dangerouslySetInnerHTML={{ __html: post.content }} />
