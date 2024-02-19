@@ -1,9 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
-import fakeNotificationData from '../data/fakeNotificationData';
+import axios from 'axios';
 
 const NotificationModal = ({ isOpen, onClose }) => {
+  const [notifications, setNotifications] = useState([]);
+  const accessToken = localStorage.getItem('accessToken');
+  
+  useEffect(() => {
+      const fetchNotifications = async () => {
+          try {
+              const response = await axios.get('http://localhost:8080/noti', {
+                  headers: {
+                      'Authorization': `Bearer ${accessToken}`,
+                  },
+              });
+              setNotifications(response.data);
+          } catch (error) {
+              console.error('알림 내역을 불러오는 중 오류 발생:', error);
+          }
+      };
+
+      if (isOpen) {
+          fetchNotifications();
+      }
+  }, [isOpen]);
+
+
+  console.log(notifications);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -24,17 +49,18 @@ const NotificationModal = ({ isOpen, onClose }) => {
         },
       }}
     >
-      <ModalContent>
-        {fakeNotificationData.map(notification => (
-          <NotificationItem key={notification.id}>
-            <Text1>톡톡</Text1>
-            <Text2>{notification.user} 님이 {notification.type === 'comment' ? '댓글을' : '좋아요를'} 남겼습니다</Text2>
-            <Text3>{notification.content}</Text3>
-            <Text4>4분전</Text4>
-            <hr />
-          </NotificationItem>
-        ))}
-      </ModalContent>
+<ModalContent>
+  {notifications.map(notification => (
+    <NotificationItem key={notification.id}>
+      <Text1>톡톡</Text1>
+      <Text2>{notification.writer} 님이 {notification.commentId ? '댓글을' : '좋아요를'} 남겼습니다</Text2>
+      <Text3>{notification.comment}</Text3>
+      <Text4>4분전</Text4>
+      <hr />
+    </NotificationItem>
+  ))}
+</ModalContent>
+
     </Modal>
   );
 };
