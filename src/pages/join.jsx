@@ -222,8 +222,7 @@ const Join = () => {
     
           // 로그인 상태 업데이트
           toggleLogin();
-    
-          alert("로그인 성공");
+
           navigate(from, { replace: true });
         })
         .catch(error => {
