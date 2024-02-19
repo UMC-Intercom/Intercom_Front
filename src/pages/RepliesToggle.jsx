@@ -47,6 +47,7 @@ const SubmitButton = styled.button`
 const RepliesToggle = ({ talkId, parentId }) => {
   const [showReplies, setShowReplies] = useState(false);
   const [newReply, setNewReply] = useState('');
+  const [isAdopted, setIsAdopted] = useState();
 
   const toggleRepliesVisibility = () => {
     setShowReplies(!showReplies);
@@ -84,7 +85,8 @@ const RepliesToggle = ({ talkId, parentId }) => {
       </ToggleButton>
       {showReplies && (
         <>
-          <ReplyList talkId={talkId} />
+          <ReplyList talkId={talkId} isAdopted={isAdopted}
+        setIsAdopted={setIsAdopted} />
           <ReplyInputContainer>
             <ReplyInput type="text" placeholder="댓글을 입력하세요..." value={newReply} onChange={handleReplyChange} />
             <SubmitButton onClick={submitReply}>댓글 달기</SubmitButton>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import ko from 'date-fns/locale/ko';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import ActionButtons from './ActionButtons'; 
+import ActionButtons from './ActionButtons';
 import RepliesToggle from './RepliesToggle'; // 올바른 경로로 수정하세요
 import { useAuth } from './AuthContext';
 import Adopt from './Adopt';
@@ -135,6 +135,22 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 
     const [adoptedCommentId, setAdoptedCommentId] = useState(null);
     const [nestedReplies, setNestedReplies] = useState([]);
+    const [isAdopted, setIsAdopted] = useState(false);
+
+    const checkAdoptionStatus = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8080/comments/check-adopt/${talkId}`);
+            setIsAdopted(response.data);
+        } catch (error) {
+            console.error('Error checking adoption status:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (talkId && !isAdopted) {
+            checkAdoptionStatus();
+        }
+    }, [talkId, adoptedCommentId, isAdopted]);
 
     const handleAdopt = async (commentId) => {
       try {
@@ -143,6 +159,8 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
         });
         setAdoptedCommentId(commentId); // 채택된 댓글 ID 업데이트
         // 채택 성공에 대한 추가 처리 (예: 알림 표시)
+          checkAdoptionStatus();
+          fetchReplies();
       } catch (error) {
         console.error("Error adopting comment:", error);
       }
@@ -154,7 +172,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
             try {
                 const response = await axios.get(`http://localhost:8080/comments/talk/${talkId}`, {
                     headers: { 'Authorization': `Bearer ${accessToken}` },
-                });    
+                });
                 const comments = response.data.filter(reply => !reply.parentId || reply.parentId === null);
                 const nestedReplies = response.data.filter(reply => reply.parentId);
                 console.log(comments)
@@ -180,7 +198,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
             const user = await fetchCurrentUser(accessToken);
             setCurrentUser(user);
           };
-      
+
           if (accessToken) {
             getCurrentUser();
           }
@@ -200,10 +218,10 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
               console.error("Error fetching replies:", error);
             }
           };
-        
+
           fetchReplies();
-        }, [talkId, accessToken, adoptedCommentId]); // adoptedCommentId가 변경될 때마다 댓글 목록을 새로고침합니다.
-        
+        }, [talkId, accessToken]); // adoptedCommentId가 변경될 때마다 댓글 목록을 새로고침합니다.
+
     const handleToggleLike = async (commentId) => {
         // 댓글의 좋아요 상태를 토글하는 함수입니다.
         const replyIndex = replies.findIndex(reply => reply.id === commentId);
@@ -225,7 +243,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
                 });
                 updatedReply.likeCount -= 1;
             }
-            updatedReplies[replyIndex] = updatedReply; 
+            updatedReplies[replyIndex] = updatedReply;
             setReplies(updatedReplies);
         } catch (error) {
             console.error("Error toggling like:", error);
@@ -242,13 +260,12 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
       useEffect(() => {
         fetchReplies().then(() => {
           // 채택된 답변을 상단에 배치
-          setReplies(prevReplies => 
+          setReplies(prevReplies =>
             prevReplies.sort((a, b) => b.adoptionStatus === 'ADOPTED' ? 1 : -1)
           );
         });
-      }, [talkId, accessToken, adoptedCommentId]); // adoptedCommentId가 변경될 때마다 댓글 목록을 업데이트합니다.
-    
-     
+      }, [talkId, accessToken, adoptedCommentId, isAdopted]); // adoptedCommentId가 변경될 때마다 댓글 목록을 업데이트합니다.
+
     return (
         <RepliesContainer>
             {replies.map(reply => (
@@ -256,18 +273,18 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
                 <ReplyContainer key={reply.id}>
                    {reply.adoptionStatus === 'ADOPTED' && <TopBar />}
                    {reply.adoptionStatus === 'ADOPTED' && (
-              <AdoptedTag>작성자 채택</AdoptedTag>)} 
+              <AdoptedTag>작성자 채택</AdoptedTag>)}
                   <ProfileAdoptWrapper>
                     <ReplyHeader>
-                    
+
                         <ReplyProfileImage src={reply.defaultProfile || defaultProfileImg} alt="Profile"style={{ border: '3px solid #E2E2E2' }} />
                         <ReplyUserInfo>
                             <ReplyUserName>{reply.writer}</ReplyUserName>
                             {reply.mentorField && <ReplyMentorField>{reply.mentorField}</ReplyMentorField>}
                         </ReplyUserInfo>
                     </ReplyHeader>
-                   
-                    {currentUser && currentUser.nickname === postWriter && (
+
+                    {currentUser && currentUser.nickname !== reply.writer && !isAdopted && (
                <Adopt commentId={reply.id} accessToken={accessToken} adoptionStatus={reply.adoptionStatus} onAdoptSuccess={() => handleAdopt(reply.id)}/>
                         )}
                   </ProfileAdoptWrapper>
@@ -286,11 +303,11 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
                         .filter(nestedReply => nestedReply.parentId === reply.id)
                         .map(nestedReply => (
                             <NestedReplyContainer key={nestedReply.id} style={{  }}>
-                                
+
                                 <NestedReplyUserInfo>
                                 <NestedReplyProfileImage src={nestedReply.defaultProfile || defaultProfileImg} alt="Profile"style={{ border: '3px solid #E2E2E2' }} />
                                   <NestedReplyUserName>{nestedReply.writer}</NestedReplyUserName>
-                                  
+
                                </NestedReplyUserInfo>
                                 <NestedReplyContent>{nestedReply.content}</NestedReplyContent>
                             </NestedReplyContainer>
@@ -337,6 +354,5 @@ font-size: 20px;
 font-weight: 600;
 margin-left: 11px;
 color: #636363;`;
-
 
 

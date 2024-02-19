@@ -9,7 +9,6 @@ import TalkPagination from "./TalkPagination";
 import { useAuth } from './AuthContext';
 
 
-
 export default function InterviewHome() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
