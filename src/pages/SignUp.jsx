@@ -69,99 +69,107 @@ export default function SignUp() {
     setEmail(currEmail);
 
     try {
-        const isDuplicated = await isEmailDuplicated(currEmail);
-        setCheckEmail(isDuplicated); // 중복된 경우 true로 설정
+      const isDuplicated = await isEmailDuplicated(currEmail);
+      setCheckEmail(isDuplicated); // 중복된 경우 true로 설정
 
-        if (!isDuplicated) {
-            setCheckEmail(true);
-        } else {
-          setCheckEmail(false);
-        }
+      if (!isDuplicated) {
+        setCheckEmail(true);
+      } else {
+        setCheckEmail(false);
+      }
     } catch (error) {
-        console.error('Error checking email duplication:', error);
-        setCheckEmail(false); // 오류 발생 시 false로 설정
-        alert('이메일 중복 확인 중 오류가 발생했습니다.');
+      console.error('Error checking email duplication:', error);
+      setCheckEmail(false); // 오류 발생 시 false로 설정
+      alert('이메일 중복 확인 중 오류가 발생했습니다.');
     }
-}, []);
+  }, []);
 
 
   const isEmailDuplicated = async (email) => {
     try {
-        // axios를 사용하여 서버에 GET 요청을 보냅니다.
-        const response = await axios.get(`http://localhost:8080/users/signup/email?email=${(email)}`);
+      // axios를 사용하여 서버에 GET 요청을 보냅니다.
+      const response = await axios.get(`http://localhost:8080/users/signup/email?email=${(email)}`);
 
-        // 요청이 성공하면 응답 데이터를 반환합니다.
-        return response.data;
+      // 요청이 성공하면 응답 데이터를 반환합니다.
+      return response.data;
     } catch (error) {
-        // 요청이 실패하면 콘솔에 에러를 출력하고 true를 반환합니다.
-        console.error(error);
-        return true;
+      // 요청이 실패하면 콘솔에 에러를 출력하고 true를 반환합니다.
+      console.error(error);
+      return true;
     }
-};
+  };
 
-const onChangeNickname = useCallback(async (e) => {
-  const currNickname = e.target.value;
-  setNickname(currNickname); // setNickname -> setNickName으로 수정
+  const onChangeNickname = useCallback(async (e) => {
+    const currNickname = e.target.value;
+    setNickname(currNickname); // setNickname -> setNickName으로 수정
 
-  try {
-    const isDuplicated = await isNicknameDuplicated(currNickname);
-    setCheckNickname(true); // 중복된 경우 true로 설정
-  } catch (error) {
-    console.error('Error checking nickname duplication:', error);
-    setCheckNickname(false); // 오류 발생 시 false로 설정
-    alert('닉네임 중복 확인 중 오류가 발생했습니다.');
-  }
-}, []);
+    try {
+      const isDuplicated = await isNicknameDuplicated(currNickname);
+      setCheckNickname(isDuplicated); // 중복된 경우 true로 설정
+
+      if (!isDuplicated) {
+        setCheckNickname(true);
+      } else {
+        setCheckNickname(false);
+      }
+    } catch (error) {
+      console.error('Error checking nickname duplication:', error);
+      setCheckNickname(false); // 오류 발생 시 false로 설정
+      alert('닉네임 중복 확인 중 오류가 발생했습니다.');
+    }
+  }, []);
 
 
-const isNicknameDuplicated = async (nickname) => {
-  try {
+  const isNicknameDuplicated = async (nickname) => {
+    try {
       // axios를 사용하여 서버에 GET 요청을 보냅니다.
       const response = await axios.get(`http://localhost:8080/users/signup/nickname?nickname=${(nickname)}`);
       // const response = await axios.get(`http://localhost:8080/users/signup/?nickname=${encodeURIComponent(nickname)}`);
 
       // 요청이 성공하면 응답 데이터를 반환합니다.
       return response.data;
-  } catch (error) {
+    } catch (error) {
       // 요청이 실패하면 콘솔에 에러를 출력하고 true를 반환합니다.
       console.error(error);
       return true;
-  }
-};
+    }
+  };
 
   //비밀번호 조건 1~3
   const onChangePwd1 = useCallback((e) => {
     const currPwd = e.target.value;
-    const isUpperCase = hasUpperCase(currPwd);
-    const isSpecialCharacter = hasSpecialCharacter(currPwd);
-
-    setPassword(currPwd);
-    setCheckPwd1(hasLowerCaseAndValidLength(currPwd));
-    setCheckPwd2(isUpperCase);
-    setCheckPwd3(isSpecialCharacter);
-  }, []);
-
-  const onChangePwd2 = useCallback((e) => {
-    const currPwd = e.target.value;
-    const isLowerCase = hasLowerCaseAndValidLength(currPwd);
-    const isSpecialCharacter = hasSpecialCharacter(currPwd);
-
-    setPassword(currPwd);
-    setCheckPwd1(isLowerCase);
-    setCheckPwd2(hasUpperCase(currPwd));
-    setCheckPwd3(isSpecialCharacter);
-  }, []);
-
-  const onChangePwd3 = useCallback((e) => {
-    const currPwd = e.target.value;
     const isLowerCase = hasLowerCaseAndValidLength(currPwd);
     const isUpperCase = hasUpperCase(currPwd);
-
+    const isSpecialCharacter = hasSpecialCharacter(currPwd);
+  
     setPassword(currPwd);
     setCheckPwd1(isLowerCase);
     setCheckPwd2(isUpperCase);
-    setCheckPwd3(hasSpecialCharacter(currPwd));
+    setCheckPwd3(isSpecialCharacter);
   }, []);
+  
+
+  // const onChangePwd2 = useCallback((e) => {
+  //   const currPwd = e.target.value;
+  //   const isLowerCase = hasLowerCaseAndValidLength(currPwd);
+  //   const isSpecialCharacter = hasSpecialCharacter(currPwd);
+
+  //   setPassword(currPwd);
+  //   setCheckPwd1(isLowerCase);
+  //   setCheckPwd2(hasUpperCase(currPwd));
+  //   setCheckPwd3(isSpecialCharacter);
+  // }, []);
+
+  // const onChangePwd3 = useCallback((e) => {
+  //   const currPwd = e.target.value;
+  //   const isLowerCase = hasLowerCaseAndValidLength(currPwd);
+  //   const isUpperCase = hasUpperCase(currPwd);
+
+  //   setPassword(currPwd);
+  //   setCheckPwd1(isLowerCase);
+  //   setCheckPwd2(isUpperCase);
+  //   setCheckPwd3(hasSpecialCharacter(currPwd));
+  // }, []);
 
   //비밀번호 확인
   const onChangeConfirmPwd = useCallback((e) => {
@@ -265,6 +273,8 @@ const isNicknameDuplicated = async (nickname) => {
       phone: phoneNum,
       gender,
     };
+
+    console.log("보내는 데이터:", user); // 데이터 확인을 위한 콘솔 출력
 
     axios.post('http://localhost:8080/users/signup', user, {
       withCredentials: true   // config
@@ -380,18 +390,24 @@ const isNicknameDuplicated = async (nickname) => {
           <Label style={{ marginRight: '-35px' }}>성별</Label>
           <RadioInput
             name="gender"
-            value="male"
+            onChange={handleChange}
+            value="male" // 남자일 때의 값을 설정합니다.
+            checked={gender === "male"} // 현재 상태와 비교하여 체크 여부를 결정합니다.
             label="남자"
           />
           <RadioInput
             name="gender"
-            value="female"
+            onChange={handleChange}
+            value="female" // 여자일 때의 값을 설정합니다.
+            checked={gender === "female"} // 현재 상태와 비교하여 체크 여부를 결정합니다.
             label="여자"
           />
           <RadioInput
             name="gender"
-            value="no-selected"
+            value="none" // 선택 안 함일 때의 값을 설정합니다.
+            checked={!gender} // 현재 상태와 비교하여 체크 여부를 결정합니다.
             label="선택 안 함"
+            onChange={handleChange}
           />
         </InputWrap>
 
