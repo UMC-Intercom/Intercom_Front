@@ -221,7 +221,7 @@ export default function InterviewHome() {
                   </InformationContainer>
                   <ScrapIconWrap>
                     <ScrapIcon src="./assets/scrap.png" />
-                    <ScrapCount>{interview.scrapCount}</ScrapCount>
+                    <ScrapCount>{interview.scrapCount.toLocaleString()}</ScrapCount>
                   </ScrapIconWrap>
                 </SearchResultBox>
             );

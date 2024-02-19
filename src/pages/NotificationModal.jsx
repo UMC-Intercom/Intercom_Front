@@ -29,10 +29,29 @@ const NotificationModal = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
+    useEffect(() => {
+        // 모달이 열릴 때 스크롤 방지
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            // 컴포넌트가 언마운트될 때 스크롤을 다시 활성화
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
+    // 모달 오버레이 클릭 시 모달 닫기
+    const handleOverlayClick = () => {
+        onClose();
+        document.body.style.overflow = 'unset'; // 스크롤 활성화
+    }
+
     return (
         <Modal
             isOpen={isOpen}
-            onRequestClose={onClose}
+            onRequestClose={handleOverlayClick}
+            shouldCloseOnOverlayClick={true}
             style={{
                 overlay: {
                     backgroundColor: 'none',

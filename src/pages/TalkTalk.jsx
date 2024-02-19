@@ -274,7 +274,7 @@ return(
           {(item.content && item.content.replace(/<img[^>]*>/g, "").replace(/<[^>]*>?/gm, "")) || "내용이 없습니다."}
         </p>
         <div className="details">
-          답변: {item.commentCount} | 댓글: {item.replyCount} | 조회수: {Math.floor(item.viewCount / 2)} | 좋아요: {item.likeCount}
+          답변: {item.commentCount.toLocaleString()} | 댓글: {item.replyCount.toLocaleString()} | 조회수: {Math.floor(item.viewCount / 2).toLocaleString()} | 좋아요: {item.likeCount.toLocaleString()}
         </div>
       </SearchResultItem>
     ))

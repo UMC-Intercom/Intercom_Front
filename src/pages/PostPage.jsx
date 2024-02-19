@@ -144,7 +144,7 @@ const PostPage = () => {
             <ButtonsContainer>
                 <TextButton onClick={handleReplyClick}>답변 달기</TextButton>
                 <IconButtonWithCount>
-                    <Count>{likesCount}</Count>
+                    <Count>{likesCount.toLocaleString()}</Count>
                     <LikeIcon onClick={toggleLike} src={liked ? "/assets/Vector1.png" : "/assets/Vector.png"} alt="좋아요" />
                 </IconButtonWithCount>
 

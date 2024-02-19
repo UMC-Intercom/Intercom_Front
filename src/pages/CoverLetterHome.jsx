@@ -222,7 +222,7 @@ export default function CoverLetterHome() {
                 </InformationContainer>
                 <ScrapIconWrap>
                   <ScrapIcon src="./assets/scrap.png" />
-                  <ScrapCount>{coverLetter.scrapCount}</ScrapCount>
+                  <ScrapCount>{coverLetter.scrapCount.toLocaleString()}</ScrapCount>
                 </ScrapIconWrap>
               </SearchResultBox>
           );
