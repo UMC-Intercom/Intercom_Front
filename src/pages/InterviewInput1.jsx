@@ -111,7 +111,7 @@ export default function InterviewInput1() {
     const isFormComplete = formData.company && formData.department;
   
     if (isFormComplete) {
-      navigate('/cover-letters-input2', { state: formData });
+      navigate('/interviews-input2', { state: formData });
     } else {
       alert('모든 필수 항목을 입력해주세요.');
     }

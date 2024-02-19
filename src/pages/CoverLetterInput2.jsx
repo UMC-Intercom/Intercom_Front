@@ -363,7 +363,7 @@ export default function CoverLetterInput2() {
                             <PassSearchIcon src='./assets/passSearch.png' />
                             <PassSearchText>검색하기</PassSearchText>
                         </PassSearch>
-                        <InputField2
+                        <InputField
                             placeholder='학과명'
                             type="text"
                             value={majorInputs[0].name}
