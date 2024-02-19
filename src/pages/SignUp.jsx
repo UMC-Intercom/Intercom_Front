@@ -136,7 +136,7 @@ export default function SignUp() {
   };
 
   //비밀번호 조건 1~3
-  const onChangePwd1 = useCallback((e) => {
+  const onChangePwd = useCallback((e) => {
     const currPwd = e.target.value;
     const isLowerCase = hasLowerCaseAndValidLength(currPwd);
     const isUpperCase = hasUpperCase(currPwd);
@@ -147,29 +147,6 @@ export default function SignUp() {
     setCheckPwd2(isUpperCase);
     setCheckPwd3(isSpecialCharacter);
   }, []);
-  
-
-  // const onChangePwd2 = useCallback((e) => {
-  //   const currPwd = e.target.value;
-  //   const isLowerCase = hasLowerCaseAndValidLength(currPwd);
-  //   const isSpecialCharacter = hasSpecialCharacter(currPwd);
-
-  //   setPassword(currPwd);
-  //   setCheckPwd1(isLowerCase);
-  //   setCheckPwd2(hasUpperCase(currPwd));
-  //   setCheckPwd3(isSpecialCharacter);
-  // }, []);
-
-  // const onChangePwd3 = useCallback((e) => {
-  //   const currPwd = e.target.value;
-  //   const isLowerCase = hasLowerCaseAndValidLength(currPwd);
-  //   const isUpperCase = hasUpperCase(currPwd);
-
-  //   setPassword(currPwd);
-  //   setCheckPwd1(isLowerCase);
-  //   setCheckPwd2(isUpperCase);
-  //   setCheckPwd3(hasSpecialCharacter(currPwd));
-  // }, []);
 
   //비밀번호 확인
   const onChangeConfirmPwd = useCallback((e) => {
@@ -274,7 +251,7 @@ export default function SignUp() {
       gender,
     };
 
-    console.log("보내는 데이터:", user); // 데이터 확인을 위한 콘솔 출력
+    console.log("조건확인", isAllValid); // 데이터 확인을 위한 콘솔 출력
 
     axios.post('http://localhost:8080/users/signup', user, {
       withCredentials: true   // config
@@ -315,7 +292,7 @@ export default function SignUp() {
 
         <InputWrap>
           <Label>비밀번호</Label>
-          <InputField type="password" onChange={onChangePwd1} />
+          <InputField type="password" onChange={onChangePwd} />
           <CheckWrap>
             {checkPwd1 !== null && (
               <img
