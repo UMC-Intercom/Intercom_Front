@@ -543,6 +543,7 @@ const InputField = styled.input`
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  padding-left: 15px; 
 `
 
 const FullAgreement = styled.label`
