@@ -32,7 +32,7 @@ const AdoptButtonStyled = styled.button`
 const Adopt = ({ commentId, accessToken, adoptionStatus, onAdoptSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
     const adopted = adoptionStatus === 'ADOPTED'; // 채택 상태 확인
-
+    console.log(adopted)
     const handleAdopt = async () => {
         if (adopted || isLoading) return; // 이미 채택됐거나 로딩 중이면 실행 중단
         setIsLoading(true);

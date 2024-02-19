@@ -4,8 +4,6 @@ import axios from 'axios';
 import ko from 'date-fns/locale/ko';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import ActionButtons from './ActionButtons'; 
-import RepliesToggle from './RepliesToggle'; // 올바른 경로로 수정하세요
-import { useAuth } from './AuthContext';
 import Adopt from './Adopt';
 
 
@@ -126,16 +124,46 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
     const [replies, setReplies] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
 
-    const [liked, setLiked] = useState(false); // '좋아요' 클릭 상태
+    const [liked, setLiked] = useState(false); 
     const [showReplies, setShowReplies] = useState(false);
     const [showRepliesFor, setShowRepliesFor] = useState({});
     const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
 
     const [adoptedCommentId, setAdoptedCommentId] = useState(null);
     const [nestedReplies, setNestedReplies] = useState([]);
-    const [replyContent, setReplyContent] = useState('');
+    const [isAdopted, setIsAdopted] = useState(false);
 
+    const addReplyToList = (newReply) => {
+      setReplies((prevReplies) => [...prevReplies, newReply]);
+    };
 
+    useEffect(() => {
+      const checkAdoptionStatus = async () => {
+          try {
+              const response = await axios.get(`http://localhost:8080/comments/check-adopt/${talkId}`);
+              setIsAdopted(response.data);
+          } catch (error) {
+              console.error('Error checking adoption status:', error);
+          }
+      };
+
+      if (talkId) {
+          checkAdoptionStatus();
+      }
+  }, [talkId, adoptedCommentId]);
+
+  const handleAdopt = async (commentId) => {
+    try {
+      await axios.post(`http://localhost:8080/comments/${commentId}/adopt`, {}, {
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+      });
+      setAdoptedCommentId(commentId); // 채택된 댓글 ID 업데이트
+      // 채택 성공에 대한 추가 처리 (예: 알림 표시)
+    } catch (error) {
+      console.error("Error adopting comment:", error);
+    }
+    onAdoptReply(commentId);
+  };
 
 
     const NestedReplyInput = ({ parentId, onReplySubmit }) => {
@@ -217,22 +245,6 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
       }
     };
     
-
-
-
-
-    const handleAdopt = async (commentId) => {
-      try {
-        await axios.post(`http://localhost:8080/comments/${commentId}/adopt`, {}, {
-          headers: { 'Authorization': `Bearer ${accessToken}` },
-        });
-        setAdoptedCommentId(commentId); // 채택된 댓글 ID 업데이트
-        // 채택 성공에 대한 추가 처리 (예: 알림 표시)
-      } catch (error) {
-        console.error("Error adopting comment:", error);
-      }
-      onAdoptReply(commentId);
-    };
 
     const fetchReplies = async () => {
             try {
@@ -316,9 +328,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
         }
     };
 
-    const handleCommentsClick = () => {
-        setShowReplies(!showReplies);
-      };
+  
       const toggleNestedRepliesVisibility = (commentId) => {
         setShowRepliesFor(prev => ({ ...prev, [commentId]: !prev[commentId] }));
     };
@@ -346,7 +356,9 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
                     
                         <ReplyProfileImage src={reply.defaultProfile || defaultProfileImg} alt="Profile"style={{ border: '3px solid #E2E2E2' }} />
                         <ReplyUserInfo>
-                            <ReplyUserName>{reply.writer}</ReplyUserName>
+                            <ReplyUserName>{reply.writer}
+                            {reply.mentorField && <CheckIcon src="/assets/Group133.png" alt="Verified" />}
+                            </ReplyUserName> 
                             {reply.mentorField && <ReplyMentorField>{reply.mentorField}</ReplyMentorField>}
                         </ReplyUserInfo>
                     </ReplyHeader>
@@ -377,7 +389,10 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
           <NestedReplyContainer key={nestedReply.id}>
             <NestedReplyUserInfo>
               <NestedReplyProfileImage src={nestedReply.defaultProfile || defaultProfileImg} alt="Profile" />
-              <NestedReplyUserName>{nestedReply.writer}</NestedReplyUserName>
+              <NestedReplyUserName>{nestedReply.writer}
+              {reply.mentorField && <CheckIcon2 src="/assets/Group133.png" alt="Verified" />}
+
+              </NestedReplyUserName>
             </NestedReplyUserInfo>
             <NestedReplyContent>{nestedReply.content}</NestedReplyContent>
           </NestedReplyContainer>
@@ -463,6 +478,17 @@ font-weight: 600;
 margin-left: 11px;
 color: rgba(99, 99, 99, 0.5);
 
+`;
+const CheckIcon = styled.img`
+  width: 20px;  // 로고 크기 조절
+  height: 20px; // 로고 크기 조절
+  margin-left: 7px; // 이름과의 간격 조절
+`;
+
+const CheckIcon2 = styled.img`
+  width: 15px;  // 로고 크기 조절
+  height: 15px; // 로고 크기 조절
+  margin-left: 5px; // 이름과의 간격 조절
 `;
 
 

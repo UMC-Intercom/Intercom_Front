@@ -8,6 +8,7 @@ import {useAuth} from "./AuthContext";
 import ReplyModal from "./ReplyModal";
 import ReplyList from './ReplyList';
 import Adopt from './Adopt';
+import RepliedModal from './RepliedModal';
 
 
 const PostPage = () => {
@@ -28,6 +29,7 @@ const PostPage = () => {
     const [userProfile, setUserProfile] = useState(null);
     const [adoptedComment, setAdoptedComment] = useState(null);
     const [adoptedReplyId, setAdoptedReplyId] = useState(null); // 각 게시물의 채택된 답변 ID를 관리
+    const [isRepliedModalOpen, setIsRepliedModalOpen] = useState(false); // RepliedModal 컴포넌트의 표시 여부를 제어할 상태 변수
 
     const handleAdoptReply = (replyId) => {
       setAdoptedReplyId(replyId); // 답변 채택 시 채택된 답변 ID 업데이트
@@ -196,7 +198,8 @@ const PostPage = () => {
                         likesCount={likesCount}
                     />
                 </BottomWrapper>
-                {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)} postId={postId}/>}
+                {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)} postId={postId} />}
+                
             <ReplyList talkId={postId} accessToken={accessToken} postWriter={post.writer} 
             adoptedReplyId={adoptedReplyId} 
             onAdoptReply={handleAdoptReply}/>
