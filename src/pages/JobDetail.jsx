@@ -156,29 +156,20 @@ const JobDetail = () => {
   // JobDetailsResponseDto에 맞춰서 상세 정보 표시
   return (
     <JobDetailContainer>
-      <JobHeader>
-          <Title>채용정보</Title>
-          <JobCompany>{job.company}</JobCompany>
-          <TitleScrapContainer>
-              <JobTitle>{job.title}</JobTitle>
-              <LinkButtonContainer>
-              <ScrapContainer>
-              <ScrapButton onClick={toggleScrap}>
-              스크랩
-              </ScrapButton>
-              <img 
-                src={isScraped ? "/assets/Vector10.png" : "/assets/Vector11.png"} 
-                alt="Scrap Icon"
-                width={24}
-                height={35}
-              />
-              </ScrapContainer>
-              <Link to={job.url}>
-                <LinkButton>공고 보기</LinkButton>
-              </Link>
-              </LinkButtonContainer>
-          </TitleScrapContainer>
-      </JobHeader>
+     <JobHeader>
+        <Title>채용정보</Title>
+        <JobCompany>{job.company}</JobCompany>
+        <JobTitleAndScrapContainer>
+            <JobTitle>{job.title}</JobTitle>
+            <ScrapContainer>
+                <ScrapButton onClick={toggleScrap}>스크랩</ScrapButton>
+                <ScrapButton2 src={isScraped ? "/assets/Vector10.png" : "/assets/Vector11.png"} alt="Scrap Icon" width={24} height={35}/>
+            </ScrapContainer>
+        </JobTitleAndScrapContainer>
+        <LinkButtonContainer>
+            <Link to={job.url}><LinkButton>공고 보기</LinkButton></Link>
+        </LinkButtonContainer>
+    </JobHeader>
       <JobDescription>
         <DescriptionItem>
           <Label>근무 지역</Label>
@@ -294,8 +285,9 @@ export default JobDetail;
 
 const ScrapContainer = styled.div `
   display: flex;
-  margin-top: 0rem;
+  margin-top: -40px;
 `;
+
 const ScrapButton = styled.button`
   font-family: SUITE;
   font-style: normal;
@@ -310,43 +302,45 @@ const ScrapButton = styled.button`
     background: #f7f7f7;
   }
   margin-right: 1rem;
-  margin-bottom: rem;
+  margin-top: 30px;
+`;
+
+const ScrapButton2 = styled.img`
+  margin-top: 30px;
 `;
 
 const JobDetailContainer = styled.div`
-    display: flex;
-    margin-left: 0rem;
-    align-items: center;
-    flex-direction: column;
-    
+  display: flex;
+  margin-left: 0rem;
+  align-items: center;
+  flex-direction: column;
 `;
 
 const JobHeader = styled.div`
-  display: flex;
-  align-items: left;
-  flex-direction: column;
-  margin-top: 3rem;
-  width: 1200px;
+display: flex;
+flex-direction: column;
+align-items: flex-start; // Align items to the start of the flex container
+width: 1200px;
+margin-top: 3rem;
 `;
-
 
 const JobTitle = styled.h1`
   font-family: 'SUITE';
   font-style: normal;
   font-weight: 700;
   font-size: 50px;
-  margin-top: 1rem;
-  margin-right: auto;
   color: #000000;
+  flex: 1; // Allow the title to fill the space
+  margin-right: 20px; // Add some margin to the right of the title
 `;
 
 const JobCompany = styled.p`
-font-family: 'SUITE';
-font-style: normal;
-font-weight: 600;
-font-size: 25px;
-color: #000000;
-margin-bottom:19px;
+  font-family: 'SUITE';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 25px;
+  color: #000000;
+  margin-bottom: 1rem; 
 `;
 
 const JobDescription = styled.div`
@@ -355,7 +349,7 @@ const JobDescription = styled.div`
   align-items: flex-start;
   flex-direction: column;
   color: #666;
-  margin-top: -5rem;
+  margin-top: -85px;
 `;
 const DescriptionItem = styled.div`
   display: flex;
@@ -373,9 +367,12 @@ const Label = styled.span`
 `;
 
 const LinkButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 9rem;
+display: flex;
+justify-content: flex-end;
+align-items: center;
+width: 100%;
+margin-top: 20px;
+z-index: 10; // Ensure it's above other elements
 `;
 
 const Item = styled.div`
@@ -402,10 +399,10 @@ const Title = styled.div`
 `;
 
 const TitleScrapContainer = styled.div`
-  display: flex;
-  justify-content: space-between; // 양쪽 끝으로 정렬
+display: flex;
+  justify-content: space-between; // Use this to space out job title and scrap button
   align-items: center;
-  margin-top: -9rem;
+  width: 100%; // Ensure it takes full width
 `;
 
 const ButtonContainer = styled.div`
@@ -418,20 +415,31 @@ const ButtonContainer = styled.div`
 
 
 const LinkButton = styled.button`
-  margin-left: -20rem;
-  margin-top: 5rem;
-  width: 281px;
-  height: 72px;
-  background-color: #5B00EF;
-  color: white;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  padding: 0 30px;
-  font-family: 'SUITE-SemiBold', sans-serif;
-  font-size: 22px;
-  transition: background-color 0.2s;
+width: 281px;
+height: 72px;
+background-color: #5B00EF;
+color: white;
+border-radius: 10px;
+border: none;
+cursor: pointer;
+padding: 15px 30px;
+font-family: 'SUITE-SemiBold', sans-serif;
+font-size: 22px;
+transition: background-color 0.2s;
+text-decoration: none; // Assuming it's styled like a link
+display: inline-block; // Helps with clickable area
+text-align: center; // Center the text if needed
 `;
+
+const JobTitleAndScrapContainer = styled.div`
+  display: flex;
+  justify-content: space-between; // Adjust as needed to space between title and scrap button
+  align-items: center;
+  width: 100%; // Make sure it spans the entire width of its container
+  margin-top: -50px;
+`;
+
+
 const Button = styled.button`
   margin-right: 20px;
   width: 228px;
