@@ -183,7 +183,8 @@ const customStyles = {
   placeholder: (provided) => ({
     ...provided,
     color: '#636363',
-    fontFamily: 'SUITE' //폰트 바꿈
+    fontFamily: 'SUITE', //폰트 바꿈
+    fontWeight: '700',
   }),
   option: (provided, state) => ({
     ...provided,
