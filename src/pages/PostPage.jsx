@@ -8,7 +8,7 @@ import {useAuth} from "./AuthContext";
 import ReplyModal from "./ReplyModal";
 import ReplyList from './ReplyList';
 import ActionButtons from "./ActionButtons";
-
+import Adopt from './Adopt';
 
 
 const PostPage = () => {
@@ -27,7 +27,14 @@ const PostPage = () => {
     const [commentsCount, setCommentsCount] = useState(0);
     const [isScrapped, setIsScrapped] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
+    const [adoptedComment, setAdoptedComment] = useState(null);
+    const [adoptedReplyId, setAdoptedReplyId] = useState(null); // 각 게시물의 채택된 답변 ID를 관리
 
+    const handleAdoptReply = (replyId) => {
+      setAdoptedReplyId(replyId); // 답변 채택 시 채택된 답변 ID 업데이트
+      // 서버에 채택 정보 업데이트 API 호출 등의 추가 처리
+    };
+  
     useEffect(() => {
         if (isLoggedIn) {
             const profile = localStorage.getItem('userProfile');
@@ -73,6 +80,7 @@ const PostPage = () => {
 
         fetchData();
     }, []);
+
     if (!post) {
         return <div>Loading post...</div>;
     }
@@ -124,6 +132,11 @@ const PostPage = () => {
             // 에러 처리 로직 (예: 사용자에게 오류 메시지 표시)
         }
     };
+
+    const handleAdoptSuccess = (adoptedData) => {
+        setAdoptedComment(adoptedData);
+        alert('답변이 성공적으로 채택되었습니다!');
+      };
     
     const ActionButtons = () => {
         return (
@@ -189,12 +202,16 @@ const PostPage = () => {
             </BottomWrapper>
             </PostContainer>
             {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)} postId={postId}/>}
-            <ReplyList talkId={postId} accessToken={accessToken} />
+            <ReplyList talkId={postId} accessToken={accessToken} postWriter={post.writer} 
+            adoptedReplyId={adoptedReplyId} 
+            onAdoptReply={handleAdoptReply}/>
         </PageContainer>
     );
 };
 
 export default PostPage;
+
+
 const ScrapButton = styled.img`
 width: 24px;
 height: 32px;
