@@ -35,15 +35,17 @@ export default function CoverLetterHome() {
   useEffect(() => {
     if (isLoggedIn) {
       const profile = localStorage.getItem('userProfile');
-
-      if (profile === "null") {
+  
+      if (profile === null || profile === "null") { 
         setUserProfile("./assets/MyProfile.png");
-      }
-      else {
+      } else {
         setUserProfile(profile);
       }
+    } else {
+      setUserProfile("./assets/MyProfile.png");
     }
   }, [isLoggedIn]);
+  
 
   const fetchPosts = async (page) => {
     let url = `${config.API_URL}/resumes?page=${currentPage}`;
@@ -215,9 +217,9 @@ export default function CoverLetterHome() {
                     <span> 학점: {coverLetter.gpa}</span>
                   </Information2>
                   <Information3>
-                    {coverLetter.titles[0]}
+                    {coverLetter.titles}
                     <br/>
-                    {coverLetter.contents[0]}
+                    {coverLetter.contents}
                   </Information3>
                 </InformationContainer>
                 <ScrapIconWrap>

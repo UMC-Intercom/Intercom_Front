@@ -216,7 +216,6 @@ const handleSubmit = async (e) => {
         if (response.status === 200 || response.status === 201) {
           alert('글이 성공적으로 등록되었습니다.');
           navigate('/post-success', { state: { postId: response.data.id } });
-          navigate(`/talks/${response.data.id}`);
         } else {
           throw new Error('서버에서 글 등록을 처리하지 못했습니다.');
         }
@@ -373,7 +372,7 @@ useEffect(() => {
   return (
     <PageContainer>
       <BackButtonContainer>
-        <BackButton onClick={handleGoBack}>뒤로가기</BackButton> 
+      <BackButton onClick={handleGoBack}>&lt; 뒤로가기</BackButton>
       </BackButtonContainer>
       <Form onSubmit={handleSubmit}>
       <InputContainer>
@@ -453,7 +452,7 @@ display: flex;
   min-height: 100vh; 
 `;
 const BackButtonContainer = styled.div`
-max-width: 75.125rem;`;
+max-width: 77.125rem;`;
 
 const Form = styled.form`
 display: flex;
@@ -772,14 +771,18 @@ const Button = styled.button`
 `;
 const BackButton = styled.div`
 display: flex;
+font-size:16px;
+font-weight: 700;
 cursor: pointer;
-background-color: #5B00EF;
-color: white;
+background-color: #fff;
+color: #5B00EF;
 border: none;
 padding: 10px;
 border-radius: 5px;
 margin-top: 4rem;
 margin-right: 70rem;
+font-family: SUITE;
+
 margin-bottom: -5.5rem;  
 align-self: flex-start;  
 `;
