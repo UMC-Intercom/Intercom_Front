@@ -155,7 +155,7 @@ const calculateRemainingDays = (expirationDate) => {
           <Icons onClick={() => handlePageChange('/scrap')}>
             <img src="/assets/SavedNotices.png" alt="SavedNotices" 
             style={{width: "4rem", height: "5rem", marginBottom: "1.25rem"}} />
-            <span>저장한 공고</span>
+            <span>스크랩</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/mycareer')}>
             <img src="/assets/MyCareer.png" alt="MyCareer"
@@ -215,7 +215,7 @@ const calculateRemainingDays = (expirationDate) => {
                      <SecondaryTitle>{job.company}</SecondaryTitle>
                    </TextWrap>
                    <Deadline>{calculateRemainingDays(job.expirationDate)}</Deadline>
-                   <Views>조회 {job.viewCount}</Views>
+                   <Views>조회 {job.viewCount.toLocaleString()}회</Views>
                  </div>
                </NoticeItem>
                 ))}

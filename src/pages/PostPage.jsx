@@ -8,7 +8,7 @@ import {useAuth} from "./AuthContext";
 import ReplyModal from "./ReplyModal";
 import ReplyList from './ReplyList';
 import ActionButtons from "./ActionButtons";
-
+import Adopt from './Adopt';
 
 
 const PostPage = () => {
@@ -26,14 +26,29 @@ const PostPage = () => {
     const [likesCount, setLikesCount] = useState(0);
     const [commentsCount, setCommentsCount] = useState(0);
     const [isScrapped, setIsScrapped] = useState(false);
-    const [userProfile, setUserProfile] = useState([]);
+    const [userProfile, setUserProfile] = useState(null);
+    const [adoptedComment, setAdoptedComment] = useState(null);
+    const [adoptedReplyId, setAdoptedReplyId] = useState(null); // 각 게시물의 채택된 답변 ID를 관리
+
+    const handleAdoptReply = (replyId) => {
+      setAdoptedReplyId(replyId); // 답변 채택 시 채택된 답변 ID 업데이트
+      // 서버에 채택 정보 업데이트 API 호출 등의 추가 처리
+    };
+  
+    useEffect(() => {
+        if (isLoggedIn) {
+            const profile = localStorage.getItem('userProfile');
+
+            if (profile === "null") {
+                setUserProfile("./assets/Ellipse2.png");
+            }
+            else {
+                setUserProfile(profile);
+            }
+        }
+    }, [isLoggedIn]);
 
     useEffect(() => {
-        if (!isLoggedIn) {
-            navigate('/join', { state: { from: location } });
-            return;
-        }
-
         const fetchData = async () => {
             try {
                 const headers = { 'Authorization': `Bearer ${accessToken}` };
@@ -55,7 +70,7 @@ const PostPage = () => {
                 setCommentsCount(postDetailsResponse.data.commentCount);
 
                 if (postDetailsResponse.data.writerProfileUrl === null) {
-                    setUserProfile("./assets/MyProfile.png");
+                    setUserProfile("/assets/MyProfile.png");
                 }
                 else {
                     setUserProfile(postDetailsResponse.data.writerProfileUrl);
@@ -67,7 +82,7 @@ const PostPage = () => {
         };
 
         fetchData();
-    }, []);
+    }, [postId]);
     if (!post) {
         return <div>Loading post...</div>;
     }
@@ -120,12 +135,17 @@ const PostPage = () => {
         }
     };
 
+    const handleAdoptSuccess = (adoptedData) => {
+        setAdoptedComment(adoptedData);
+        alert('답변이 성공적으로 채택되었습니다!');
+      };
+    
     const ActionButtons = () => {
         return (
             <ButtonsContainer>
                 <TextButton onClick={handleReplyClick}>답변 달기</TextButton>
                 <IconButtonWithCount>
-                    <Count>{likesCount}</Count>
+                    <Count>{likesCount.toLocaleString()}</Count>
                     <LikeIcon onClick={toggleLike} src={liked ? "/assets/Vector1.png" : "/assets/Vector.png"} alt="좋아요" />
                 </IconButtonWithCount>
                 <IconButtonWithCount>
@@ -153,7 +173,6 @@ const PostPage = () => {
                         <Title>{post.title}</Title>
                         {isMentor && <MentorLabel>멘토</MentorLabel>}
                     </LeftContainer>
-                    {isLoggedIn && ( // 로그인 상태일 때만 스크랩 버튼 표시
                         <RightContainer>
                             <ScrapButton
                                 src={isScrapped ? '/assets/scrap.png' : '/assets/unscrap.png'}
@@ -161,7 +180,7 @@ const PostPage = () => {
                                 onClick={toggleScrap}
                             />
                         </RightContainer>
-                    )}
+                    
 
                 </TitleWrapper>
                 <Content dangerouslySetInnerHTML={{ __html: post.content }} />
@@ -184,12 +203,16 @@ const PostPage = () => {
                 </BottomWrapper>
             </PostContainer>
             {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)} postId={postId}/>}
-            <ReplyList talkId={postId} accessToken={accessToken} />
+            <ReplyList talkId={postId} accessToken={accessToken} postWriter={post.writer} 
+            adoptedReplyId={adoptedReplyId} 
+            onAdoptReply={handleAdoptReply}/>
         </PageContainer>
     );
 };
 
 export default PostPage;
+
+
 const ScrapButton = styled.img`
   width: 24px;
   height: 32px;

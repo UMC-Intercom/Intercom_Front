@@ -102,6 +102,10 @@ function App() {
           <Route path="/mycareer-edit" element={<EditCareer />} />
           <Route path='/job/:jobId' element={<JobDetail />} />
 
+          <Route path='/findingPassword' element={<FindingPassword />} />
+          <Route path='/settingPwd' element={<SettingPassword />} />
+          <Route path='/post-success' element={<PostSuccessPage />} />
+
           <Route path="/cover-letters" element={<CoverLetterInput />} />
           <Route path="/cover-letters-home" element={<CoverLetterHome />} />
           <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />

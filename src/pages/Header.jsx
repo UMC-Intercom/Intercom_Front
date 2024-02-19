@@ -10,7 +10,7 @@ import NotificationModal from "./NotificationModal";
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
   const { isLoggedIn, toggleLogin } = useAuth();
-  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: './assets/MyProfile.png'});
+  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: '/assets/MyProfile.png'});
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,7 +106,7 @@ const Header = () => {
         <Logo src="/assets/Logo.png" alt="IntercomLogo" onClick={() => handlePageChange('/home')}/>
         <PageLists>
           <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
-          <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>저장한 공고</Pages>
+          <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>스크랩</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
           <Pages active={activePage === '/mycareer'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
           <Pages active={activePage === '/cover-letters-home'} onClick={() => handlePageChange('/cover-letters-home')}>합격 자소서</Pages>

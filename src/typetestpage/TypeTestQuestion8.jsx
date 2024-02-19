@@ -27,7 +27,7 @@ export default function TypeTestQuestion8() {
     const filteringResult2_2Num = newChoice.split('').filter(char => char !== '4' && char !== '5').join('');
     const filteringResult3Num = newChoice.split('').filter(char => char !== '2' && char !== '3').join('');
     
-    if (filteringResult1Num === '04674' && countOccurrences(newChoice, '2') >= 1) { //느티(안정)
+    if (filteringResult1Num === '04674' || countOccurrences(newChoice, '2') >= 3) { //느티(안정)
       navigate('/type-test-result1');
     } 
     else if (filteringResult2_1Num === '15585' && countOccurrences(newChoice, '3') >= 1) { //자작(도전)
@@ -36,13 +36,13 @@ export default function TypeTestQuestion8() {
     else if (filteringResult2_2Num === '13338' && countOccurrences(newChoice, '5') >= 1) { //자작(연봉)
       navigate('/type-test-result2');
     }
-    else if (filteringResult3Num === '04684' && countOccurrences(newChoice, '3') >= 1) { //버드(도전)
+    else if (filteringResult3Num === '04684' || countOccurrences(newChoice, '3') >= 3) { //버드(도전)
       navigate('/type-test-result3');
     }
-    else if (filteringResult2_1Num === '15575' && countOccurrences(newChoice, '2') >= 1) { //선인장(안정)
+    else if (filteringResult2_1Num === '15575' || countOccurrences(newChoice, '2') >= 2) { //선인장(안정)
       navigate('/type-test-result4');
     }
-    else if (filteringResult2_2Num === '12227' && countOccurrences(newChoice, '5') >= 1) { //선인장(연봉)
+    else if (filteringResult2_2Num === '12227' || countOccurrences(newChoice, '5') >= 2) { //선인장(연봉)
       navigate('/type-test-result4');
     }
     else {

@@ -265,6 +265,7 @@ export default function SignUp() {
       alert('회원가입 성공');
 
         // userNickname 아래 페이지로 넘겨서 정보 보낼 때 같이 전달 plz
+        localStorage.setItem('userNickname', userNickname);
         // 2단계 api는 구현 안 된 상태라 하고 연동 예정
         navigateToSignUp2();
       })
