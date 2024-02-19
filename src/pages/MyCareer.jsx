@@ -426,6 +426,7 @@ const DownloadButtonContainer = styled.div`
 
 const DownloadPDFButton = styled.button`
   width: 200px;
+  margin-top: -30px;
   height: 64px;
   background-color: #5B00EF; 
   color: white;
@@ -548,21 +549,27 @@ const EducationContent = styled.div`
 
 const LinkTitle = styled(CertificateTitle)``; // 자격증 섹션과 동일한 스타일
 
-const LinkBox = styled(CertificateBox)``; // 자격증 섹션과 동일한 스타일
+const LinkBox = styled(CertificateBox)`
+height: 70px;`; // 자격증 섹션과 동일한 스타일
 
 const LinkEntry = styled(CertificateEntry)``; // 자격증 섹션과 동일한 스타일
 
 const LinkName = styled(CertificateName)``; // 자격증 섹션과 동일한 스타일
 
 const LinkValue = styled.a`
-  font-weight: 600;
-  font-size: 20px;
-  color: #5B00EF; // 링크 색상
-  text-decoration: none; // 밑줄 제거
+font-weight: 600;
+font-size: 20px;
+color: #5B00EF; // 링크 색상
+text-decoration: none; // 밑줄 제거
+overflow: hidden; // 내용이 넘칠 경우 숨김
+text-overflow: ellipsis; // 넘칠 경우 말줄임표 사용
+white-space: nowrap; // 텍스트를 한 줄로 표시
+display: block; // 블록 레벨 요소로 만들어 전체 너비 사용
+max-width: 90%; // LinkBox 내에서 최대 너비 설정, 필요에 따라 조절
 
-  &:hover {
-    text-decoration: underline; // 호버 시 밑줄 표시
-  }
+&:hover {
+  text-decoration: underline; // 호버 시 밑줄 표시
+}
 `;
 
 const MyProfile = () => {
@@ -691,22 +698,26 @@ const MyCareer = () => {
   const [activities, setActivities] = useState([]);
   const [skills, setSkills] = useState([]);
   const [profileImage, setProfileImage] = useState('');
-  const [links, setLinks] = useState([]); // 링크 상태 초기화
+  const [linkUrl, setLinkUrl] = useState('');
 
-  const renderLinks = () => {
-    return links.map((link, index) => (
-      <CenteredContainer key={index}>
-        <LinkBox  style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
-          <LinkEntry>
-            {/* LinkName을 <a> 태그로 변경합니다. */}
-            <LinkName as="a" href={link.url} target="_blank" rel="noopener noreferrer">
-              {link.title}
-            </LinkName>
-          </LinkEntry>
-        </LinkBox>
-      </CenteredContainer>
-    ));
-  };
+      const renderLink = () => {
+        if (!linkUrl) return null; // 링크 URL이 없으면 렌더링하지 않음
+
+        return (
+          <CenteredContainer>
+            <LinkBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
+              <LinkEntry>
+                {/* a 태그를 사용하여 링크 제공 */}
+                <LinkValue href={linkUrl} target="_blank" rel="noopener noreferrer">
+                  {linkUrl}
+                </LinkValue>
+              </LinkEntry>
+            </LinkBox>
+          </CenteredContainer>
+        );
+      };
+
+
   
   useEffect(() => {
     const fetchCareerInfo = async () => {
@@ -731,11 +742,9 @@ const MyCareer = () => {
         setActivities(data.activity);
         setSkills(data.skill ? data.skill.split(', ') : []);
         setProfileImage(data.careerProfile);
-        const linkData = data.link ? data.link.split(',').map(linkItem => {
-          const [title, url] = linkItem.split('|').map(item => item.trim());
-          return { title, url };
-        }) : [];
-        setLinks(linkData);
+        if (data.link) {
+          setLinkUrl(data.link.trim());
+        }
       } catch (error) {
         console.error('Failed to fetch career info:', error);
       }
@@ -847,39 +856,46 @@ const MyCareer = () => {
     ));
   };
 
-  const handleDownload = () => {
-
-    
+  const handleDownload = async () => {
     setShowModal(false);
     setIsPdfDownloadMode(true);
-    
+  
+    // 이미지가 완전히 로드되었는지 확인
+    await new Promise(resolve => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = resolve; // 에러 처리도 고려
+      img.src = profileImage || "/assets/idphoto.png";
+    });
+  
     setTimeout(() => {
       const element = document.getElementById('pdf-content');
       const fileName = `${userInfo.name}님의 커리어.pdf`;
   
       const options = {
-      margin: [5, 5, 5, 5],
-      filename: fileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
-        logging: true, 
-        useCORS: true,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight 
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    };
-    
-    html2pdf().from(element).set(options).save().then(() => {
-      // PDF 다운로드가 완료되면 완료 모달 표시
-      setShowDownloadCompleteModal(true);
-      setIsPdfDownloadMode(false); // PDF 다운로드 모드 비활성화
-    });
-  }, 500);
-};
+        margin: [5, 5, 5, 5],
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          logging: true,
+          useCORS: true,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      };
+  
+      html2pdf().from(element).set(options).save().then(() => {
+        // PDF 다운로드가 완료되면 완료 모달 표시
+        setShowDownloadCompleteModal(true);
+        setIsPdfDownloadMode(false); // PDF 다운로드 모드 비활성화
+      });
+    }, 500);
+  };
+  
 
 const DownloadCompleteModal = () => (
 
@@ -920,7 +936,7 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
         <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '757px' : '792px' }}>
         {isPdfDownloadMode && (
         <ProfileSection>
-          <IDPhoto src={profileImage || "/assets/idphoto.png"} alt="ID Photo" />
+          <IDPhoto src="./assets/Idphoto2.png" alt="ID Photo" />
           <ProfileDetailsContainer2>
             <ProfileName2>{userInfo.name}</ProfileName2>
             <ProfileDetail2>이메일 <ProfileEmailValue>{userInfo.email}</ProfileEmailValue></ProfileDetail2>
@@ -1017,13 +1033,13 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
           )}
 
           {/* 링크 섹션 렌더링 */}
-          {links.length > 0 && (
-            <>
-              <LinkTitle>링크</LinkTitle>
-              {renderLinks()}
-              <SectionDivider />
-            </>
-          )}
+          {linkUrl && (
+        <>
+          <LinkTitle>링크</LinkTitle>
+          {renderLink()}
+          <SectionDivider />
+        </>
+      )}
 
         </CareerBox>
         
