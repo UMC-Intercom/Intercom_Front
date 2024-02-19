@@ -129,12 +129,13 @@ export default function CoverLetterInput() {
 
           <InputWrap>
             <Label>회사명</Label>
-            <InputField
+            <InputField2
               type="text"
               name="company"
               placeholder="회사명"
               value={formData.company}
               onChange={handleChange}
+              readOnly={true}
             />
             <PassSearch onClick={toggleSearchModal}>
               <PassSearchIcon src='./assets/passSearch.png' />

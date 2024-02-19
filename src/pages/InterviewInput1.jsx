@@ -128,12 +128,13 @@ export default function InterviewInput1() {
 
           <InputWrap>
             <Label>회사명</Label>
-            <InputField
+            <InputField2
               type="text"
               name="company"
               placeholder="회사명"
               value={formData.company}
               onChange={handleChange}
+              readOnly={true}
             />
             <PassSearch onClick={toggleSearchModal}>
               <PassSearchIcon src='./assets/passSearch.png' />
@@ -292,7 +293,7 @@ export default function InterviewInput1() {
         );
       }
 
-      const InputField2 = styled.input`
+const InputField2 = styled.input`
   font-family: SUITE;
   font-size: 1.25rem;
   font-weight: 700;
