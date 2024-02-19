@@ -387,6 +387,8 @@ const SearchResultBox = styled.div`
   margin-top: 30px;
   border-bottom: 2px solid #E2E2E2;
   padding-bottom: 16px;
+  overflow: hidden;
+  padding-bottom: 5px; 
 `;
 
 const InformationContainer = styled.div`
