@@ -215,7 +215,7 @@ const calculateRemainingDays = (expirationDate) => {
                      <SecondaryTitle>{job.company}</SecondaryTitle>
                    </TextWrap>
                    <Deadline>{calculateRemainingDays(job.expirationDate)}</Deadline>
-                   <Views>조회 {job.viewCount}</Views>
+                   <Views>조회 {job.viewCount.toLocaleString()}회</Views>
                  </div>
                </NoticeItem>
                 ))}
