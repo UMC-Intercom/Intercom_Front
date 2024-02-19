@@ -388,6 +388,8 @@ const Item = styled.div`
 `;
 
 const Content = styled.div`
+  margin-left:-20rem;
+  margin-top: -1rem;
 `;
 
 const Title = styled.div`
@@ -396,13 +398,6 @@ const Title = styled.div`
     font-style: normal;
     font-size: 1.5625rem;
     font-weight: 800;
-`;
-
-const TitleScrapContainer = styled.div`
-display: flex;
-  justify-content: space-between; // Use this to space out job title and scrap button
-  align-items: center;
-  width: 100%; // Ensure it takes full width
 `;
 
 const ButtonContainer = styled.div`
@@ -459,7 +454,7 @@ const InterviewListContainer = styled.div`
     font-family: SUITE;
     font-weight: 800;
     display: flex;
-    width: 50rem;
+    width: 100%;
     flex-direction: column;
     background-color: white; // 배경색 변경
     border-radius: 3%; // 모서리 둥글게
