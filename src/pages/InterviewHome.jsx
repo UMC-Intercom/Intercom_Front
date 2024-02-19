@@ -219,7 +219,7 @@ export default function InterviewHome() {
                       <span> 학점: {interview.gpa}</span>
                     </Information2>
                     <Information3>
-                      {interview.contents && interview.contents.length > 0 ? interview.contents[0] : '내용이 없습니다.'}
+                      {interview.contents && interview.contents.length > 0 ? interview.contents : '내용이 없습니다.'}
                     </Information3>
                   </InformationContainer>
                   <ScrapIconWrap>

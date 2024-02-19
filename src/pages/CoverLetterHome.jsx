@@ -217,9 +217,9 @@ export default function CoverLetterHome() {
                     <span> 학점: {coverLetter.gpa}</span>
                   </Information2>
                   <Information3>
-                    {coverLetter.titles[0]}
+                    {coverLetter.titles}
                     <br/>
-                    {coverLetter.contents[0]}
+                    {coverLetter.contents}
                   </Information3>
                 </InformationContainer>
                 <ScrapIconWrap>
