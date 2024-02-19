@@ -49,7 +49,7 @@ const Adopt = ({ commentId, accessToken, adoptionStatus, onAdoptSuccess }) => {
         try {
             // 채택 API 호출
             const response = await axios.post(
-                `http://localhost:8080/comments/${commentId}/adopt`,
+                `http://www.umcintercom.site/comments/${commentId}/adopt`,
                 {},
                 { headers: { Authorization: `Bearer ${accessToken}` } }
             );

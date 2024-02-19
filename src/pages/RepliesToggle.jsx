@@ -47,7 +47,6 @@ const SubmitButton = styled.button`
 const RepliesToggle = ({ talkId, parentId }) => {
   const [showReplies, setShowReplies] = useState(false);
   const [newReply, setNewReply] = useState('');
-  const [isAdopted, setIsAdopted] = useState();
 
   const toggleRepliesVisibility = () => {
     setShowReplies(!showReplies);
@@ -61,7 +60,7 @@ const RepliesToggle = ({ talkId, parentId }) => {
     if (!newReply.trim()) return;
     try {
       const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
-      const response = await axios.post('http://localhost:8080/comments/reply', {
+      const response = await axios.post('http://www.umcintercom.site/comments/reply', {
         talkId: talkId,
         parentId: parentId, // 대댓글이 달릴 상위 댓글의 ID
         content: newReply
@@ -85,8 +84,7 @@ const RepliesToggle = ({ talkId, parentId }) => {
       </ToggleButton>
       {showReplies && (
         <>
-          <ReplyList talkId={talkId} isAdopted={isAdopted}
-        setIsAdopted={setIsAdopted} />
+          <ReplyList talkId={talkId} />
           <ReplyInputContainer>
             <ReplyInput type="text" placeholder="댓글을 입력하세요..." value={newReply} onChange={handleReplyChange} />
             <SubmitButton onClick={submitReply}>댓글 달기</SubmitButton>

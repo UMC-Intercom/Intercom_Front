@@ -150,7 +150,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    const response = await axios.get('http://localhost:8080/talks/check-mentor', {
+    const response = await axios.get('http://www.umcintercom.site/talks/check-mentor', {
       headers: {
         'Authorization': `Bearer ${accessToken}`, // 로컬 스토리지에서 가져온 토큰 사용
       },
@@ -206,7 +206,7 @@ const handleSubmit = async (e) => {
       });
 
       try {
-        const response = await axios.post('http://localhost:8080/talks', formData, {
+        const response = await axios.post('http://www.umcintercom.site/talks', formData, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'multipart/form-data',
@@ -317,7 +317,7 @@ function dataURLtoBlob(dataUrl) {
   });
 
   try {
-    const response = await axios.post('http://localhost:8080/talks/temporary-save', formData, {
+    const response = await axios.post('http://www.umcintercom.site/talks/temporary-save', formData, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },

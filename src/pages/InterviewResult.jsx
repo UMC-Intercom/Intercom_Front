@@ -14,7 +14,7 @@
             const fetchInterview = async () => {
               try {
                 // 변경된 API 경로에 맞춰서 요청
-                const response = await axios.get(`http://localhost:8080/interviews/${id}`, {
+                const response = await axios.get(`http://www.umcintercom.site/interviews/${id}`, {
                   headers: {
                     'Authorization': `Bearer ${accessToken}`,
                   },
@@ -32,14 +32,14 @@
             const fetchInterview = async () => {
               try {
                 // 변경된 API 경로에 맞춰서 요청
-                const response = await axios.get(`http://localhost:8080/interviews/${id}`, {
+                const response = await axios.get(`http://www.umcintercom.site/interviews/${id}`, {
                   headers: {
                     'Authorization': `Bearer ${accessToken}`,
                   },
                 });
                 setInterview(response.data);
         
-                const scrapResponse = await axios.get(`http://localhost:8080/scraps/posts/${id}`, {
+                const scrapResponse = await axios.get(`http://www.umcintercom.site/scraps/posts/${id}`, {
                   headers: {
                     'Authorization': `Bearer ${accessToken}`,
                   },
@@ -57,13 +57,13 @@
           const toggleScrap = async () => {
             try {
               if (isScrapped) {
-                await axios.delete(`http://localhost:8080/scraps/posts/${id}`, {
+                await axios.delete(`http://www.umcintercom.site/scraps/posts/${id}`, {
                   headers: {
                     'Authorization': `Bearer ${accessToken}`,
                   },
                 });
               } else {
-                await axios.post(`http://localhost:8080/scraps/posts/${id}`, {}, {
+                await axios.post(`http://www.umcintercom.site/scraps/posts/${id}`, {}, {
                   headers: {
                     'Authorization': `Bearer ${accessToken}`,
                   },

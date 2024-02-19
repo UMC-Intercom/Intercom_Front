@@ -13,7 +13,7 @@ const NotificationModal = ({ isOpen, onClose }) => {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/noti', {
+                const response = await axios.get('http://www.umcintercom.site/noti', {
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
                     },

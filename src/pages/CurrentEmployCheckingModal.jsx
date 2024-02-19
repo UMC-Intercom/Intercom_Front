@@ -275,7 +275,7 @@ const CurrentEmployCheckingModal = ({ isOpen, onClose, onCheck }) => {
       try {
         // `mentorField` 쿼리 파라미터로 카테고리 이름을 전송합니다.
         // JSON 형식이 아닌 URL 인코딩된 폼 데이터 형식을 사용할 경우, `Content-Type` 헤더와 `body` 형식을 변경해야 합니다.
-        const response = await axios.post(`http://localhost:8080/talks/certification-mentor?mentorField=${selectedCategoryName}`, null,{
+        const response = await axios.post(`http://www.umcintercom.site/talks/certification-mentor?mentorField=${selectedCategoryName}`, null,{
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },

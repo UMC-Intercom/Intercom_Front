@@ -42,7 +42,7 @@ useEffect(() => {
     console.log(formData);
   
     try {
-      const response = await axios.post('http://localhost:8080/interviews', formData, {
+      const response = await axios.post('http://www.umcintercom.site/interviews', formData, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         },

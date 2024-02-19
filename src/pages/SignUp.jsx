@@ -88,7 +88,7 @@ export default function SignUp() {
   const isEmailDuplicated = async (email) => {
     try {
       // axios를 사용하여 서버에 GET 요청을 보냅니다.
-      const response = await axios.get(`http://localhost:8080/users/signup/email?email=${(email)}`);
+      const response = await axios.get(`http://www.umcintercom.site/users/signup/email?email=${(email)}`);
 
       // 요청이 성공하면 응답 데이터를 반환합니다.
       return response.data;
@@ -123,7 +123,7 @@ export default function SignUp() {
   const isNicknameDuplicated = async (nickname) => {
     try {
       // axios를 사용하여 서버에 GET 요청을 보냅니다.
-      const response = await axios.get(`http://localhost:8080/users/signup/nickname?nickname=${(nickname)}`);
+      const response = await axios.get(`http://www.umcintercom.site/users/signup/nickname?nickname=${(nickname)}`);
       // const response = await axios.get(`http://localhost:8080/users/signup/?nickname=${encodeURIComponent(nickname)}`);
 
       // 요청이 성공하면 응답 데이터를 반환합니다.
@@ -255,7 +255,7 @@ export default function SignUp() {
 
       console.log("조건확인", isAllValid); // 데이터 확인을 위한 콘솔 출력
 
-      axios.post('http://localhost:8080/users/signup', user, {
+      axios.post('http://www.umcintercom.site/users/signup', user, {
         withCredentials: true   // config
       }).then(response => {
         const userNickname = response.data;

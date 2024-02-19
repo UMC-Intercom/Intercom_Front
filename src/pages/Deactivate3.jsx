@@ -13,7 +13,7 @@ const Deactivate3 = () => {
 
   return (
     <DeactivateContainer>
-      <Title>{name} 님, 회원 탈퇴하기 전에 확인해주세요</Title>
+      <Title>회원 탈퇴하기 전에 확인해주세요</Title>
       <InstructionsList>
         <li>내 커리어에 입력해 둔 이력서 및 자기소개는 더 이상 열람 및 수정이 어려워요 </li>
         <li>탈퇴 후 정보를 열람할 수 없지만 저장해 둔 이력서를 PDF 파일로 내려 받을 수 있어요</li>

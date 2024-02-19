@@ -9,7 +9,7 @@ export default function OnBoarding2() {
 
   const navigateToSignUp4 = () => {
     // 서버
-    axios.post(`http://localhost:8080/users/interests?nickname=${userNickname}`, selectedStr)
+    axios.post(`http://www.umcintercom.site/users/interests?nickname=${userNickname}`, selectedStr)
         .then(response => {
           alert('관심분야가 저장되었습니다.');
           navigate('/signup4');

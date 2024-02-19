@@ -14,7 +14,7 @@ export default function CoverLetterResult() {
         const fetchResume = async () => {
           try {
             // 변경된 API 경로에 맞춰서 요청
-            const response = await axios.get(`http://localhost:8080/resumes/${id}`, {
+            const response = await axios.get(`http://www.umcintercom.site/resumes/${id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },
@@ -32,14 +32,14 @@ export default function CoverLetterResult() {
         const fetchResume = async () => {
           try {
             // 변경된 API 경로에 맞춰서 요청
-            const response = await axios.get(`http://localhost:8080/resumes/${id}`, {
+            const response = await axios.get(`http://www.umcintercom.site/resumes/${id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },
             });
             setResume(response.data);
     
-            const scrapResponse = await axios.get(`http://localhost:8080/scraps/posts/${id}`, {
+            const scrapResponse = await axios.get(`http://www.umcintercom.sitescraps/posts/${id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
               },

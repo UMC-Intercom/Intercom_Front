@@ -13,7 +13,7 @@ const CommentReply = ({ parentId, postId, fetchComments }) => {
     const submitReply = async () => {
         if (replyInput.trim() !== '') {
             try {
-                await axios.post(`http://localhost:8080/comments/reply`, {
+                await axios.post(`http://www.umcintercom.site/comments/reply`, {
                     talkId : postId,
                     content: replyInput,
                     parentId: parentId,
