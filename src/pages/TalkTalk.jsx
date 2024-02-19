@@ -450,7 +450,6 @@ const ButtonsContainer = styled.div`
 display: flex;
 justify-content: center;
 margin-right: 52rem;
-margin-top: 4.56rem;
 width: 100%;
 
 `;
