@@ -104,6 +104,7 @@ function App() {
 
           <Route path='/findingPassword' element={<FindingPassword />} />
           <Route path='/settingPwd' element={<SettingPassword />} />
+          <Route path='/post-success' element={<PostSuccessPage />} />
 
           <Route path="/cover-letters" element={<CoverLetterInput />} />
           <Route path="/cover-letters-home" element={<CoverLetterHome />} />
