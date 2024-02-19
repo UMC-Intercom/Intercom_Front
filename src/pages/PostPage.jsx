@@ -62,7 +62,7 @@ const PostPage = () => {
         };
 
         fetchData();
-    }, []);
+    }, [postId]);
     if (!post) {
         return <div>Loading post...</div>;
     }
