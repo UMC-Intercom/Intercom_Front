@@ -71,7 +71,7 @@ const Talktalk = () => {
 
 useEffect(() => {
   if (isLoggedIn) {
-    const profile = localStorage.getItem('userProfile');
+    const profile = localStorage.getItem('profileImageUrl');
 
     if (profile === "null") {
       setUserProfile("./assets/MyProfile.png");
