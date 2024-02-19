@@ -233,7 +233,7 @@ return(
     </ButtonsContainer>
     <TalkContainer >
     <SearchInputContainer onSubmit={handleSubmit}>
-  <img src="./assets/SearchGray.png" alt="Search Icon" style={{ margin: '1.19rem 1.75rem 1.21rem 1.75rem' }} onClick={handleGoSearch}/>
+  <img src="/assets/SearchGray.png" alt="Search Icon" style={{ margin: '1.19rem 1.75rem 1.21rem 1.75rem' }} onClick={handleGoSearch}/>
   <SearchInput
       type="text"
       placeholder="원하는 글을 검색해 보세요."
@@ -450,7 +450,6 @@ const ButtonsContainer = styled.div`
 display: flex;
 justify-content: center;
 margin-right: 52rem;
-margin-top: 4.56rem;
 width: 100%;
 
 `;

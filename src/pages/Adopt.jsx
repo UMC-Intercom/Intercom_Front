@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import styled, { css } from 'styled-components';
-
+import AdoptModal from './AdoptModal';
 
 const AdoptButtonStyled = styled.button`
   background-color: #fff;
@@ -19,7 +19,7 @@ const AdoptButtonStyled = styled.button`
   &:hover {
     border: 2px solid #5B00EF;
     background-color: #5B00EF;
-    color: #fff; 
+    color: #fff;
   }
 
   ${props => props.adopted && css`
@@ -32,8 +32,17 @@ const AdoptButtonStyled = styled.button`
 const Adopt = ({ commentId, accessToken, adoptionStatus, onAdoptSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
     const adopted = adoptionStatus === 'ADOPTED'; // 채택 상태 확인
-    console.log(adopted)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const handleAdopt = async () => {
+        setIsModalOpen(true); // 채택하기 버튼 클릭 시 모달 열기
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false); // 모달 닫기
+    };
+
+    const handleConfirmAdopt = async () => {
         if (adopted || isLoading) return; // 이미 채택됐거나 로딩 중이면 실행 중단
         setIsLoading(true);
 
@@ -48,6 +57,8 @@ const Adopt = ({ commentId, accessToken, adoptionStatus, onAdoptSuccess }) => {
             // 채택 성공 시 onAdoptSuccess 콜백 실행
             if (response.status === 200) {
                 onAdoptSuccess(commentId); // 채택 성공 처리 (상위 컴포넌트에서 상태 업데이트 등을 수행할 수 있도록 commentId 전달)
+                setIsModalOpen(false);
+                window.location.reload();
             }
         } catch (error) {
             console.error('채택 처리 중 오류 발생:', error);
@@ -58,9 +69,12 @@ const Adopt = ({ commentId, accessToken, adoptionStatus, onAdoptSuccess }) => {
     };
 
     return (
-        <AdoptButtonStyled onClick={handleAdopt} adopted={adopted} disabled={isLoading}>
+        <>
+        <AdoptButtonStyled onClick={handleAdopt} adopted={adopted} disabled={adopted || isLoading}>
             채택하기
         </AdoptButtonStyled>
+        <AdoptModal isOpen={isModalOpen} onClose={handleModalClose} onConfirm={handleConfirmAdopt} />
+        </>
     );
 };
 

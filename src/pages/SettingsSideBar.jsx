@@ -158,6 +158,7 @@ const ProfileIcon = styled.img`
   width: 1.875rem;
   height: 1.875rem;
   flex-shrink: 0;
+  border-radius: 50%;
 `;
 
 const Username = styled.div`

@@ -490,6 +490,3 @@ const CheckIcon2 = styled.img`
   height: 15px; // 로고 크기 조절
   margin-left: 5px; // 이름과의 간격 조절
 `;
-
-
-

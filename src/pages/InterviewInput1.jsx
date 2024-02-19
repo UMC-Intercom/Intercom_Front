@@ -108,7 +108,7 @@ export default function InterviewInput1() {
   };
 
   const navigateToPass2 = () => {
-    const isFormComplete = formData.company && formData.department && formData.year && formData.gender !== 'no-selected' && formData.birthday !== `${currentYear}-01-01`;
+    const isFormComplete = formData.company && formData.department;
   
     if (isFormComplete) {
       navigate('/interviews-input2', { state: formData });
@@ -128,12 +128,13 @@ export default function InterviewInput1() {
 
           <InputWrap>
             <Label>회사명</Label>
-            <InputField
+            <InputField2
               type="text"
               name="company"
               placeholder="회사명"
               value={formData.company}
               onChange={handleChange}
+              readOnly={true}
             />
             <PassSearch onClick={toggleSearchModal}>
               <PassSearchIcon src='./assets/passSearch.png' />
@@ -143,12 +144,13 @@ export default function InterviewInput1() {
 
           <InputWrap>
             <Label>부서 및 직무명</Label>
-            <InputField
+            <InputField2
               type="text"
               name="department"
               placeholder="부서 및 직무명"
               value={formData.department}
               onChange={handleChange}
+              readOnly={true}
             />
             <PassSearch onClick={toggleFieldSearchModal}> {/* 검색 모달 토글 함수 호출 */}
               <PassSearchIcon src='./assets/passSearch.png' />
@@ -291,6 +293,27 @@ export default function InterviewInput1() {
         );
       }
 
+const InputField2 = styled.input`
+  font-family: SUITE;
+  font-size: 1.25rem;
+  font-weight: 700;
+  width: 30rem;
+  height: 1.5rem;
+  margin-left: 2rem;
+  margin-right: 25px;
+  padding: 1rem 1.5rem;
+  border: 3px solid #e2e2e2;
+  border-radius: 0.625rem;
+  background: #F7F7F7;
+  color: #000;
+  &:focus {
+    outline: none;
+  }
+  &::placeholder {
+    color: #BDBDBD;
+  }
+
+`;
 const ResultInfo = styled.div`
   display: flex;
   align-items: center;

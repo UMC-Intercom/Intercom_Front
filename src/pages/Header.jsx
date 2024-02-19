@@ -270,6 +270,7 @@ const ProfileBox = styled.div`
 const ProfileImage = styled.img`
   width: 1.5rem;
   height: 1.5rem;
+  border-radius: 50%;
   margin-right: 0.31rem; 
   margin-top: -0.1rem;
 `;

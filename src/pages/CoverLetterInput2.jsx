@@ -155,6 +155,7 @@ export default function CoverLetterInput2() {
         const hasMajor = majorInputs[0].name;
         const hasGPA = formData.gpa;
         const hasActivity = formData.activity;
+        
       
         // 모든 필수 정보가 입력되었는지 검사
         const isFormComplete = hasLanguage && hasCertificate && hasSchool && hasMajor && hasGPA && hasActivity;
@@ -302,11 +303,12 @@ export default function CoverLetterInput2() {
                     {languageInputs.map((input, index) => (
                         <InputWrap key={index}>
                             {index === 0 && <Label>어학</Label>}
-                            <InputField
+                            <InputField2
                                 placeholder='어학 종류'
                                 type="text"
                                 style={{ marginLeft: index !== 0 ? '12.6rem' : '0' }}
                                 value={input.name}
+                                readOnly={true}
                                 onChange={(e) => handleChange(e, 'english', index)} // 변경된 부분: 'license' -> 'english'
                             />
 
@@ -329,8 +331,9 @@ export default function CoverLetterInput2() {
                         {certificateInputs.map((input, index) => (
                         <InputWrap key={index}>
                             {index === 0 && <Label>자격증</Label>}
-                            <InputField
+                            <InputField2
                                 type="text"
+                                readOnly={true}
                                 style={{ marginLeft: index !== 0 ? '12.6rem' : '0' }}
                                 value={input.name}
                                 onChange={(e) => handleChange(e, 'certifications', index)}
@@ -348,12 +351,13 @@ export default function CoverLetterInput2() {
 
                     <InputWrap>
                         <MajorLabel>학력</MajorLabel>
-                        <InputField
+                        <InputField2
                             placeholder='학교명'
                             type="text"
                             value={schoolInputs[0].name}
                             onChange={handleChange}
                             name="education"
+                            readOnly={true}
                         />
                         <PassSearch onClick={handleSearchSchoolClick}>
                             <PassSearchIcon src='./assets/passSearch.png' />
@@ -365,6 +369,7 @@ export default function CoverLetterInput2() {
                             value={majorInputs[0].name}
                             onChange={handleChange}
                             name="major"
+                            readOnly={true}
                         />
                         <PassSearch onClick={handleSearchMajorClick}>
                             <PassSearchIcon src='./assets/passSearch.png' />
@@ -452,6 +457,8 @@ export default function CoverLetterInput2() {
         
     );
 }
+
+
 
 const QualificationContainer = styled.div`
   display: flex;
@@ -749,6 +756,37 @@ const InputField = styled.input`
         font-size: 20px;
         line-height: 25px;
     }
+`;
+
+const InputField2 = styled.input`
+    width: 231px;
+    height: 56px;
+    left: 502px;
+    top: 427px;
+    border: 3px solid #E2E2E2;
+    border-radius: 10px;
+    color: #000;
+    font-family: 'SUITE';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 25px;
+    padding-left: 21px;
+
+    &:focus {
+        outline: none;
+      }
+    
+
+    &::placeholder {
+        color: #A1A1A1;
+        font-family: 'SUITE';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 20px;
+        line-height: 25px;
+    }
+    background: #F7F7F7;
 `;
 
 const ExternalInputField = styled.input`
