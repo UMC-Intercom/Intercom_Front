@@ -32,18 +32,22 @@ export default function InterviewHome() {
   const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 상태
   const [userProfile, setUserProfile] = useState(null);
 
+  
   useEffect(() => {
     if (isLoggedIn) {
       const profile = localStorage.getItem('userProfile');
-
-      if (profile === "null") {
+  
+      if (profile === null || profile === "null") { 
         setUserProfile("./assets/MyProfile.png");
-      }
-      else {
+      } else {
         setUserProfile(profile);
       }
+    } else {
+     
+      setUserProfile("./assets/MyProfile.png");
     }
   }, [isLoggedIn]);
+  
 
   const fetchPosts = async (page) => {
     let url = `${config.API_URL}/interviews?page=${currentPage}`;

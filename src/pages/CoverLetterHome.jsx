@@ -35,15 +35,17 @@ export default function CoverLetterHome() {
   useEffect(() => {
     if (isLoggedIn) {
       const profile = localStorage.getItem('userProfile');
-
-      if (profile === "null") {
+  
+      if (profile === null || profile === "null") { 
         setUserProfile("./assets/MyProfile.png");
-      }
-      else {
+      } else {
         setUserProfile(profile);
       }
+    } else {
+      setUserProfile("./assets/MyProfile.png");
     }
   }, [isLoggedIn]);
+  
 
   const fetchPosts = async (page) => {
     let url = `${config.API_URL}/resumes?page=${currentPage}`;
