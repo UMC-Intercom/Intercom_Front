@@ -7,7 +7,6 @@ import ko from 'date-fns/locale/ko';
 import {useAuth} from "./AuthContext";
 import ReplyModal from "./ReplyModal";
 import ReplyList from './ReplyList';
-import ActionButtons from "./ActionButtons";
 import Adopt from './Adopt';
 
 
@@ -140,7 +139,7 @@ const PostPage = () => {
         alert('답변이 성공적으로 채택되었습니다!');
       };
     
-    const ActionButtons = () => {
+    const ActionButtons2 = () => {
         return (
             <ButtonsContainer>
                 <TextButton onClick={handleReplyClick}>답변 달기</TextButton>
@@ -148,10 +147,7 @@ const PostPage = () => {
                     <Count>{likesCount}</Count>
                     <LikeIcon onClick={toggleLike} src={liked ? "/assets/Vector1.png" : "/assets/Vector.png"} alt="좋아요" />
                 </IconButtonWithCount>
-                <IconButtonWithCount>
-                    <Count>{commentsCount}</Count>
-                    <CommentIcon onClick={handleCommentsClick} src="/assets/comment.png" alt="댓글 보기" />
-                </IconButtonWithCount>
+
             </ButtonsContainer>
         );
     };
@@ -190,22 +186,22 @@ const PostPage = () => {
                     <WrittenTime>{timeAgo}</WrittenTime>
 
                 </PostingInfoContainer>
-                <BottomWrapper>
+                <BottomWrapper hasCategories={categories.length > 0}>
                     {categories.length > 0 && <Categories>{renderedCategories}</Categories>}
-                    <ActionButtons
+                    
+                    <ActionButtons2
                         postId={postId}
                         liked={liked}
                         toggleLike={toggleLike}
                         likesCount={likesCount}
-                        handleCommentsClick={handleCommentsClick}
-                        commentsCount={commentsCount}
                     />
                 </BottomWrapper>
-            </PostContainer>
-            {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)} postId={postId}/>}
+                {isReplyModalOpen && <ReplyModal isOpen={isReplyModalOpen} onClose={() => setIsReplyModalOpen(false)} postId={postId}/>}
             <ReplyList talkId={postId} accessToken={accessToken} postWriter={post.writer} 
             adoptedReplyId={adoptedReplyId} 
             onAdoptReply={handleAdoptReply}/>
+            </PostContainer>
+            
         </PageContainer>
     );
 };
@@ -293,10 +289,11 @@ const WrittenTime=styled.div`
 `;
 const BottomWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: ${(props) => props.hasCategories ? 'space-between' : 'flex-end'};
   align-items: center;
   width: 100%;
   margin-top: 10px;
+  padding-bottom: 49px;
 `;
 const ProfileImage = styled.img`
   width: 40px;
@@ -322,7 +319,6 @@ const PostContainer = styled.div`
   flex-direction: column;
   width: 69rem;
   padding: 3rem 5rem;
-
 `;
 
 
@@ -376,14 +372,7 @@ const LikeIcon = styled.img`
     margin-right: 10px;
   }
 `;
-const CommentIcon = styled.img`
-  width: 36.43px;
-  height: 34px;
-  cursor: pointer;
-  &:not(:last-child) {
-    margin-right: 10px;
-  }
-`;
+
 const IconButtonWithCount = styled.div`
   display: flex;
   align-items: center;

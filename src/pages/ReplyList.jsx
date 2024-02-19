@@ -11,18 +11,17 @@ import Adopt from './Adopt';
 
 const RepliesContainer = styled.div`
   margin-top: 20px;
+  margin-left: -80px;
 `;
 
 const ReplyContainer = styled.div`
 background: #FFF;
-border: 2px solid #E2E2E2;
-border-radius: 1.25rem;
+border-top: 2px solid #E2E2E2;
 display: flex;
 flex-direction: column;
 width: 69rem;
 padding: 3rem 5rem; 
 `;
-
 
 const ReplyHeader = styled.div`
   display: flex;
@@ -122,7 +121,6 @@ const fetchCurrentUser = async (accessToken) => {
 
 
 
-
 const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
     const defaultProfileImg = '../assets/MyProfile.png';
     const [replies, setReplies] = useState([]);
@@ -135,6 +133,93 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 
     const [adoptedCommentId, setAdoptedCommentId] = useState(null);
     const [nestedReplies, setNestedReplies] = useState([]);
+    const [replyContent, setReplyContent] = useState('');
+
+
+
+
+    const NestedReplyInput = ({ parentId, onReplySubmit }) => {
+      const [replyContent, setReplyContent] = useState('');
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+       
+        onReplySubmit(parentId, replyContent);
+        setReplyContent(''); 
+      };
+    
+      return (
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            placeholder="댓글을 입력하세요"
+            style={{
+              paddingLeft: '30px',
+              fontFamily: 'SUITE',
+              fontSize: '17px',
+              fontWeight: '700',
+              width: '800px', // 입력창의 너비 설정
+              marginLeft: '70px',
+              border: 'none', // 테두리 색상 설정
+              height: '44px',
+              outline: 'none', // 포커스 시 테두리 스타일 제거
+              marginTop: '62px'
+            }}
+          />
+          <button
+            type="submit"
+            disabled={!replyContent.trim()} // 입력창이 비어있으면 버튼 비활성화
+            style={{
+              marginTop: '62px',
+              fontSize: '17px',
+              fontWeight: '700',
+              fontFamily: 'SUITE',
+              width: '148px',
+              height: '46px',
+              border: 'none',
+              backgroundColor: replyContent.trim() ? '#5B00EF' : '#ccc', // 입력 내용에 따라 배경색 변경
+              color: 'white',
+              cursor: replyContent.trim() ? 'pointer' : 'default', // 입력 내용에 따라 커서 변경
+            }}
+          >
+            등록 하기
+          </button>
+        </form>
+      );
+    };
+    
+
+
+
+
+    const handleNestedReplySubmit = async ( parentId, content) => {
+      try {
+        const response = await axios.post('http://localhost:8080/comments/reply', {
+          talkId:talkId,
+          parentId,
+          content
+        }, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`, 
+            'Content-Type': 'application/json'
+          }
+        });
+    
+        if (response.status === 200) {
+          const newNestedReply = response.data;
+         setNestedReplies([...nestedReplies, newNestedReply]);
+        }
+      } catch (error) {
+        console.error('Error submitting nested reply:', error);
+        // 에러 처리 로직 구현
+      }
+    };
+    
+
+
+
 
     const handleAdopt = async (commentId) => {
       try {
@@ -148,7 +233,6 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
       }
       onAdoptReply(commentId);
     };
-
 
     const fetchReplies = async () => {
             try {
@@ -277,24 +361,43 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
                         <ActionButtons
                          liked={reply.liked}
                          likesCount={reply.likeCount}
+                         repliesCount={reply.replyCount}
                           onToggleLike={() => handleToggleLike(reply.id)}
                           handleCommentsClick={() => toggleNestedRepliesVisibility(reply.id)}
                         />
                     </ReplyFooter>
+
+
+                    {showRepliesFor[reply.id] && (
+  <NestedRepliesContainer>
+    <NestedRepliesWrapper>
+      {nestedReplies
+        .filter(nestedReply => nestedReply.parentId === reply.id)
+        .map(nestedReply => (
+          <NestedReplyContainer key={nestedReply.id}>
+            <NestedReplyUserInfo>
+              <NestedReplyProfileImage src={nestedReply.defaultProfile || defaultProfileImg} alt="Profile" />
+              <NestedReplyUserName>{nestedReply.writer}</NestedReplyUserName>
+            </NestedReplyUserInfo>
+            <NestedReplyContent>{nestedReply.content}</NestedReplyContent>
+          </NestedReplyContainer>
+      ))}
+      
+      <NestedReplyInput
+      parentId={reply.id}
+      onReplySubmit={handleNestedReplySubmit}
+    />
+    </NestedRepliesWrapper>
+    
+  </NestedRepliesContainer>
+)}
+
+
+
+
+
                 </ReplyContainer>
-                    {showRepliesFor[reply.id] && nestedReplies
-                        .filter(nestedReply => nestedReply.parentId === reply.id)
-                        .map(nestedReply => (
-                            <NestedReplyContainer key={nestedReply.id} style={{  }}>
-                                
-                                <NestedReplyUserInfo>
-                                <NestedReplyProfileImage src={nestedReply.defaultProfile || defaultProfileImg} alt="Profile"style={{ border: '3px solid #E2E2E2' }} />
-                                  <NestedReplyUserName>{nestedReply.writer}</NestedReplyUserName>
-                                  
-                               </NestedReplyUserInfo>
-                                <NestedReplyContent>{nestedReply.content}</NestedReplyContent>
-                            </NestedReplyContainer>
-        ))}
+                
         </div>
                     ))}
         </RepliesContainer>
@@ -303,25 +406,46 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
 };
 
 export default ReplyList;
-const NestedRepliesContainer=styled.div`
+const NestedRepliesContainer = styled.div`
+  background: #FFF;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center; 
+  padding: 37px; 
+  margin-top: 50px;
+`;
+
+const NestedRepliesWrapper=styled.div`
+background: #EFF0F4;
+width: 1120px;
+border-radius: 10px;
+padding-top: 42.75px;
+padding-bottom: 62px; 
+
 `;
 
 const NestedReplyContainer = styled.div`
-background: #E2E2E2;
+background: #EFF0F4;
 border-bottom: 2px solid #E2E2E2;
 display: flex;
 flex-direction: column;
-width: 884px;
+width: 984px;
+margin-left: 67px;
 
 `;
 const NestedReplyUserInfo = styled.div`
   display: flex;
+  margin-top: 10px;
+  
   justify-content: flex-start; /* 요소들을 왼쪽으로 정렬합니다 */
 `;
 const NestedReplyProfileImage = styled.img`
 width: 34.5px;
 height: 34.5px;
 border-radius: 50%;
+margin-top: 16px
+
 `;
 const NestedReplyUserName = styled.div`
 font-weight: 900;
@@ -329,14 +453,17 @@ font-size: 20px;
 font-family: SUITE;
 margin-bottom: 2px;
 margin-left: 10.75px;
-margin-top: 5px
+margin-top: 19px
 `;
 const NestedReplyContent = styled.div`
-margin-top: 15.75px;
+padding-bottom: 27px;
+margin-top: 19px;
 font-size: 20px;
 font-weight: 600;
 margin-left: 11px;
-color: #636363;`;
+color: rgba(99, 99, 99, 0.5);
+
+`;
 
 
 

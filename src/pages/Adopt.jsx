@@ -2,24 +2,29 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styled, { css } from 'styled-components';
 
+
 const AdoptButtonStyled = styled.button`
   background-color: #fff;
-  color: white;
+  color: #A1A1A1;
   padding: 10px 24px;
   margin: 4px 2px;
   cursor: pointer;
-  border: none;
+  font-faimily: SUITE;
+  font-size: 20px;
+  font-weight: 900;
+  border: 2px solid #A1A1A1;
   border-radius: 5px;
-  display: inline-block; // Updated from 'inline' to 'inline-block' for proper dimension application
+  display: inline-block;
 
   &:hover {
-    background-color: #5B00EF; // Ensure the color value is a string and correctly prefixed with #
+    border: 2px solid #5B00EF;
+    background-color: #5B00EF;
+    color: #fff; 
   }
 
-  
   ${props => props.adopted && css`
-  display: none; // 채택된 경우 버튼을 숨깁니다.
-`}
+    display: none;
+  `}
 `;
 
 
