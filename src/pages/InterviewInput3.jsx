@@ -33,6 +33,12 @@ useEffect(() => {
   const accessToken = localStorage.getItem('accessToken');
 
   const handleConfirm = async () => {
+    // 모든 필수 정보가 입력되었는지 확인
+    if (!formData.contents.trim()) {
+      alert('후기 내용을 입력해주세요.');
+      return;
+    }
+  
     console.log(formData);
   
     try {
@@ -40,15 +46,15 @@ useEffect(() => {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         },
-      })
+      });
       console.log(response.data);
-    }
-    catch (error) {
+      setPostModalOpen(true);
+    } catch (error) {
       console.error(error);
+      alert('후기 등록에 실패했습니다. 나중에 다시 시도해주세요.');
     }
-  
-    setPostModalOpen(true);
   };
+  
 
   const handleClose = () => {
     setPostModalOpen(false); // PostQuestionModal 닫기

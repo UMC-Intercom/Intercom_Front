@@ -154,7 +154,7 @@ const ReplyList = ({ talkId }) => {
             {replies.map(reply => (
                 <ReplyContainer key={reply.id}>
                     <ReplyHeader>
-                        <ReplyProfileImage src={reply.defaultProfile || defaultProfileImg} alt="Profile" />
+                        <ReplyProfileImage src={reply.defaultProfile || defaultProfileImg} alt="Profile"style={{ border: '3px solid #E2E2E2' }} />
                         <ReplyUserInfo>
                             <ReplyUserName>{reply.writer}</ReplyUserName>
                             {reply.mentorField && <ReplyMentorField>{reply.mentorField}</ReplyMentorField>}

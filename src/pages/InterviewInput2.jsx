@@ -4,7 +4,16 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function CoverLetterInput2() {
     const navigate = useNavigate();
-    const navigateToPass3 = () => navigate('/interviews-input3', { state: formData });
+    const navigateToPass3 = () => {
+        const isFormComplete = formData.education && formData.major && formData.gpa && formData.activity;
+      
+        if (isFormComplete) {
+          navigate('/interviews-input3', { state: formData });
+        } else {
+          alert('모든 필수 정보를 입력해주세요.');
+        }
+      };
+      
     const location = useLocation();
     const [languageFields, setLanguageFields] = useState([{ id: 1 }]);
     const [licenseFields, setLicenseFields] = useState([{ id: 1 }]);

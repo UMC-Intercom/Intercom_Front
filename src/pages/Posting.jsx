@@ -176,14 +176,7 @@ const handleSubmit = async (e) => {
       console.error('Error during mentor check:', errorMessage);
       alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
 
-      // if (status === 403 && error === "Forbidden") {
-      //   // 인증되지 않은 경우, 인증 모달 표시
-      //   setIsModalOpen(true);
-      // } else {
-      //   // 기타 에러 처리
-      //   console.error('Error during mentor check:', errorMessage);
-      //   alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
-      // }
+  
     } else {
       // 응답 오류 객체가 없는 경우의 처리
       console.error('Error during mentor check:', error);
@@ -198,7 +191,14 @@ const handleSubmit = async (e) => {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('content', content);
-      // 이미지 파일 및 기타 필요한 데이터 추가
+
+      const categoryNames = selectedCategories.map(categoryId => {
+        const category = categories.find(c => c.id === categoryId);
+        return category ? category.name : null;
+      }).filter(Boolean);
+
+      const categoriesString = categoryNames.join(',');
+      formData.append('category', categoriesString);
       imageUrls.forEach((url, index) => {
         const blob = dataURLtoBlob(url);
         const file = new File([blob], `image-${index}.jpg`, { type: 'image/jpeg' });
@@ -263,8 +263,8 @@ function dataURLtoBlob(dataUrl) {
       setIsDropdownOpen(!isDropdownOpen);
     };
   
-     // 카테고리 선택 핸들러
-     const handleCategoryChange = (categoryId) => {
+  
+    const handleCategoryChange = (categoryId) => {
       setSelectedCategories((prevSelectedCategories) => {
         const isSelected = prevSelectedCategories.includes(categoryId);
         if (isSelected) {
@@ -283,7 +283,8 @@ function dataURLtoBlob(dataUrl) {
       });
     };
 
-   // 선택된 카테고리 이름을 표시하는 문자열 생성
+    
+
     let selectedCategoriesHeader = '카테고리 선택';
     if (selectedCategoryNames.length > 0) {
     if (selectedCategoryNames.length <= 2) {
@@ -294,16 +295,19 @@ function dataURLtoBlob(dataUrl) {
       selectedCategoriesHeader = `${selectedCategoryNames.slice(0, 2).join(', ')} 외 ${selectedCategoryNames.length - 2}개`;
     }
   }
-  const [showTempSaveAlert, setShowTempSaveAlert] = useState(false);
- // 'handleSave' 함수 내용 변경
- const handleSave = async () => {
+
+  const handleSave = async () => {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('content', content);
   
-  // 선택된 카테고리 ID들을 쉼표로 구분된 문자열로 변환
-  const categoriesString = selectedCategories.join(',');
-  formData.append('category', categoriesString); // 서버에서 받는 필드명이 'category'라고 가정
+  const categoryNames = selectedCategories.map(categoryId => {
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.name : null;
+  }).filter(Boolean);
+
+  const categoriesString = categoryNames.join(',');
+  formData.append('category', categoriesString); 
 
   // 이미지 파일 추가
   imageUrls.forEach((url, index) => {
@@ -316,13 +320,11 @@ function dataURLtoBlob(dataUrl) {
     const response = await axios.post('http://localhost:8080/talks/temporary-save', formData, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
-        // 'Content-Type': 'multipart/form-data' 헤더는 FormData와 함께 사용할 때 자동으로 설정됩니다.
       },
     });
 
-    if (response.status === 200 || response.status === 201) { // 200 또는 201 상태 코드를 성공으로 처리
+    if (response.status === 200 || response.status === 201) {
       alert('글이 임시 저장되었습니다.');
-      // 성공 후 필요한 로직 처리
     } else {
       throw new Error('Unexpected response status: ' + response.status);
     }
@@ -334,26 +336,20 @@ function dataURLtoBlob(dataUrl) {
 
 
   const handleCancel = () => {
-    // Step 1: Clear the state values for title, content, and any other temporary data
     setTitle('');
     setContent('');
     setSelectedCategories([]);
     setImageUrls([]);
   
-    // Step 2: Clear any temporary data stored in localStorage or other storages
     localStorage.removeItem(TEMP_DATA_KEY);
   
-    // Step 3: Navigate back to the previous page
     navigate(-1);
-  
-    // Step 4: Show an alert or a confirmation message if needed
     alert("작성 내용이 초기화되었으며, 이전 페이지로 돌아갑니다.");
   };
   
 const location = useLocation();
 
 useEffect(() => {
-  // 포스트 작성 페이지의 경로가 '/post-create'라고 가정합니다.
   if (location.pathname === '/posting') {
     const params = new URLSearchParams(window.location.search);
     const fromTalkTalk = params.get('from') === 'talktalk';
@@ -412,15 +408,19 @@ useEffect(() => {
         </DropdownHeader>
         {isDropdownOpen && (
           <DropdownList>
-            {categories.map((category) => (
-              <DropdownItem key={category.id}>
-                <CheckboxLabel>
-               <input type="checkbox" checked={selectedCategories.includes(category.id)} onChange={() => handleCategoryChange(category.id)} />
-                <span className="checkmark"></span>
-                </CheckboxLabel>
-                {category.name}
-              </DropdownItem>
-            ))}
+           {categories.map((category) => (
+          <DropdownItem key={category.id}>
+            <CheckboxLabel>
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes(category.id)}
+                onChange={() => handleCategoryChange(category.id)}
+              />
+              <span className="checkmark"></span>
+            </CheckboxLabel>
+            {category.name}
+          </DropdownItem>
+        ))}
           </DropdownList>
         )}
       </DropdownContainer>
@@ -486,7 +486,7 @@ font-weight: 700;
 `;
 const Input = styled.input`
 display: flex;
-    align-items: center; // 세로 중앙 정렬
+    align-items: center; 
     width: 75.125rem;   
     height: 3.75rem;
   border-width: 0.2rem;;
@@ -500,13 +500,13 @@ display: flex;
     font-size: 1.25rem;
     
     &:focus {
-      outline: none; // 포커스 상태에서 아웃라인 제거
-      border-color: #5B00EF; // 필요한 경우 특정 색상으로 변경
+      outline: none;
+      border-color: #5B00EF; 
     }
 
   &::placeholder {
     display: flex;
-    align-items: center; // 세로 중앙 정렬
+    align-items: center;
     font-size: 1.25rem;
     font-weight: 700;
     font-family: 'SUITE', sans-serif;
@@ -520,8 +520,7 @@ const ContentContainer = styled.div`
   border: 3px solid #A1A1A1;
   border-radius: 0.8rem;
   margin-top: 5.13rem;;
-  position: relative; /* 이 부분을 추가하세요 */
-
+  position: relative; 
 `;
 const StyledReactQuill = styled(ReactQuill)`
 
@@ -531,7 +530,7 @@ const StyledReactQuill = styled(ReactQuill)`
   
 }
     .ql-editor {
-      position: relative; // 상대적 위치 설정
+      position: relative; 
     top: -1.56rem;      
       height: 32.94rem;
     font-size: 1.25rem;
@@ -545,12 +544,12 @@ const StyledReactQuill = styled(ReactQuill)`
   }
 
   .ql-toolbar {
-    position: relative; // 상대적 위치 설정
+    position: relative;
     top: -4rem;
     left: 0;
     display: flex;
-    justify-content: center; // 중앙 정렬
-    align-items: center; // 세로 중앙 정렬
+    justify-content: center; 
+    align-items: center; 
     width: 23.9375rem;
     height: 3rem;
     font-family: 'SUITE', sans-serif;
@@ -592,7 +591,7 @@ border-radius: 0.625rem;
     background-color: #4e00d1;
   }
   &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
+    transform: scale(0.95); 
   }
 `;
 
@@ -645,14 +644,14 @@ justify-content: flex;
 border-bottom: 2px solid #E2E2E2;
 margin-left: 3rem;
 display: flex;
-align-items: center; // 체크박스와 텍스트를 세로 중앙정렬합니다.
+align-items: center; 
 padding: 10px;
 
 `;
 
 const CheckboxLabel = styled.label`
 display: flex;
-margin-right: 2.5rem; // 라벨과 카테고리 이름 사이의 간격을 설정합니다.
+margin-right: 2.5rem; 
 position: relative;
 cursor: pointer;
 
@@ -704,20 +703,20 @@ const ImageButton = styled.button`
   cursor: pointer; 
   border: none; 
   display: flex; 
-  align-items: flex-end; /* 이미지와 텍스트를 바닥으로 정렬 */
-  justify-content: space-between; /* 내부 요소 사이에 공간 동등 분배 */
+  align-items: flex-end; 
+  justify-content: space-between; 
   font-size: 1.0625rem;
   font-weight: 700;
   font-family: 'SUITE', sans-serif;
   transition: transform 0.1s, background-color 0.1s; 
 
   img {
-    margin-right: 0.56rem; /* 아이콘과 텍스트 사이의 간격 */
+    margin-right: 0.56rem; 
     width: 1.875rem;
     height: 1.875rem;
   }
   &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
+    transform: scale(0.95); 
   }
 `;
 
@@ -727,7 +726,7 @@ const ContentCounter = styled.div`
     width: 6.375rem;
 bottom: 10.13rem; 
 right: 2.38rem;
-    color: #636363; // 글자 색상
+    color: #636363;
     font-family: SUITE;
     font-size: 1.0625rem;
     font-weight: 700;
@@ -737,24 +736,22 @@ const SaveCancelButtonContainer = styled.div`
   position: relative;
   margin-top: 1.69rem;
   margin-left:62.4rem; 
-  width: 16rem; /* 너비를 자동으로 조절 */
+  width: 16rem; 
   height: auto;
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
-  /* 버튼 간격 조절 */
+  justify-content: flex-end;
   & > button {
-    margin-right: 1rem; /* 버튼 사이의 간격을 조절할 수 있습니다. */
+    margin-right: 1rem; 
   }
 
-  /* 마지막 버튼의 오른쪽 마진 제거 */
   & > button:last-child {
     margin-right: 0;
   }
 `;
 const Button = styled.button`
-  background-color: transparent; /* 버튼 기본 색상 */
-  color: #636363; /* 여기서 색상 코드 앞에 '#'가 누락되었습니다. */
+  background-color: transparent; 
+  color: #636363; 
   border: 2px solid #A1A1A1;
   cursor: pointer;
   padding: 0.5rem 1rem;
@@ -767,10 +764,10 @@ const Button = styled.button`
   height: 3.375rem;
 
   &:hover {
-    background-color: rgba(128, 128, 128, 0.2); /* 버튼 호버 색상 */
+    background-color: rgba(128, 128, 128, 0.2); 
   }
   &:active {
-    transform: scale(0.95); /* 버튼을 5% 축소 */
+    transform: scale(0.95); 
   }
 `;
 const BackButton = styled.div`
@@ -783,6 +780,6 @@ padding: 10px;
 border-radius: 5px;
 margin-top: 4rem;
 margin-right: 70rem;
-margin-bottom: -5.5rem;  // 제목 입력칸과의 간격
-align-self: flex-start;  // 왼쪽 정렬
+margin-bottom: -5.5rem;  
+align-self: flex-start;  
 `;

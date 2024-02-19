@@ -74,7 +74,7 @@ useEffect(() => {
     const profile = localStorage.getItem('userProfile');
 
     if (profile === "null") {
-      setUserProfile("./assets/Ellipse2.png");
+      setUserProfile("./assets/MyProfile.png");
     }
     else {
       setUserProfile(profile);
@@ -101,15 +101,11 @@ useEffect(() => {
 }, [selectedPostId]); // selectedPostId가 변경될 때마다 실행
 
 const handlePostClick = async (postId) => {
-  // 이미 요청 중이라면 추가 요청 방지
-  if (isRequesting) return;
-
-  // 요청 시작 상태로 설정
+  if (isRequesting || selectedPostId === postId) return;
   setIsRequesting(true);
-
-    navigate(`/talks/${postId}`);
-
-  // 요청 완료 후 상태 초기화 (여기서는 useEffect 내 cleanup 함수에서 처리하는 것이 좋음)
+  setSelectedPostId(postId);
+  navigate(`/talks/${postId}`);
+  setIsRequesting(false);
 };
 
 
@@ -264,24 +260,31 @@ return(
 
 <TalkListContainer>
   {searchResults.length > 0 ? (
-      searchResults.map(item => (
-          <SearchResultItem
-              key={item.id}
-              onClick={() => handlePostClick(item.id)}> 
-              <p className="title">{item.title}</p>
-            <p className="content">{(item.content && item.content.replace(/<img[^>]*>/g,"").replace(/<[^>]*>?/gm, '')) || "내용이 없습니다."}</p>
-            <p className="response">답변: {item.commentCount} | 댓글: {item.replyCount} | 조회수: {item.viewCount} | 좋아요: {item.likeCount}</p>
-          </SearchResultItem>
-      ))
+    searchResults.map((item) => (
+      <SearchResultItem key={item.id} onClick={() => handlePostClick(item.id)}>
+        <TitleWrapper>
+          <p className="title">{item.title}</p>
+          {item.mentorField && <span className="mentorMark">멘토</span>}
+        </TitleWrapper>
+        <p className="content">
+          {(item.content && item.content.replace(/<img[^>]*>/g, "").replace(/<[^>]*>?/gm, "")) || "내용이 없습니다."}
+        </p>
+        <div className="details">
+          답변: {item.commentCount} | 댓글: {item.replyCount} | 조회수: {Math.floor(item.viewCount / 2)} | 좋아요: {item.likeCount}
+        </div>
+      </SearchResultItem>
+    ))
   ) : (
-      <div className="none-search">검색 결과가 없습니다.</div>
+    <div className="none-search">검색 결과가 없습니다.</div>
   )}
 </TalkListContainer>
-<TalkPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      /> </TalkContainer>
+<div style={{ marginBottom: '2rem' }}>
+  <TalkPagination
+    currentPage={currentPage}
+    totalPages={totalPages}
+    onPageChange={handlePageChange}
+  />
+</div> </TalkContainer>
       </TalkButtonContainer>
   </PageContainer>
 );
@@ -289,7 +292,12 @@ return(
 
 export default Talktalk;
 
-
+const TitleWrapper = styled.div`
+margin-top: -10px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px; // 제목과 내용 사이의 간격 조정
+`;
 const PageContainer = styled.div`
 align-items: center;
 background-color: #EFF0F4;
@@ -359,12 +367,12 @@ width: 20rem;
 
 const SearchResultItem = styled.div`
   border-bottom: 1px solid #ddd;
-  padding: 1rem; // 내부 여백 추가
-  max-height: 9.6875rem; // 최대 높이 설정
+  padding: 1rem;
+  max-height: 9.6875rem; 
   margin-left: 4.88rem;
-  width: 65.25rem;
-  overflow: hidden; // 넘치는 내용 숨김
-
+  width: 62.25rem;
+  overflow: hidden;
+  
   .title {
     color: #000;
     font-size: 1.5625rem;
@@ -374,13 +382,16 @@ const SearchResultItem = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
+.details{
+  margin-bottom: 10px;
+}
   .content {
     color: #A1A1A1;
     font-size: 1.25rem;
     font-weight: 600;
+    margin-right: 20px;
     display: -webkit-box; 
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical; 
     overflow: hidden; 
     text-overflow: ellipsis; 
@@ -392,11 +403,32 @@ const SearchResultItem = styled.div`
     font-weight: 700;
     margin-top: 0.5rem;
   }
+
+  .mentorMark {
+    margin-top: 15px;
+    margin-left: 10px; // 제목과 멘토 마크 사이의 간격
+    display: flex;
+    background-color: #9FAEFF;
+    color: #FFFFFF;
+    border-radius:10px;
+    font-weight: bold;
+    width: 65px;
+    height: 28px;
+    font-size: 15px;
+    align-items: center;
+    justify-content: center;
+  }
+
+
+
+
+
 `;
 
 const TalkListContainer = styled.div`
-margin-top: 3.56rem;
+margin-top: 3.5rem;
 cursor: pointer;
+margin-bottom: 2rem;
 .none-search{
   display: flex;
   justify-content: center;

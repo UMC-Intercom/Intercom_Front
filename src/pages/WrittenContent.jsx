@@ -50,6 +50,7 @@ const Button = styled.button`
 
 const TalkListContainer = styled.div`
   width: 1202px;
+  height: auto;
   background-color: #EFF0F4;
   border-radius: 10px;
   padding-top: 30px;
@@ -82,6 +83,9 @@ const SearchResultItem = styled.div`
     font-size: 16px;
     margin-top: 10px;
     color: #636363;
+  }
+  &:hover {
+    cursor: pointer;
   }
 `;
 
@@ -121,6 +125,7 @@ const InfoBox = styled.div`
   margin-top: 25px;
   margin-bottom: 20px; 
   margin-left: 40px;
+  margin-right: 40px;
   cursor: pointer;
 `;
 
@@ -282,27 +287,147 @@ const handleViewChange = (newView) => {
   setView(newView);
 };
 
+const stripHtmlTags = (str) => {
+  if (!str) return '';
+  return str.replace(/<[^>]*>/g, '');
+};
+
+// 톡톡 글 상세 페이지로 이동하는 함수
+const navigateToTalkDetail = (id) => {
+  navigate(`/talks/${id}`); // `/talks/:id` 형태의 URL로 가정
+};
+
+
+const handleNavigateToDetail = (id, type) => {
+  // Depending on the type, navigate to the appropriate route
+  const basePath = type === 'interview' ? '/interviews' : '/cover-letters';
+  navigate(`${basePath}/${id}`);
+};
+
+
+
   const renderContent = () => {
     switch(view) {
       case 'talk':
-      case 'interview':
-      case 'coverletter':
         return (
           <TalkListContainer>
             {data.map((item) => (
-              <SearchResultItem key={item.id}>
+              <SearchResultItem key={item.id} onClick={() => navigateToTalkDetail(item.id)}>
                 <p className="title">{item.title}</p>
-                <p className="content">{item.content || "내용이 없습니다."}</p>
+                <p className="content">{stripHtmlTags(item.content) || "내용이 없습니다."}</p>
                 <p className="response">조회수 {item.viewCount}회 &nbsp;&nbsp; 스크랩 {item.scrapCount}</p>
               </SearchResultItem>
             ))}
             <TalkPagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={onPageChange}
-                            />
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+           />
           </TalkListContainer>
         );
+        case 'interview':
+          return (
+            <InterviewReviewContainer>
+              <CenteredContainer>
+              <InterviewReviewContainer2>
+              {data.map((item, index) => (
+                <InterviewReviewBox key={index}>
+                  <InfoBox onClick={() => handleNavigateToDetail(item.id, 'interview')}>
+                    <InfoItems>
+                      <InfoItem>
+                        <InfoContent>{item.company} |&nbsp;</InfoContent>
+                      </InfoItem>
+                      <InfoItem>
+                        <InfoContent>{item.department} |&nbsp;</InfoContent>
+                      </InfoItem>
+                      <InfoItem>
+                        <InfoContent>{item.year} {item.semester}</InfoContent>
+                      </InfoItem>
+                    </InfoItems>
+                    <InfoDetail>
+                      {item.english}:{item.score} / {item.certification} / {item.education} / {item.major} / 학점:{item.gpa} / 대외활동 경험: {item.activity}
+                    </InfoDetail>
+                  </InfoBox>
+                  <SectionDivider />
+                  <ReviewBox>
+                    <ReviewContent> {item.contents}</ReviewContent>
+                    <ReviewStats>
+                      <span>스크랩 {item.scrapCount}</span>
+                      <span>조회수 {item.viewCount}회</span>
+                    </ReviewStats>
+                  </ReviewBox>
+                </InterviewReviewBox>
+              ))}
+               {data.length > 0 && (
+                <TalkPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                />
+              )}
+              </InterviewReviewContainer2>
+              </CenteredContainer>
+            </InterviewReviewContainer>
+          );
+
+        
+        
+          // eslint-disable-next-line no-fallthrough
+          case 'coverletter':
+            return (
+              <CoverLetterContainer>
+                <CenteredContainer>
+                  <InterviewReviewContainer2>
+                    {data && data.length > 0 && data.map((item, index) => (
+                      <InterviewReviewBox key={index}>
+                        <InfoBox onClick={() => handleNavigateToDetail(item.id, 'coverletter')}>
+                          <InfoItems>
+                            <InfoItem>
+                              <InfoContent>{item.company} |&nbsp;</InfoContent>
+                            </InfoItem>
+                            <InfoItem>
+                              <InfoContent>{item.department} |&nbsp;</InfoContent>
+                            </InfoItem>
+                            <InfoItem>
+                              <InfoContent>{item.year} {item.semester}</InfoContent>
+                            </InfoItem>
+                          </InfoItems>
+                          <InfoDetail>
+                            {item.english}:{item.score} / {item.certification} / {item.education} / {item.major} / 학점:{item.gpa} / 대외활동 경험: {item.activity}
+                          </InfoDetail>
+                        </InfoBox>
+                        <SectionDivider />
+                        <ReviewBox>
+                          {/* Iterate over titles and contents and display each pair */}
+                          {item.titles && item.contents && item.titles.map((title, idx) => (
+                            <div key={idx}>
+                              <ReviewContent><strong>{title}</strong></ReviewContent>
+                              <ReviewContent>{item.contents[idx]}</ReviewContent>
+                            </div>
+                          ))}
+                          <ReviewStats>
+                            <span>스크랩 {item.scrapCount}</span>
+                            <span>조회수 {item.viewCount}회</span>
+                          </ReviewStats>
+                        </ReviewBox>
+                      </InterviewReviewBox>
+                    ))}
+                    {data.length > 0 && (
+                      <TalkPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={onPageChange}
+                      />
+                    )}
+                  </InterviewReviewContainer2>
+                </CenteredContainer>
+              </CoverLetterContainer>
+            );
+          
+
+          
+       
+      // eslint-disable-next-line no-fallthrough
       default:
         return <p>데이터를 불러올 수 없습니다.</p>;
     }

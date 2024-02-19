@@ -21,7 +21,7 @@ const InterviewCoinUseQuestionModal = ({ isOpen, onClose, selectedItem }) => {
                   <ModalOverlay>
                       <ModalContainer>
                           <ModalContent>
-                              <ModalText>10코인을 사용하여<br/>글을 열람 할까요?</ModalText>
+                              <ModalText>20코인을 사용하여<br/>글을 열람 할까요?</ModalText>
                               <ModalButtons>
                                   <CancelButton onClick={onClose}>취소</CancelButton>
                                   <ConfirmButton onClick={handleConfirm}>사용하기</ConfirmButton>

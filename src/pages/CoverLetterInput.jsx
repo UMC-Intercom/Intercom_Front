@@ -50,8 +50,16 @@ export default function CoverLetterInput() {
     });
   };
 
-  const navigateToPass2 = () => navigate('/cover-letters-input2', { state: formData });
-
+  const navigateToPass2 = () => {
+    const isFormComplete = formData.company && formData.department && formData.year && formData.gender !== 'no-selected' && formData.birthday !== `${currentYear}-01-01`;
+  
+    if (isFormComplete) {
+      navigate('/cover-letters-input2', { state: formData });
+    } else {
+      alert('모든 필수 항목을 입력해주세요.');
+    }
+  };
+  
   return (
     <SettingTitle>
       <Container>
