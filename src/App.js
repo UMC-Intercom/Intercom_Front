@@ -43,8 +43,8 @@ import EditCareer from './pages/EditCareer';
 import FindingPassword from './pages/FindingPassword';
 import SettingPassword from './pages/SettingPassword';
 import PostSuccessPage from './pages/PostSuccessPage';
-import TypeTestHome from './typetestpage/TypeTestHome';
 import JobDetail from './pages/JobDetail'
+import TypeTestHome from './typetestpage/TypeTestHome';
 import TypeTestQuestion1 from './typetestpage/TypeTestQuestion1';
 import TypeTestQuestion2 from './typetestpage/TypeTestQuestion2';
 import TypeTestQuestion3 from './typetestpage/TypeTestQuestion3';
@@ -101,10 +101,10 @@ function App() {
           <Route path="/scrap" element={<Scrap />} />
           <Route path="/mycareer-edit" element={<EditCareer />} />
           <Route path='/job/:jobId' element={<JobDetail />} />
+
           <Route path='/findingPassword' element={<FindingPassword />} />
           <Route path='/settingPwd' element={<SettingPassword />} />
-          <Route path='/' element={<PostSuccessPage />} />
-          
+
           <Route path="/cover-letters" element={<CoverLetterInput />} />
           <Route path="/cover-letters-home" element={<CoverLetterHome />} />
           <Route path="/cover-letters-input2" element={<CoverLetterInput2 />} />
@@ -120,7 +120,6 @@ function App() {
           <Route path="/interviews-input3" element={<InterviewInput3 />} />
 
           <Route path="/type-test-home" element={<TypeTestHome />} />
-
           <Route path="/type-test-question1" element={<TypeTestQuestion1 />} />
           <Route path="/type-test-question2" element={<TypeTestQuestion2 />} />
           <Route path="/type-test-question3" element={<TypeTestQuestion3 />} />
