@@ -13,15 +13,15 @@ export default function InterviewInput1() {
     year: '2024',
     semester: '상반기',
     gender: 'no-selected',
-    birthday: '',
+    birthday: `${currentYear}-01-01`,
     education: '',
     major: '',
     gpa: '',
     activity: '',
-    certification: "",
+    certifications: [],
     english: '',
     score: '',
-    content: "",
+    contents: '',
     birthYear: '2024',
     birthMonth: '1',
     birthDay: '1'
@@ -35,7 +35,7 @@ export default function InterviewInput1() {
           ...prevData,
           [name]: value
         };
-        const birthday = `${newBirthData.birthYear}-${newBirthData.birthMonth}-${newBirthData.birthDay}`;
+        const birthday = `${newBirthData.birthYear}-${newBirthData.birthMonth.padStart(2, '0')}-${newBirthData.birthDay.padStart(2, '0')}`;
         return {
           ...newBirthData,
           birthday: birthday
@@ -50,7 +50,16 @@ export default function InterviewInput1() {
   };
   
 
-  const navigateToPass2 = () => navigate('/interviews-input2', { state: formData });
+  const navigateToPass2 = () => {
+    const isFormComplete = formData.company && formData.department && formData.year && formData.gender !== 'no-selected' && formData.birthday !== `${currentYear}-01-01`;
+  
+    if (isFormComplete) {
+      navigate('/interviews-input2', { state: formData });
+    } else {
+      alert('모든 필수 항목을 입력해주세요.');
+    }
+  };
+  
 
   return (
     <SettingTitle>

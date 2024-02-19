@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import fakeInterviewData from '../data/fakeSearchInterviewData';
 import InterviewCoinUseQuestionModal from './InterviewCoinUseQuestionModal';
+import axios from "axios";
+import config from "../path/config";
+import TalkPagination from "./TalkPagination";
+import { useAuth } from './AuthContext';
+
 
 
 export default function InterviewHome() {
   const navigate = useNavigate();
-  const navigateToInput = () => navigate('/interviews-input1');
+  const { isLoggedIn } = useAuth();
   const [sortByDateActive, setSortByDateActive] = useState(true);
   const [sortByLikesActive, setSortByLikesActive] = useState(false);
-  const [sortedData, setSortedData] = useState(fakeInterviewData);
+//  const [sortedData, setSortedData] = useState(fakeInterviewData);
+  const [sortedData, setSortedData] = useState([]);
   const [searchQuery, setSearchQuery] = useState({
     company: '',
     position: ''
@@ -19,9 +25,73 @@ export default function InterviewHome() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);const [totalElements, setTotalElements] = useState([]);
+  const ITEMS_PER_PAGE = 10;
+  const indexOfLast = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+  const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 상태
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const profile = localStorage.getItem('userProfile');
+
+      if (profile === "null") {
+        setUserProfile("./assets/MyProfile.png");
+      }
+      else {
+        setUserProfile(profile);
+      }
+    }
+  }, [isLoggedIn]);
+
+  const fetchPosts = async (page) => {
+    let url = `${config.API_URL}/interviews?page=${currentPage}`;
+
+    if (!isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/interviews/scrap-counts?page=${currentPage}`;
+    }
+    if (isSearchMode && sortByDateActive) {
+      url = `${config.API_URL}/interviews/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+    else if (isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/interviews/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+
+    try{
+      // const sortBy = sortByDateActive ? '' : '/scrap-counts';
+      const response = await axios.get(url);
+
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+    } catch (error){
+      console.error('Failed to fetch posts:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts(currentPage);
+  }, [currentPage, sortByDateActive]);
+
+
+
   const handleResultClick = (item) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
+    if (isLoggedIn) {
+      setSelectedItem(item);
+      setIsModalOpen(true);
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
+  };
+
+  const navigateToInput = () => {
+    if (isLoggedIn) {
+      navigate('/interviews-input1'); // 로그인했다면 입력 페이지로 이동
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
   };
 
   const closeModal = () => {
@@ -32,15 +102,13 @@ export default function InterviewHome() {
   const handleSortByDate = () => {
     setSortByDateActive(true);
     setSortByLikesActive(false);
-    const sortedByDate = [...fakeInterviewData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-    setSortedData(sortedByDate);
+    setCurrentPage(1);
   };
 
   const handleSortByLikes = () => {
     setSortByDateActive(false);
     setSortByLikesActive(true);
-    const sortedByLikes = [...fakeInterviewData].sort((a, b) => b.scrap - a.scrap);
-    setSortedData(sortedByLikes);
+    setCurrentPage(1);
   };
 
   const handleSearchInputChange = (event) => {
@@ -48,79 +116,126 @@ export default function InterviewHome() {
     setSearchQuery({ ...searchQuery, [id]: value });
   };
 
-  const handleSearch = () => {
-    let filteredData = fakeInterviewData;
+  const onPageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0,0);
+  };
 
-    if (searchQuery.company.trim() !== '') {
-      filteredData = filteredData.filter(item => item.company.toLowerCase().includes(searchQuery.company.toLowerCase()));
+  const handleSearch = async () => {
+    // 빈칸 검색 시 검색 모드 종료 및 상태 초기화
+    if (!searchQuery.company.trim() && ! searchQuery.position.trim) {
+      resetSearch();
+      return;
     }
 
-    if (searchQuery.position.trim() !== '') {
-      filteredData = filteredData.filter(item => item.department.toLowerCase().includes(searchQuery.position.toLowerCase()));
+    let url;
+    if (sortByDateActive) {
+      url = `${config.API_URL}/interviews/search`;
+    }
+    else if (sortByLikesActive) {
+      url = `${config.API_URL}/interviews/scrap-counts`;
     }
 
-    setSortedData(filteredData);
+    try {
+      const response = await axios.get(url, {
+        params: {
+          company: searchQuery.company,
+          department: searchQuery.position,
+          page: currentPage // 현재 페이지도 함께 전송할 수 있도록 수정
+        }
+      });
+
+      setIsSearchMode(true);
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+    } catch (error) {
+      console.error('Failed to search interviews:', error);
+    }
+  };
+
+  const resetSearch = () => {
+    // setSearchTerm('');
+    setIsSearchMode(false);
+    setCurrentPage(1);
   };
 
   return (
-    <PageContainer>
-      <SearchBox>
-        <SearchText>면접 후기 검색하기</SearchText>
-        <SearchInput>
-          <InputField type="text" id="company" placeholder="기업명" onChange={handleSearchInputChange} />
-          <InputField type="text" id="position" placeholder="직무" onChange={handleSearchInputChange} />
-          <SearchButton onClick={handleSearch}>검색</SearchButton>
-        </SearchInput>
-      </SearchBox>
+      <PageContainer>
+        <SearchBox>
+          <SearchText>면접 후기 검색하기</SearchText>
+          <SearchInput>
+            <InputField type="text" id="company" placeholder="기업명" onChange={handleSearchInputChange} />
+            <InputField type="text" id="position" placeholder="직무" onChange={handleSearchInputChange} />
+            <SearchButton onClick={handleSearch}>검색</SearchButton>
+          </SearchInput>
+        </SearchBox>
 
-      <WritingContainer>
-        <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
-        <WritingBox onClick={navigateToInput}>
-          면접 후기를 남겨보세요
-        </WritingBox>
-      </WritingContainer>
+        <WritingContainer>
+          <img src={userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px', borderRadius: '100%', border: '3px solid #E2E2E2' }} />
+          <WritingBox onClick={navigateToInput}>
+            면접 후기를 남겨보세요
+          </WritingBox>
+        </WritingContainer>
 
-      <SearchResultWrap>
-        {sortedData.length > 0 && (
-          <SearchResultVar>
-            <SearchResultText>
-              검색결과 ({sortedData.length})
-            </SearchResultText>
+        <SearchResultWrap>
+          {totalElements > 0 && (
+              <SearchResultVar>
+                <SearchResultText>
+                  검색결과 ({totalElements})
+                </SearchResultText>
 
-            <SortButtonsContainer>
-              <SortButton onClick={handleSortByDate} active={sortByDateActive}>
-                <ButtonImage src={sortByDateActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
-                최근 작성순
-              </SortButton>
-              <SortButton onClick={handleSortByLikes} active={sortByLikesActive}>
-                <ButtonImage src={sortByLikesActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
-                스크랩 많은 순
-              </SortButton>
-            </SortButtonsContainer>
-          </SearchResultVar>
-        )}
+                <SortButtonsContainer>
+                  <SortButton onClick={handleSortByDate} active={sortByDateActive}>
+                    <ButtonImage src={sortByDateActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+                    최근 작성순
+                  </SortButton>
+                  <SortButton onClick={handleSortByLikes} active={sortByLikesActive}>
+                    <ButtonImage src={sortByLikesActive ? "./assets/Vector14.png" : "./assets/Ellipse26.png"} alt="button image" />
+                    스크랩 많은 순
+                  </SortButton>
+                </SortButtonsContainer>
+              </SearchResultVar>
+          )}
+          {sortedData.map((interview, index) => {
+            const englishList = interview.english ? interview.english.split(', ') : [];
+            const scoreList = interview.score ? interview.score.split(', ') : [];
 
-        {sortedData.map((coverLetter, index) => (
-          <SearchResultBox key={index} onClick={() => handleResultClick(coverLetter)}>
-            <InformationContainer>
-              <Information1>{coverLetter.company} | {coverLetter.department} | {coverLetter.year} {' '} {coverLetter.semester}</Information1>
-              <Information2>
-                토익: {coverLetter.english}, 오픽: {coverLetter.opic} / {coverLetter.activity} / 컴퓨터활용능력: {coverLetter.certification} / {coverLetter.major} / 학점 {coverLetter.gpa}
-              </Information2>
-              <Information3>
-                {coverLetter.contents}
-              </Information3>
-            </InformationContainer>
-            <ScrapIconWrap>
-              <ScrapIcon src="./assets/scrap.png" />
-              <ScrapCount>{coverLetter.scrap}</ScrapCount>
-            </ScrapIconWrap>
-          </SearchResultBox>
-        ))}
-      </SearchResultWrap>
+            return (
+                <SearchResultBox key={index} >
+                  <InformationContainer key = {interview.id} onClick={() => handleResultClick(interview)}>
+                    <Information1>{interview.company} | {interview.department} | {interview.year} {' '} {interview.semester}</Information1>
+                    <Information2>
+                      {englishList.map((english, index) => (
+                          <span key={index}> {english}: {scoreList[index]}, </span>
+                      ))} /
+                      <span> 대외활동: {interview.activity}</span> /
+                      <span> {interview.certification}</span> /
+                      <span> {interview.education}</span> /
+                      <span> {interview.department}</span> /
+                      <span> 학점: {interview.gpa}</span>
+                    </Information2>
+                    <Information3>
+                      {interview.contents && interview.contents.length > 0 ? interview.contents[0] : '내용이 없습니다.'}
+                    </Information3>
+                  </InformationContainer>
+                  <ScrapIconWrap>
+                    <ScrapIcon src="./assets/scrap.png" />
+                    <ScrapCount>{interview.scrapCount}</ScrapCount>
+                  </ScrapIconWrap>
+                </SearchResultBox>
+            );
+          })}
+        </SearchResultWrap>
 
-      <InterviewCoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
-    </PageContainer>
+        <InterviewCoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} selectedItem={selectedItem} />
+
+        <TalkPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+        />
+      </PageContainer>
   );
 }
 
@@ -132,7 +247,7 @@ const PageContainer = styled.div`
 `;
 
 const SearchBox = styled.div`
-  width: 74.9375rem;  
+  width: 74.9375rem;
   height: 15.5625rem;
   background-color: #E5FF7D;
   border-radius: 0.5rem;
@@ -178,7 +293,7 @@ const InputField = styled.input`
 const SearchButton = styled.button`
   width: 132px;
   height: 78px;
-  background-color:  #5B00EF; 
+  background-color:  #5B00EF;
   border: 0.1875rem solid  #5B00EF;
   border-radius: 1rem;
   color: white;
@@ -264,7 +379,7 @@ const ButtonImage = styled.img`
 
 const SearchResultBox = styled.div`
   display: flex;
-  width: calc(1198px); 
+  width: calc(1198px);
   height: 165px;
   margin-top: 30px;
   border-bottom: 2px solid #E2E2E2;

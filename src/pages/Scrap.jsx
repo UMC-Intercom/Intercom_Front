@@ -1,12 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation  } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import fakeNotices from '../data/fakeNotices'; // Ensure the path to fakeNotices is correct
 import fakeInterviewData from '../data/fakeInterviewData'; 
 import fakeData from '../data/fakeData';
 import fakeCoverletterData from '../data/fakeCoverletterData';
+import axios from "axios";
+import config from '../path/config';
+import TalkPagination from "./TalkPagination";
+
 
 const ITEMS_PER_PAGE = 4;
 const NOTICES_PER_PAGE = 9;
@@ -15,10 +19,13 @@ const Scrap = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { toggleLogin } = useAuth();
+        
+    const { jobId } = useParams();
 
-    const totalPages = Math.ceil(fakeInterviewData.length / ITEMS_PER_PAGE);
- 
+    // const totalPages = Math.ceil(fakeInterviewData.length / ITEMS_PER_PAGE);
+    const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalElements, setTotalElements] = useState([]);
     const indexOfLast = currentPage * ITEMS_PER_PAGE;
     const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
     const currentInterviews = fakeInterviewData.slice(indexOfFirst, indexOfLast);
@@ -30,12 +37,6 @@ const Scrap = () => {
     const indexOfFirstNotice = indexOfLastNotice - NOTICES_PER_PAGE;
     const currentNotices = fakeNotices.slice(indexOfFirstNotice, indexOfLastNotice);
 
-
-    const paginate = (pageNumber) => {
-      setCurrentPage(pageNumber);
-      window.scrollTo(0, 0);
-    };
-
     const isCurrentPath = (path) => location.pathname === path;
     
     const handleLogout = () => {
@@ -46,38 +47,108 @@ const Scrap = () => {
     const [view, setView] = useState('announcement');
     const [data, setData] = useState([]);
 
+    const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+
     useEffect(() => {
         if (view === 'announcement') {
-            setData(fakeNotices);
+            axios.get(`${config.API_URL}/scraps/jobs?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const jobDto = response.data;
+                    setData(jobDto.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching job scraps:', error);
+                });
         }
         else if (view === 'interview') {
-          setData(fakeInterviewData);
+            axios.get(`${config.API_URL}/scraps/interviews?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const interviewData = response.data;
+                    setData(interviewData.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching interview data:', error);
+                });
         }
         else if (view === 'coverletter') {
-            setData(fakeCoverletterData);
+            axios.get(`${config.API_URL}/scraps/resumes?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const coverletterData = response.data;
+                    setData(coverletterData.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching coverletter data:', error);
+                });
         }
         else if (view === 'talk') {
-            setData(fakeData);
+            axios.get(`${config.API_URL}/scraps/talks?page=${currentPage}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
+                .then((response) => {
+                    const talkData = response.data;
+                    setData(talkData.content);
+                    setTotalPages(response.data.totalPages);
+                    setTotalElements(response.data.totalElements);
+                })
+                .catch((error) => {
+                    console.error('Error fetching talk data:', error);
+                });
         }
-      }, [view]);
+      }, [currentPage, view]);
 
     const handleAnnouncementClick = () => {
         setView('announcement'); // 공고 글 보기로 설정
+        setCurrentPage(1);
     };
     
     const handleInterviewClick = () => {
         setView('interview'); // 면접 후기 보기로 설정
+        setCurrentPage(1);
     };
     
     const handleCoverLetterClick = () => {
-        setView('coverletter'); 
+        setView('coverletter');
+        setCurrentPage(1);
     };
 
     const handleTalkClick = () => {
         setView('talk');
+        setCurrentPage(1);
     };
-    
-        
+
+    const calculateRemainingDays = (expirationDate) => {
+        const today = new Date();
+        const expiration = new Date(expirationDate);
+        const timeDiff = expiration - today;
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        return daysDiff > 0 ? `D-${daysDiff}` : '기한 만료';
+    };
+
+    const onPageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo(0, 0);
+    };
+
     return (
         <ScrapContainer>
             <MenuContainer>
@@ -107,385 +178,131 @@ const Scrap = () => {
                         <Button onClick={handleTalkClick} selected={view === 'talk'}>톡톡 글</Button>
                     </ButtonContainer>
 
-                    {view === 'announcement' && (  
+                    {view === 'announcement' && (   
                         <Content> 
-                            <Title>공고({fakeNotices.length})</Title>
+                            <Title>공고({totalElements})</Title>
                             <NoticesContent>
-                                {currentNotices.map(notice => (
+                                {data.map(notice => (
+                                    <StyledLink to={`/job/${notice.id}`} key={notice.id}>
                                     <NoticeItem key={notice.id} >
-                                    <img src={notice.imageUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
+                                    <img src={notice.logoUrl} alt={notice.title} style={{marginBottom: "1.25rem"}}/>
                                     <div>
-                                        <NoticeTitle>[{notice.title}]</NoticeTitle> 
-                                        <Information>{notice.information}</Information>
-                                        <br />
-                                        <br />
-                                        <NoticeDeadline>D-{notice.deadline} </NoticeDeadline> <NoticeViews> 조회 {notice.views}</NoticeViews>
+                                        <NoticeTitle>[{notice.title}]</NoticeTitle>
+                                        <Information>{notice.company}</Information>
+                                        <br /><br />
+                                        <NoticeDeadline>{calculateRemainingDays(notice.expirationDate)}</NoticeDeadline> <NoticeViews> 조회 {notice.viewCount}</NoticeViews>
                                     </div>
                                     </NoticeItem>
+                                    </StyledLink>
                                 ))}
                                 </NoticesContent>
-                                <Pagination>
-                                        {/* 현재 페이지가 1 또는 2일 때 */}
-                                        {currentPage === 1 && totalNoticePages > 1 && (
-                                            <>
-                                            <PageNumber
-                                                onClick={() => paginate(1)}
-                                                isActive={true}
-                                            >
-                                                1
-                                            </PageNumber>
-                                            <PageNumber
-                                                onClick={() => paginate(2)}
-                                                isActive={false}
-                                            >
-                                                2
-                                            </PageNumber>
-                                            {totalNoticePages > 2 && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(3)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-
-                                        {currentPage === 2 && (
-                                            <>
-                                            <PageNumber
-                                                onClick={() => paginate(1)}
-                                                isActive={false}
-                                            >
-                                                1
-                                            </PageNumber>
-                                            <PageNumber
-                                                onClick={() => paginate(2)}
-                                                isActive={true}
-                                            >
-                                                2
-                                            </PageNumber>
-                                            {totalNoticePages > 2 && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(3)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-
-                                        {/* 현재 페이지가 3 이상일 때 */}
-                                        {currentPage > 2 && (
-                                            <>
-                                            <Arrow
-                                                src="/assets/LeftArrow.png"
-                                                onClick={() => paginate(currentPage - 1)}
-                                                alt="Previous"
-                                            />
-                                            <PageNumber
-                                                onClick={() => paginate(currentPage)}
-                                                isActive={true}
-                                            >
-                                                {currentPage}
-                                            </PageNumber>
-                                            {currentPage < totalNoticePages && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(currentPage + 1)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-                                    </Pagination>
-                            
+                            <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
                         </Content>   
                     )}
 
                     {view === 'interview' && (
                         <Content> 
-                            <Title>면접 후기({fakeInterviewData.length})</Title>
+                            <Title>면접 후기({totalElements})</Title>
                             <InterviewListContainer>
-                                {currentInterviews.map(item => (
-                                <InterviewItem key={item.id}>
-                                    <div className="company-position">{item.company} | {item.position} | {item.when}</div> 
-                                    <div className="details">
-                                        <span>{item.language}</span> /
-                                        <span> 대외활동: {item.activities}</span> / 
-                                        <span> {item.certificate}</span> / 
-                                        <span> {item.education}</span> / 
-                                        <span> {item.department}</span> / 
-                                        <span> 학점: {item.grade}</span>
-                                    </div>
-                                    <div className="scrap-views">
-                                        스크랩 {item.scrap} | 조회수 {item.views}
-                                    </div>
-                                </InterviewItem>
-                                ))}
+                                {data.map(item => {
 
-                                <Pagination>
-                                        {/* 현재 페이지가 1 또는 2일 때 */}
-                                        {currentPage === 1 && totalPages > 1 && (
-                                            <>
-                                            <PageNumber
-                                                onClick={() => paginate(1)}
-                                                isActive={true}
-                                            >
-                                                1
-                                            </PageNumber>
-                                            <PageNumber
-                                                onClick={() => paginate(2)}
-                                                isActive={false}
-                                            >
-                                                2
-                                            </PageNumber>
-                                            {totalPages > 2 && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(3)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
+                                    const englishList = item.english ? item.english.split(', ') : [];
+                                    const scoreList = item.score ? item.score.split(', ') : [];
 
-                                        {currentPage === 2 && (
-                                            <>
-                                            <PageNumber
-                                                onClick={() => paginate(1)}
-                                                isActive={false}
-                                            >
-                                                1
-                                            </PageNumber>
-                                            <PageNumber
-                                                onClick={() => paginate(2)}
-                                                isActive={true}
-                                            >
-                                                2
-                                            </PageNumber>
-                                            {totalPages > 2 && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(3)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-
-                                        {/* 현재 페이지가 3 이상일 때 */}
-                                        {currentPage > 2 && (
-                                            <>
-                                            <Arrow
-                                                src="/assets/LeftArrow.png"
-                                                onClick={() => paginate(currentPage - 1)}
-                                                alt="Previous"
-                                            />
-                                            <PageNumber
-                                                onClick={() => paginate(currentPage)}
-                                                isActive={true}
-                                            >
-                                                {currentPage}
-                                            </PageNumber>
-                                            {currentPage < totalPages && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(currentPage + 1)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-                                        </Pagination>
+                                    return (
+                                        <StyledLink to={`/interviews/${item.id}`} key={item.id}>
+                                        <InterviewItem key={item.id}>
+                                            <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
+                                            <div className="details">
+                                                {englishList.map((english, index) => (
+                                                    <span key={index}> {english}: {scoreList[index]}, </span>
+                                                ))} /
+                                                <span> 대외활동: {item.activity}</span> /
+                                                <span> {item.certification}</span> /
+                                                <span> {item.education}</span> /
+                                                <span> {item.department}</span> /
+                                                <span> 학점: {item.gpa}</span>
+                                            </div>
+                                            <div className="scrap-views">
+                                                스크랩 {item.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {item.viewCount}
+                                            </div>
+                                        </InterviewItem>
+                                        </StyledLink>
+                                    );
+                                })}
+                                <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                                />
                             </InterviewListContainer>
+                            
                         </Content>
                     )}
 
                     {view === 'coverletter' && (
                         <Content> 
-                        <Title>합격 자소서({fakeInterviewData.length})</Title>
+                        <Title>합격 자소서({totalElements})</Title>
                         <InterviewListContainer>
-                            {currentInterviews.map(item => (
-                            <InterviewItem key={item.id}>
-                                <div className="company-position">{item.company} | {item.position} | {item.when}</div> 
-                                <div className="details">
-                                    <span>{item.language}</span> /
-                                    <span> 대외활동: {item.activities}</span> / 
-                                    <span> {item.certificate}</span> / 
-                                    <span> {item.education}</span> / 
-                                    <span> {item.department}</span> / 
-                                    <span> 학점: {item.grade}</span>
-                                </div>
-                                <div className="scrap-views">
-                                    스크랩 {item.scrap} | 조회수 {item.views}
-                                </div>
-                            </InterviewItem>
-                            ))}
+                            {data.map(item => {
+                                const englishList = item.english ? item.english.split(', ') : [];
+                                const scoreList = item.score ? item.score.split(', ') : [];
 
-                            <Pagination>
-                                    {/* 현재 페이지가 1 또는 2일 때 */}
-                                    {currentPage === 1 && totalPages > 1 && (
-                                        <>
-                                        <PageNumber
-                                            onClick={() => paginate(1)}
-                                            isActive={true}
-                                        >
-                                            1
-                                        </PageNumber>
-                                        <PageNumber
-                                            onClick={() => paginate(2)}
-                                            isActive={false}
-                                        >
-                                            2
-                                        </PageNumber>
-                                        {totalPages > 2 && (
-                                            <Arrow
-                                            src="/assets/RightArrow.png"
-                                            onClick={() => paginate(3)}
-                                            alt="Next"
-                                            />
-                                        )}
-                                        </>
-                                    )}
-
-                                    {currentPage === 2 && (
-                                        <>
-                                        <PageNumber
-                                            onClick={() => paginate(1)}
-                                            isActive={false}
-                                        >
-                                            1
-                                        </PageNumber>
-                                        <PageNumber
-                                            onClick={() => paginate(2)}
-                                            isActive={true}
-                                        >
-                                            2
-                                        </PageNumber>
-                                        {totalPages > 2 && (
-                                            <Arrow
-                                            src="/assets/RightArrow.png"
-                                            onClick={() => paginate(3)}
-                                            alt="Next"
-                                            />
-                                        )}
-                                        </>
-                                    )}
-
-                                    {/* 현재 페이지가 3 이상일 때 */}
-                                    {currentPage > 2 && (
-                                        <>
-                                        <Arrow
-                                            src="/assets/LeftArrow.png"
-                                            onClick={() => paginate(currentPage - 1)}
-                                            alt="Previous"
-                                        />
-                                        <PageNumber
-                                            onClick={() => paginate(currentPage)}
-                                            isActive={true}
-                                        >
-                                            {currentPage}
-                                        </PageNumber>
-                                        {currentPage < totalPages && (
-                                            <Arrow
-                                            src="/assets/RightArrow.png"
-                                            onClick={() => paginate(currentPage + 1)}
-                                            alt="Next"
-                                            />
-                                        )}
-                                        </>
-                                    )}
-                                    </Pagination>
+                                return (
+                                    <StyledLink to={`/cover-letters/${item.id}`} key={item.id}>
+                                    <InterviewItem key={item.id}>
+                                        <div className="company-position">{item.company} | {item.department} | {item.year} | {item.semester}</div>
+                                        <div className="details">
+                                            {englishList.map((english, index) => (
+                                                <span key={index}> {english}: {scoreList[index]}, </span>
+                                            ))} /
+                                            <span> 대외활동: {item.activity}</span> /
+                                            <span> {item.certification}</span> /
+                                            <span> {item.education}</span> /
+                                            <span> {item.department}</span> /
+                                            <span> 학점: {item.gpa}</span>
+                                        </div>
+                                        <div className="scrap-views">
+                                            스크랩 {item.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {item.viewCount}
+                                        </div>
+                                    </InterviewItem>
+                                    </StyledLink>
+                                );
+                            })}
+                            <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
                         </InterviewListContainer>
+                            
                     </Content>
                     )}
                     
                     {view === 'talk' && (
-                        <Content> 
-                            <Title>톡톡 글({fakeData.length})</Title>
+                        <Content>
+                            <Title>톡톡 글({totalElements})</Title>
                             <TalkListContainer>
-                            {currentTalks.map(item => (
+                            {data.map(item => (
                                 <SearchResultItem key={item.id}>
-                                <p className="title">{item.title}</p>
-                                <p className="content">{item.content || "내용이 없습니다."}</p>
-                                <p className="response">답변: {item.answers} 댓글: {item.comments} 조회수: {item.views} 좋아요: {item.likes}</p>
-                                </SearchResultItem>
+                                    <StyledLink to={`/talks/${item.id}`}>
+                                    <p className="title">{item.title}</p>
+                                    <p className="content">{(item.content && item.content.replace(/<img[^>]*>/g,"").replace(/<[^>]*>?/gm, '')) || "내용이 없습니다."}</p>
+                                    <p className="response">답변: {item.commentCount}&nbsp;&nbsp;&nbsp;댓글: {item.replyCount}&nbsp;&nbsp;&nbsp;조회수: {item.viewCount}&nbsp;&nbsp;&nbsp;좋아요: {item.likeCount}</p>
+                                    </StyledLink >
+                                    </SearchResultItem>
                             ))}
-                            <Pagination>
-                                        {/* 현재 페이지가 1 또는 2일 때 */}
-                                        {currentPage === 1 && totalPages > 1 && (
-                                            <>
-                                            <PageNumber
-                                                onClick={() => paginate(1)}
-                                                isActive={true}
-                                            >
-                                                1
-                                            </PageNumber>
-                                            <PageNumber
-                                                onClick={() => paginate(2)}
-                                                isActive={false}
-                                            >
-                                                2
-                                            </PageNumber>
-                                            {totalPages > 2 && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(3)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-
-                                        {currentPage === 2 && (
-                                            <>
-                                            <PageNumber
-                                                onClick={() => paginate(1)}
-                                                isActive={false}
-                                            >
-                                                1
-                                            </PageNumber>
-                                            <PageNumber
-                                                onClick={() => paginate(2)}
-                                                isActive={true}
-                                            >
-                                                2
-                                            </PageNumber>
-                                            {totalPages > 2 && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(3)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-
-                                        {/* 현재 페이지가 3 이상일 때 */}
-                                        {currentPage > 2 && (
-                                            <>
-                                            <Arrow
-                                                src="/assets/LeftArrow.png"
-                                                onClick={() => paginate(currentPage - 1)}
-                                                alt="Previous"
-                                            />
-                                            <PageNumber
-                                                onClick={() => paginate(currentPage)}
-                                                isActive={true}
-                                            >
-                                                {currentPage}
-                                            </PageNumber>
-                                            {currentPage < totalPages && (
-                                                <Arrow
-                                                src="/assets/RightArrow.png"
-                                                onClick={() => paginate(currentPage + 1)}
-                                                alt="Next"
-                                                />
-                                            )}
-                                            </>
-                                        )}
-                                        </Pagination>  
+                            <TalkPagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={onPageChange}
+                            />
                             </TalkListContainer>
+                            
                         </Content>
                     )}
                 </ContentsBox>
@@ -614,13 +431,14 @@ const NoticeTitle = styled.h1`
 `;
         
 const NoticesContent = styled.div`
-    display: flex;
-    gap: 1.563rem;
-    flex-wrap: wrap;
-
-    @media (max-width: 75rem) {
-        justify-content: space-around;
-    }
+display: grid;
+grid-template-columns: repeat(3, 1fr); // 3개의 컬럼으로 나눕니다.
+grid-gap: 1rem; // 그리드 아이템 사이의 간격을 지정합니다.
+background-color: white;
+border-radius: 3%;
+padding: 1.5rem;
+margin-top: 1rem;
+width: 100%; // 컨테이너의 너비를 100%로 설정합니다.
 `;
 
 const Content = styled.div``;
@@ -753,34 +571,8 @@ const SearchResultItem = styled.div`
   }
 `;
 
-const Pagination = styled.div`
-  margin-top: 2rem;
-  display: flex;
-  justify-content: center;
-  padding: 1rem;
-`;
 
-const PageNumber = styled.span`
-  font-family: SUITE;
-  font-size: 1.25rem;
-  margin: 0 0.1rem;
-  cursor: pointer;
-  font-weight: ${({ isActive }) => (isActive ? "700" : "400")};
-  ${({ isArrow }) => isArrow && `pointer-events: none;`}
-  border-radius: 50%; // 원형 모양
-  background-color: ${({ isActive }) => (isActive ? "#E0E0E0" : "transparent")}; // 선택된 페이지에 대한 배경색
-  display: inline-block;
-  text-align: center;
-  min-width: 2rem; // 최소 너비 설정
-  height: 2rem; // 높이 설정
-  line-height: 2rem; // 텍스트를 수직 중앙으로 정렬
-`;
-
-const Arrow = styled.img`
-  width: 7px;
-  height: 15px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  margin-left: 1rem;
-  margin-right: 1rem;
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
 `;

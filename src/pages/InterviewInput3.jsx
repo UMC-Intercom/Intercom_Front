@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import PostQuestionModal from './PostQuestionModal';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 export default function CoverLetterInput3() {
   const [postModalOpen, setPostModalOpen] = useState(false); // PostQuestionModal 열림 상태
@@ -17,10 +18,10 @@ export default function CoverLetterInput3() {
     major: '',
     gpa: '',
     activity: '',
-    certifications: '',
+    certification: [],
     english: '',
     score: '',
-    content: ''
+    contents: ''
 });
 
 useEffect(() => {
@@ -29,10 +30,31 @@ useEffect(() => {
   }
 }, [location]);
 
-  const handleConfirm = () => {
-    console.log(formData); 
-    setPostModalOpen(true); // PostQuestionModal 열기
+  const accessToken = localStorage.getItem('accessToken');
+
+  const handleConfirm = async () => {
+    // 모든 필수 정보가 입력되었는지 확인
+    if (!formData.contents.trim()) {
+      alert('후기 내용을 입력해주세요.');
+      return;
+    }
+  
+    console.log(formData);
+  
+    try {
+      const response = await axios.post('http://localhost:8080/interviews', formData, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        },
+      });
+      console.log(response.data);
+      setPostModalOpen(true);
+    } catch (error) {
+      console.error(error);
+      alert('후기 등록에 실패했습니다. 나중에 다시 시도해주세요.');
+    }
   };
+  
 
   const handleClose = () => {
     setPostModalOpen(false); // PostQuestionModal 닫기
@@ -49,8 +71,8 @@ useEffect(() => {
           </SubtitleWrap>
 
             <QuestionWrap type='text' placeholder='답변을 입력해주세요'
-            value={formData.content}
-            onChange={(e) => setFormData({...formData, content: e.target.value})}
+            value={formData.contents}
+            onChange={(e) => setFormData({...formData, contents: e.target.value})}
             />
 
         </Form>

@@ -103,7 +103,7 @@ const Header = () => {
   return (
     <HeaderContainer>
       <HeaderBox>
-        <Logo src="./assets/Logo.png" alt="IntercomLogo" onClick={() => handlePageChange('/home')}/>
+        <Logo src="/assets/Logo.png" alt="IntercomLogo" onClick={() => handlePageChange('/home')}/>
         <PageLists>
           <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
           <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>저장한 공고</Pages>
@@ -121,7 +121,7 @@ const Header = () => {
             <UserProfileBox>
               <NotificationImage 
               onClick={handleNotificationClick}
-              src="./assets/Notification.png" 
+              src="/assets/Notification.png" 
               alt = "Notification Image"/>
               <ProfileBox onClick={toggleSettingsSidebar}>
               <ProfileImage 
@@ -271,7 +271,7 @@ const ProfileImage = styled.img`
 `;
 
 const UserName = styled.span`
-width: 5rem;
+width: auto;
 height: 1.75rem;
 color: #5B00EF;
 text-align: right;
