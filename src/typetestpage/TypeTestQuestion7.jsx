@@ -29,8 +29,8 @@ export default function TypeTestQuestion7() {
         <Text1>새로운 프로젝트를 시작하는데, 프로젝트의 방향성에 대해 의견이 분분하다. <br />이럴 때 나는...
         </Text1>
         <Image1 src='assets/handsup.png' />
-        <Button onClick={() => handleChange('0')}>대다수의 의견을 따른다.<Arrow>&gt;</Arrow></Button>
-        <Button onClick={() => handleChange('1')}>자신의 의견을 표현하며,
+        <Button onClick={() => handleChange('7')}>대다수의 의견을 따른다.<Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('8')}>자신의 의견을 표현하며,
           다른 사람들의 의견도 존중한다. <Arrow>&gt;</Arrow></Button>
       </TestWrap>
     </Container>

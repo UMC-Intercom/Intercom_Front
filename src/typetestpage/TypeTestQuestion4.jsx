@@ -29,8 +29,8 @@ export default function TypeTestQuestion4() {
         <Text1>연말에 중요한 프로젝트와 오랫동안 계획했던 가족 여행이 겹친다!<br />이럴 때 나는...
         </Text1>
         <Image1 src='assets/airplane.png' />
-        <Button onClick={() => handleChange('0')}>아쉽지만 프로젝트를 위해 휴가를 미룬다. <Arrow>&gt;</Arrow></Button>
-        <Button onClick={() => handleChange('1')}>휴가를 누리면서 필요한 경우
+        <Button onClick={() => handleChange('4')}>아쉽지만 프로젝트를 위해 휴가를 미룬다. <Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('5')}>휴가를 누리면서 필요한 경우
            원격으로 일을 지원한다.<Arrow>&gt;</Arrow></Button>
       </TestWrap>
     </Container>

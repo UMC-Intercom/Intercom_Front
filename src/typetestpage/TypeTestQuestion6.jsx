@@ -29,8 +29,8 @@ export default function TypeTestQuestion6() {
         <Text1>스타트업과 대기업 둘 다 잡 오퍼를 받았다! <br />이럴 때 나는...
         </Text1>
         <Image1 src='assets/company.png' />
-        <Button onClick={() => handleChange('0')}>안정적인 대기업을 선택한다.<Arrow>&gt;</Arrow></Button>
-        <Button onClick={() => handleChange('1')}>변화와 성장이 기대되는 스타트업을 선택한다. <Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('2')}>안정적인 대기업을 선택한다.<Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('3')}>변화와 성장이 기대되는 스타트업을 선택한다. <Arrow>&gt;</Arrow></Button>
       </TestWrap>
     </Container>
   )

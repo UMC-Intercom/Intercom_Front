@@ -29,8 +29,8 @@ export default function TypeTestQuestion5() {
         <Text1>팀 이동의 기회가 생겼다.<br />이럴 때 나는...
         </Text1>
         <Image1 src='assets/runner.png' />
-        <Button onClick={() => handleChange('0')}>연봉 인상이 더 큰 다른 팀으로 이동한다.<Arrow>&gt;</Arrow></Button>
-        <Button onClick={() => handleChange('1')}>좋은 동료들과 함께 일하는 현재 팀을 유지한다.<Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('5')}>연봉 인상이 더 큰 다른 팀으로 이동한다.<Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('6')}>좋은 동료들과 함께 일하는 현재 팀을 유지한다.<Arrow>&gt;</Arrow></Button>
       </TestWrap>
     </Container>
   )

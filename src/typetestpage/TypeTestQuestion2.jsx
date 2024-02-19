@@ -29,8 +29,8 @@ export default function TypeTestQuestion2() {
             <Text1>회사에서 새로운 사업 아이디어 제안의 기회가 생겼다.<br/>이럴 때 나는...
             </Text1>
             <Image1 src='assets/bulb.png'/>
-            <Button onClick={() => handleChange('0')}>기존의 안정적인 업무를 유지하는 것을 선택한다.{'>'}</Button>
-        <Button onClick={() => handleChange('1')}>새로운 사업 아이디어를 제안하고 이를 주도한다. {'>'}</Button>
+            <Button onClick={() => handleChange('2')}>기존의 안정적인 업무를 유지하는 것을 선택한다.{'>'}</Button>
+        <Button onClick={() => handleChange('3')}>새로운 사업 아이디어를 제안하고 이를 주도한다. {'>'}</Button>
         </TestWrap>
     </Container>
   )

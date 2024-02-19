@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+function countOccurrences(str, char) {
+  // 문자열에서 특정 문자가 몇 개 있는지 세는 함수
+  return str.split(char).length - 1;
+}
+
 export default function TypeTestQuestion8() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,12 +21,34 @@ export default function TypeTestQuestion8() {
   const handleChange = (input) => {
     const newChoice = choice + input;
     setChoice(newChoice);
-    navigateToQuestion(newChoice);
-    console.log(newChoice);
-  }
 
-  const navigateToQuestion = (newChoice) => {
-    navigate('/type-test-result1', { state: { choice: newChoice } });
+    const filteringResult1Num = newChoice.split('').filter(char => char !== '1' && char !== '2').join('');
+    const filteringResult2_1Num = newChoice.split('').filter(char => char !== '2' && char !== '3').join('');
+    const filteringResult2_2Num = newChoice.split('').filter(char => char !== '4' && char !== '5').join('');
+    const filteringResult3Num = newChoice.split('').filter(char => char !== '2' && char !== '3').join('');
+    
+    if (filteringResult1Num === '04674' && countOccurrences(newChoice, '2') >= 2) { //느티(안정)
+      navigate('/type-test-result1');
+    } 
+    else if (filteringResult2_1Num === '15585' && countOccurrences(newChoice, '3') >= 2) { //자작(도전)
+      navigate('/type-test-result2');
+    }
+    else if (filteringResult2_2Num === '13338' && countOccurrences(newChoice, '5') >= 2) { //자작(연봉)
+      navigate('/type-test-result2');
+    }
+    else if (filteringResult3Num === '04684' && countOccurrences(newChoice, '3') >= 2) { //버드(도전)
+      navigate('/type-test-result3');
+    }
+    else if (filteringResult2_1Num === '15575' && countOccurrences(newChoice, '2') >= 2) { //선인장(안정)
+      navigate('/type-test-result4');
+    }
+    else if (filteringResult2_2Num === '12227' && countOccurrences(newChoice, '5') >= 2) { //선인장(연봉)
+      navigate('/type-test-result4');
+    }
+    else {
+      navigate('/type-test-result5'); // 그 외는 대나무
+    }
+    
   }
   return (
     <Container>
@@ -29,8 +56,8 @@ export default function TypeTestQuestion8() {
         <Text1>연봉 인상과 주4일 근무, <br /> 나의 선택은? 
         </Text1>
         <Image1 src='assets/money.png' />
-        <Button onClick={() => handleChange('0')}>연봉 인상을 선택한다.<Arrow>&gt;</Arrow></Button>
-        <Button onClick={() => handleChange('1')}>주4일 근무를 선택한다.<Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('5')}>연봉 인상을 선택한다.<Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('4')}>주4일 근무를 선택한다.<Arrow>&gt;</Arrow></Button>
       </TestWrap>
     </Container>
   )

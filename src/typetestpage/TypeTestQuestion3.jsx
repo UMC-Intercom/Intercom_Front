@@ -29,8 +29,8 @@ export default function TypeTestQuestion3() {
         <Text1>새로운 프로젝트를 맡게 되었다.<br />이럴 때 나는...
         </Text1>
         <Image1 src='assets/notebookperson.png' />
-        <Button onClick={() => handleChange('0')}>자유롭게 아이디어를 제안하고 이를 실현하는 방향을 선호한다. <Arrow>&gt;</Arrow></Button>
-        <Button onClick={() => handleChange('1')}>상사의 지시를 따르면서 프로젝트를 진행하는 것을 선호한다. <Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('3')}>자유롭게 아이디어를 제안하고 이를 실현하는 방향을 선호한다. <Arrow>&gt;</Arrow></Button>
+        <Button onClick={() => handleChange('2')}>상사의 지시를 따르면서 프로젝트를 진행하는 것을 선호한다. <Arrow>&gt;</Arrow></Button>
       </TestWrap>
     </Container>
   )
