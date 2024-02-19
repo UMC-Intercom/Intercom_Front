@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const PostModal = ({ isOpen, onClose}) => {
   const navigate = useNavigate();
-  const navigateCoverLetterHome = () => navigate('/cover-letters-home');
+  const navigateCoverLetterHome = () => navigate('/home');
     return (
         <>
             {isOpen && (

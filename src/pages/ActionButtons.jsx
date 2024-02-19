@@ -39,7 +39,7 @@ const Count = styled.span`
   font-family: SUITE;
 `;
 
-const ActionButtons = ({ postId, liked, onToggleLike, likesCount, handleCommentsClick, commentsCount }) => {
+const ActionButtons = ({ postId, liked, onToggleLike, likesCount, handleCommentsClick, repliesCount }) => {
   return (
     <ButtonsContainer>
       <IconButtonWithCount onClick={() => onToggleLike(postId)}>
@@ -48,7 +48,7 @@ const ActionButtons = ({ postId, liked, onToggleLike, likesCount, handleComments
        
       </IconButtonWithCount>
       <IconButtonWithCount onClick={handleCommentsClick}>
-      <Count>{commentsCount}</Count>
+      <Count>{repliesCount}</Count>
         <CommentIcon src="/assets/comment.png" alt="Comment" />
       </IconButtonWithCount>
     </ButtonsContainer>

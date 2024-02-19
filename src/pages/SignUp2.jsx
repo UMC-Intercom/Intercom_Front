@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SignUp2() {
   const navigate = useNavigate();
-  const navigateToOnBoarding1 = () => navigate('/onboarding1');
+  const navigateToOnBoarding1 = () => navigate('/onboarding2');
   const navigateToSignUp3 = () => navigate('/signup3');
 
   const handleLaterButtonClick = () => {

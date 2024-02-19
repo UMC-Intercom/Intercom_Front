@@ -1,11 +1,50 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import companies from '../data/companies';
+import fields from '../data/fields';
 
 export default function InterviewInput1() {
   const navigate = useNavigate();
   const [currentYear] = useState(new Date().getFullYear());
   const [years] = useState(Array.from(new Array(125), (val, index) => currentYear - index));
+
+  const [isSearchModalVisible, setSearchModalVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  const [isFieldSearchModalVisible, setFieldSearchModalVisible] = useState(false);
+  const [fieldSearchTerm, setFieldSearchTerm] = useState('');
+  const [fieldSearchResults, setFieldSearchResults] = useState([]);
+
+  const toggleFieldSearchModal = () => {
+    setFieldSearchModalVisible(!isFieldSearchModalVisible);
+  };
+  
+  // 검색 입력 변경 처리 함수
+  const handleFieldSearchChange = (e) => {
+    const newSearchTerm = e.target.value;
+    setFieldSearchTerm(newSearchTerm);
+    const filteredFields = fields.filter(field =>
+      field.name.toLowerCase().includes(newSearchTerm.toLowerCase())
+    );
+    setFieldSearchResults(filteredFields);
+  };
+  
+  // 검색 결과 선택 처리 함수
+  const handleFieldSelect = (field) => {
+    setFormData({ ...formData, department: field.name });
+    setFieldSearchModalVisible(false);
+    setFieldSearchTerm('');
+    setFieldSearchResults([]);
+  };
+
+
+
+  const handleCloseModal = () => {
+    setSearchModalVisible(false); // 모달 창을 닫음
+  };
+  
 
   const [formData, setFormData] = useState({
     company: '',
@@ -48,13 +87,31 @@ export default function InterviewInput1() {
       }
     });
   };
-  
+  const handleSearchChange = (e) => {
+    const newSearchTerm = e.target.value;
+    setSearchTerm(newSearchTerm);
+    const filteredCompanies = companies.filter(company =>
+      company.name.toLowerCase().includes(newSearchTerm.toLowerCase())
+    );
+    setSearchResults(filteredCompanies);
+  };
+
+  const handleCompanySelect = (company) => {
+    setFormData({ ...formData, company: company.name });
+    setSearchModalVisible(false);
+    setSearchTerm('');
+    setSearchResults([]);
+  };
+
+  const toggleSearchModal = () => {
+    setSearchModalVisible(!isSearchModalVisible);
+  };
 
   const navigateToPass2 = () => {
-    const isFormComplete = formData.company && formData.department && formData.year && formData.gender !== 'no-selected' && formData.birthday !== `${currentYear}-01-01`;
+    const isFormComplete = formData.company && formData.department;
   
     if (isFormComplete) {
-      navigate('/interviews-input2', { state: formData });
+      navigate('/cover-letters-input2', { state: formData });
     } else {
       alert('모든 필수 항목을 입력해주세요.');
     }
@@ -78,7 +135,7 @@ export default function InterviewInput1() {
               value={formData.company}
               onChange={handleChange}
             />
-            <PassSearch>
+            <PassSearch onClick={toggleSearchModal}>
               <PassSearchIcon src='./assets/passSearch.png' />
               <PassSearchText>검색하기</PassSearchText>
             </PassSearch>
@@ -86,14 +143,15 @@ export default function InterviewInput1() {
 
           <InputWrap>
             <Label>부서 및 직무명</Label>
-            <InputField
+            <InputField2
               type="text"
               name="department"
               placeholder="부서 및 직무명"
               value={formData.department}
               onChange={handleChange}
+              readOnly={true}
             />
-            <PassSearch>
+            <PassSearch onClick={toggleFieldSearchModal}> {/* 검색 모달 토글 함수 호출 */}
               <PassSearchIcon src='./assets/passSearch.png' />
               <PassSearchText>검색하기</PassSearchText>
             </PassSearch>
@@ -158,11 +216,182 @@ export default function InterviewInput1() {
 
         </Form>
         <SubmitButton type="submit" onClick={navigateToPass2}>다음</SubmitButton>
-      </Container>
-    </SettingTitle>
-  );
-}
 
+        {isSearchModalVisible && (
+            <Modal>
+              <ModalContent>
+                <CloseButton src="./assets/closebtn.png" alt="Close" onClick={handleCloseModal} />
+                <SearchSection>
+                  <SearchInput
+                    type="text"
+                    placeholder="회사명을 검색해보세요"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                  />
+                  <SearchButtonContainer>
+                    <SearchIcon src="./assets/EditCareerSearch.png" alt="Search" />
+                    <SearchButton>검색하기</SearchButton>
+                  </SearchButtonContainer>
+                </SearchSection>
+                {/* searchTerm이 비어있지 않을 경우에만 결과 컨테이너 렌더링 */}
+                {searchTerm && (
+                  <ResultsContainer>
+                    {searchResults.length > 0 && (
+                      <ResultInfo>
+                        <SearchResultTitle>검색결과</SearchResultTitle>
+                        <SearchResultsCount>({searchResults.length})</SearchResultsCount>
+                      </ResultInfo>
+                    )}
+                    {searchResults.map((company, index) => (
+                      <SearchResultItem key={index} onClick={() => handleCompanySelect(company)}>
+                        {company.name.split(new RegExp(`(${searchTerm})`, 'gi'))
+                          .map((part, index) => part.toLowerCase() === searchTerm.toLowerCase() ? 
+                            <Highlight key={index}>{part}</Highlight> : part)}
+                      </SearchResultItem>
+                    ))}
+                  </ResultsContainer>
+                )}
+              </ModalContent>
+            </Modal>
+          )}
+
+            {isFieldSearchModalVisible && (
+              <Modal>
+                <ModalContent>
+                  <CloseButton src="./assets/closebtn.png" alt="Close" onClick={() => setFieldSearchModalVisible(false)} />
+                  <SearchSection>
+                    <SearchInput
+                      type="text"
+                      placeholder="부서 및 직무명을 검색해보세요 ex) IT개발·데이터"
+                      value={fieldSearchTerm}
+                      onChange={handleFieldSearchChange}
+                    />
+                    <SearchButtonContainer>
+                    <SearchIcon src="./assets/EditCareerSearch.png" alt="Search" />
+                    <SearchButton>검색하기</SearchButton>
+                  </SearchButtonContainer>
+                  </SearchSection>
+                  {fieldSearchTerm && (
+                    <ResultsContainer>
+                    {fieldSearchResults.map((field, index) => (
+                      <SearchResultItem key={index} onClick={() => handleFieldSelect(field)}>
+                        {field.name.split(new RegExp(`(${fieldSearchTerm})`, 'gi')).map((part, index) => 
+                          part.toLowerCase() === fieldSearchTerm.toLowerCase() ? 
+                          <Highlight key={index}>{part}</Highlight> : part
+                        )}
+                      </SearchResultItem>
+                    ))}
+                    </ResultsContainer>
+                  )}
+                </ModalContent>
+              </Modal>
+            )}
+
+            </Container>
+          </SettingTitle>
+        );
+      }
+
+      const InputField2 = styled.input`
+  font-family: SUITE;
+  font-size: 1.25rem;
+  font-weight: 700;
+  width: 30rem;
+  height: 1.5rem;
+  margin-left: 2rem;
+  margin-right: 25px;
+  padding: 1rem 1.5rem;
+  border: 3px solid #e2e2e2;
+  border-radius: 0.625rem;
+  background: #F7F7F7;
+  color: #000;
+  &:focus {
+    outline: none;
+  }
+  &::placeholder {
+    color: #BDBDBD;
+  }
+
+`;
+const ResultInfo = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  font-family: SUITE;
+  font-size: 0.875rem;
+  color: #9E9E9E;
+  margin-top: 5px;
+`;
+
+
+const SearchResultTitle = styled.span`
+  font-size: 1rem;
+`;
+
+const ResultsContainer = styled.div`
+  width: 556px;
+  padding: 10px;
+  height: 441px;
+  overflow-y: auto; // 결과가 많을 경우 스크롤바 생성
+  border: 2px solid #D1D1D1;
+  border-radius: 10px;
+  background-color: #FFF;
+  margin-left: 49px;
+  margin-top: 1px;
+  font-family: SUITE;
+  font-size: 17px;
+  font-weight: 600;
+  color: #636363;
+`;
+
+
+const SearchButton = styled.span`
+  font-family: SUITE;
+  font-size: 20px;
+  color: #636363;
+  font-weight: 700;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+`;
+
+const SearchButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 13px;
+  margin-right: 25px;
+`;
+
+const SearchIcon = styled.img`
+  height: 24px; 
+  margin-right: 0.625rem;
+`;
+
+
+const SearchSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px; // Adjust as needed for spacing
+`;
+
+const CloseButton = styled.img`
+  align-self: flex-end;
+  cursor: pointer;
+  height: 16px; // Adjust as needed
+`;
+
+const SearchResultsCount = styled.span`
+  background-color: #F7F7F7;
+  font-size: 0.875rem;
+  color: #9E9E9E;
+  margin-left: 1px;
+`;
+
+const Highlight = styled.span`
+  color: #5B00EF; 
+`;
 
 const SettingTitle = styled.div``;
 
@@ -339,6 +568,72 @@ color: #636363;
     }
   }
 `;
+
+const Modal = styled.div`
+display: flex;
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+justify-content: center;
+align-items: center;
+z-index: 1000;
+`;
+
+// 모달 내용 컨테이너
+const ModalContent = styled.div`
+width: 834px;
+height: 581px;
+background: #FFF;
+border-radius: 10px;
+padding: 20px;
+display: flex;
+flex-direction: column;
+border: 1.5px solid #A1A1A1;
+`;
+
+// 검색 결과 리스트
+const SearchResults = styled.div`
+  margin-top: 10px;
+  max-height: 300px; // 검색 결과 리스트의 최대 높이 설정
+  overflow-y: auto; // 내용이 넘칠 경우 스크롤 가능하도록 설정
+  border-top: 1px solid #ccc; // 상단에 구분선 추가
+  padding-top: 10px;
+`;
+
+// 검색 결과 아이템
+const SearchResultItem = styled.div`
+  padding: 8px;
+  cursor: pointer;
+  &:hover {
+    background-color: #f8f8f8; // 마우스 호버 시 배경색 변경
+  }
+`;
+
+// 검색 입력 필드
+const SearchInput = styled.input`
+  width: 556px;
+  height: 35px;
+  padding: 10px;
+  margin-right: 15px;
+  border: 2px solid #A1A1A1;
+  border-radius: 10px;
+  font-family: SUITE;
+  font-size: 20px;
+  font-weight: 600;
+  color: #636363;
+
+  &::placeholder {
+    color: #BDBDBD;
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;
+
 
 const RadioInput = ({ className, label, ...props }) => (
   <RadioLabel className={className}>
