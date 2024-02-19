@@ -177,7 +177,7 @@ const JobDetail = () => {
         </DescriptionItem>
         <DescriptionItem>
           <Label>직무</Label>
-          <Item>{job.industry}</Item>
+          <Item>{job.jobMidCode}</Item>
         </DescriptionItem>
         <DescriptionItem>
           <Label>경력</Label>
