@@ -74,7 +74,7 @@ useEffect(() => {
     const profile = localStorage.getItem('userProfile');
 
     if (profile === "null") {
-      setUserProfile("./assets/Ellipse2.png");
+      setUserProfile("./assets/MyProfile.png");
     }
     else {
       setUserProfile(profile);
@@ -104,7 +104,11 @@ const handlePostClick = async (postId) => {
   if (isRequesting || selectedPostId === postId) return;
   setIsRequesting(true);
   setSelectedPostId(postId);
-  navigate(`/talks/${postId}`);
+  if (!isLoggedIn) {
+    navigate('/join', { state: { from: location } });
+  } else {
+    navigate(`/talks/${postId}`);
+  }
   setIsRequesting(false);
 };
 

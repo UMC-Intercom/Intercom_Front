@@ -38,7 +38,7 @@ export default function InterviewHome() {
       const profile = localStorage.getItem('userProfile');
 
       if (profile === "null") {
-        setUserProfile("./assets/Ellipse2.png");
+        setUserProfile("./assets/MyProfile.png");
       }
       else {
         setUserProfile(profile);

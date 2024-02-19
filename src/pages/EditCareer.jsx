@@ -485,6 +485,29 @@ const ActivityTitle = styled.input`
 
 `;
 
+const LinkTitle = styled.input`
+  width: 215px;
+  height: 50px;
+  margin-right: 3rem;
+  padding: 10px;
+  border: 3px solid #E2E2E2;
+  border-radius: 10px;
+  font-family: SUITE;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #636363;
+  cursor: default;
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #BDBDBD;
+  }
+
+`;
+
 const InputFieldRow = styled.div`
   margin-left: 3.4375rem;
   display: flex;
@@ -770,7 +793,9 @@ const AddButton3 = styled.img`
 
 const EditCareer = () => {
   const [gradeScale, setGradeScale] = useState(""); // 선택한 기준 학점
-
+  const [linkUrl, setLinkUrl] = useState(""); // 단일 링크 URL
+  
+  
   const [activities, setActivities] = useState([
     { title: '', startDate: null, endDate: null, description: '' },
   ]);
@@ -882,13 +907,8 @@ const EditCareer = () => {
   
         // 보유 스킬 정보 업데이트
         setSelectedSkills(data.skill.split(', '));
-  
-        // 링크 정보 업데이트
-        if (data.link) {
-          const linkData = parseLinkData(data.link); // Implement `parseLinkData` based on how data is stored
-          setLink(linkData);
-        }
-  
+
+        setLinkUrl(data.link || '');
         // 커리어 프로필 이미지 URL 업데이트
         if (data.careerProfile) {
           localStorage.setItem('careerProfileImage', data.careerProfile);
@@ -915,6 +935,13 @@ const EditCareer = () => {
       [field]: value,
     }));
   };
+
+
+// 링크 URL 변경 처리
+const handleLinkUrlChange = (value) => {
+  setLinkUrl(value);
+};
+
 
   const [link, setLink] = useState({ title: '', url: '' });
 
@@ -952,14 +979,13 @@ const EditCareer = () => {
   const addLink = () => {
     setLinks([...links, { title: '', url: '' }]);
   };
-  
-  // 링크 정보 업데이트 함수
-  const updateLink = (index, field, value) => {
-    const updatedLinks = links.map((link, i) =>
-      i === index ? { ...link, [field]: value } : link
-    );
-    setLinks(updatedLinks);
-  };
+
+const updateLink = (index, field, value) => {
+  const updatedLinks = links.map((link, i) =>
+    i === index ? { ...link, [field]: value } : link
+  );
+  setLinks(updatedLinks);
+};
 
   const handleSave = async () => {
 
@@ -997,7 +1023,7 @@ const EditCareer = () => {
         description: activity.description
       })) : [],
       skill: sectionsVisible['보유스킬'] ? selectedSkills.join(", ") : "",
-      link: `${link.title}: ${link.url}`,
+      link: sectionsVisible['링크'] ? linkUrl : "", // 링크 URL
       careerProfile: localStorage.getItem('careerProfileImage'), // 사용자가 업로드한 이미지 URL 사용
       noCareer: false
     };
@@ -1309,19 +1335,15 @@ const renderSection = (sectionName) => {
               <DeleteButton src="./assets/editclose.png" onClick={() => handleDeleteSection('링크')} />
             </LanguageTitleContainer>
             <InputFieldRow>
-              <ActivityTitle
-                placeholder="링크 제목"
-                value={link.title}
-                onChange={(e) => handleLinkChange('title', e.target.value)}
-              />
-              <LinkInput
-                placeholder="링크 URL 입력하기"
-                value={link.url}
-                onChange={(e) => handleLinkChange('url', e.target.value)}
-              />
+            <LinkInput
+              placeholder="링크 URL"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+            />
             </InputFieldRow>
           </LinkSectionContainer>
         );
+      
     default:
       return null;
   }
@@ -1362,22 +1384,33 @@ const renderSection = (sectionName) => {
     setSkillModalVisible(true);
   };
   
-  const handleSkillSelect = (skill) => {
-    if (selectedSkills.includes(skill)) {
-      setSelectedSkills(selectedSkills.filter(s => s !== skill)); // 스킬이 이미 선택된 경우 제거
-    } else {
-      setSelectedSkills([...selectedSkills, skill]); // 스킬이 선택되지 않은 경우 추가
-    }
+  const handleSkillSearch = (searchTerm) => {
+    const searchResults = Object.entries(jobSkills).reduce((acc, [jobTitle, skills]) => {
+      if (jobTitle.toLowerCase().includes(searchTerm.toLowerCase())) {
+        acc = acc.concat(skills);
+      }
+      return acc;
+    }, []);
+  
+    setSkillSearchResults([...new Set(searchResults)]); // 중복 제거 후 상태 업데이트
   };
   
   useEffect(() => {
     if (skillSearchTerm) {
-      const skills = jobSkills[skillSearchTerm.toLowerCase()] || [];
-      setSkillSearchResults(skills);
+      handleSkillSearch(skillSearchTerm);
     } else {
       setSkillSearchResults([]);
     }
   }, [skillSearchTerm]);
+  
+  const handleSkillSelect = (skill) => {
+    if (!selectedSkills.includes(skill)) {
+      setSelectedSkills([...selectedSkills, skill]);
+    } else {
+      setSelectedSkills(selectedSkills.filter(s => s !== skill));
+    }
+  };
+  
 
   const renderSkillsSection = () => {
     return (

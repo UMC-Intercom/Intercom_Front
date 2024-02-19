@@ -10,7 +10,7 @@ import NotificationModal from "./NotificationModal";
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
   const { isLoggedIn, toggleLogin } = useAuth();
-  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: './assets/MyProfile.png'});
+  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: '/assets/MyProfile.png'});
   
   const navigate = useNavigate();
   const location = useLocation();
