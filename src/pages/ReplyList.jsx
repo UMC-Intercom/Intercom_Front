@@ -88,15 +88,15 @@ margin-top: 10px;
 const TopBar = styled.div`
   height: 10px; 
   background-color: #5B00EF; 
-  width: 1044px; 
+  width: 1100px; 
 `;
 const AdoptedTag = styled.div`
   justify-content: flex-end;
   background: none;
   color: #5B00EF;
-  font-size: 20;
+  font-size: 20px;
   font-weight: 800;
-  margin-right: 60px;
+  margin-right: 5px;
   margin-top: 10px;
   margin-left: auto;
 
@@ -137,6 +137,17 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
       setReplies((prevReplies) => [...prevReplies, newReply]);
     };
 
+
+    const checkAdoptionStatus = async () => {
+      try {
+          const response = await axios.get(`http://localhost:8080/comments/check-adopt/${talkId}`);
+          setIsAdopted(response.data);
+      } catch (error) {
+          console.error('Error checking adoption status:', error);
+      }
+  };
+
+  
     useEffect(() => {
       const checkAdoptionStatus = async () => {
           try {
@@ -363,9 +374,9 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
                         </ReplyUserInfo>
                     </ReplyHeader>
                    
-                    {currentUser && currentUser.nickname === postWriter && (
-               <Adopt commentId={reply.id} accessToken={accessToken} adoptionStatus={reply.adoptionStatus} onAdoptSuccess={() => handleAdopt(reply.id)}/>
-                        )}
+                    {currentUser && currentUser.nickname === postWriter && !isAdopted && (
+  <Adopt commentId={reply.id} accessToken={accessToken} adoptionStatus={reply.adoptionStatus} onAdoptSuccess={() => handleAdopt(reply.id)}/>
+)}
                   </ProfileAdoptWrapper>
                     <ReplyContent>{reply.content}</ReplyContent>
                     <ReplyFooter>
@@ -390,7 +401,7 @@ const ReplyList = ({ talkId, postWriter  , adoptedReplyId, onAdoptReply}) => {
             <NestedReplyUserInfo>
               <NestedReplyProfileImage src={nestedReply.defaultProfile || defaultProfileImg} alt="Profile" />
               <NestedReplyUserName>{nestedReply.writer}
-              {reply.mentorField && <CheckIcon2 src="/assets/Group133.png" alt="Verified" />}
+              {nestedReply.mentorField && <CheckIcon2 src="/assets/Group133.png" alt="Verified" />}
 
               </NestedReplyUserName>
             </NestedReplyUserInfo>
