@@ -177,7 +177,7 @@ const JobDetail = () => {
         </DescriptionItem>
         <DescriptionItem>
           <Label>직무</Label>
-          <Item>{job.jobMidCode}</Item>
+          <Item>{job.industry}</Item>
         </DescriptionItem>
         <DescriptionItem>
           <Label>경력</Label>
@@ -194,89 +194,11 @@ const JobDetail = () => {
         
       </JobDescription>
 
-      <ButtonContainer>
-      <Button onClick={handleCoverLetterClick} selected={view === 'coverletter'}>비슷한 공고 합격 자소서</Button>
-        <Button onClick={handleInterviewClick} selected={view === 'interview'}>비슷한 공고 면접 후기</Button>
-      </ButtonContainer>
 
-      {view === 'interview' && (
-        <Content>
-          <InterviewListContainer>
-            {interviews.map(interview => {
 
-              const englishList = interview.english ? interview.english.split(', ') : [];
-              const scoreList = interview.score ? interview.score.split(', ') : [];
 
-              return (
-                  <InterviewItem key={interview.id}>
-                    <div className="company-position">{interview.company} | {interview.department} | {interview.year} | {interview.semester}</div>
-                    <div className="details">
-                      {englishList.map((english, index) => (
-                          <span key={index}> {english}: {scoreList[index]}, </span>
-                      ))} /
-                      <span> 대외활동: {interview.activity}</span> /
-                      <span> {interview.certification}</span> /
-                      <span> {interview.education}</span> /
-                      <span> {interview.department}</span> /
-                      <span> 학점: {interview.gpa}</span>
 
-                      <br/>
-                      <InterviewContent>{interview.content}</InterviewContent>
-                    </div>
-                    <div className="scrap-views">
-                      스크랩 {interview.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {interview.viewCount}
-                    </div>
-                  </InterviewItem>
-              );
-            })}
-          </InterviewListContainer>
-          <TalkPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-          />
-        </Content>
-      )}
-
-      {view === 'coverletter' && (
-        <Content>
-          <InterviewListContainer>
-            {resumes.map(resume => {
-              const englishList = resume.english ? resume.english.split(', ') : [];
-              const scoreList = resume.score ? resume.score.split(', ') : [];
-
-              return (
-                  <InterviewItem key={resume.id}>
-                    <div className="company-position">{resume.company} | {resume.department} | {resume.year} | {resume.semester}</div>
-                    <div className="details">
-                      {englishList.map((english, index) => (
-                          <span key={index}> {english}: {scoreList[index]}, </span>
-                      ))} /
-                      <span> 대외활동: {resume.activity}</span> /
-                      <span> {resume.certification}</span> /
-                      <span> {resume.education}</span> /
-                      <span> {resume.department}</span> /
-                      <span> 학점: {resume.gpa}</span>
-
-                      <Resume>{resume.titles[0]}</Resume>
-                      <Resume>{resume.contents[0]}</Resume>
-
-                    </div>
-                    <div className="scrap-views">
-                      스크랩 {resume.scrapCount}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;조회수 {resume.viewCount}
-                    </div>
-                  </InterviewItem>
-              );
-            })}
-          </InterviewListContainer>
-          <TalkPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-          />
-        </Content>
-
-      )}  
+      
       </JobDetailContainer>
   );
 };

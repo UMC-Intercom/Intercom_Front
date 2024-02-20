@@ -389,6 +389,7 @@ const SearchResultBox = styled.div`
   padding-bottom: 16px;
   overflow: hidden; 
   padding-bottom: 5px; 
+  cursor: pointer;
 `;
 
 const InformationContainer = styled.div`
