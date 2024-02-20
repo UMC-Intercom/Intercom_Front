@@ -6,10 +6,11 @@ import CoinUseQuestionModal from './CoinUseQuestionModal';
 import axios from "axios";
 import config from "../path/config";
 import TalkPagination from "./TalkPagination";
+import { useAuth } from './AuthContext';
 
 export default function CoverLetterHome() {
   const navigate = useNavigate();
-  const navigateToInput = () => navigate('/cover-letters');
+  const { isLoggedIn } = useAuth();
   const [sortByDateActive, setSortByDateActive] = useState(true);
   const [sortByLikesActive, setSortByLikesActive] = useState(false);
   // const [sortedData, setSortedData] = useState(fakeCoverletterData);
@@ -28,16 +29,44 @@ export default function CoverLetterHome() {
   const ITEMS_PER_PAGE = 10;
   const indexOfLast = currentPage * ITEMS_PER_PAGE;
   const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+  const [isSearchMode, setIsSearchMode] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const profile = localStorage.getItem('userProfile');
+  
+      if (profile === null || profile === "null") { 
+        setUserProfile("./assets/MyProfile.png");
+      } else {
+        setUserProfile(profile);
+      }
+    } else {
+      setUserProfile("./assets/MyProfile.png");
+    }
+  }, [isLoggedIn]);
+  
 
   const fetchPosts = async (page) => {
+    let url = `${config.API_URL}/resumes?page=${currentPage}`;
+
+    if (!isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/resumes/scrap-counts?page=${currentPage}`;
+    }
+    if (isSearchMode && sortByDateActive) {
+      url = `${config.API_URL}/resumes/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+    else if (isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/resumes/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
     try {
-      const sortBy = sortByDateActive ? '' : '/scrap-counts'; // 추가된 부분
-      const response = await axios.get(`${config.API_URL}/resumes${sortBy}?page=${currentPage}`);
+      //const sortBy = sortByDateActive ? '' : '/scrap-counts'; // 추가된 부분
+      const response = await axios.get(url);
 
       setSortedData(response.data.content);
       setTotalPages(response.data.totalPages);
       setTotalElements(response.data.totalElements);
-      // setSearchResults(response.data.content);
+
     } catch (error) {
       console.error('Failed to fetch posts:', error);
     }
@@ -46,12 +75,23 @@ export default function CoverLetterHome() {
     fetchPosts(currentPage);
   }, [currentPage, sortByDateActive]);
 
-
   const handleResultClick = (item) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
-    navigate(`/cover-letters/${item.id}`);
+    if (isLoggedIn) {
+      setSelectedItem(item);
+      setIsModalOpen(true);
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
   };
+
+  const navigateToInput = () => {
+    if (isLoggedIn) {
+      navigate('/cover-letters'); // 로그인했다면 입력 페이지로 이동
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
+  };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -75,23 +115,48 @@ export default function CoverLetterHome() {
     setSearchQuery({ ...searchQuery, [id]: value });
   };
 
-  const handleSearch = () => {
-    let filteredData = fakeCoverletterData;
-
-    if (searchQuery.company.trim() !== '') {
-      filteredData = filteredData.filter(item => item.company.toLowerCase().includes(searchQuery.company.toLowerCase()));
+  const handleSearch = async () => {
+    // 빈칸 검색 시 검색 모드 종료 및 상태 초기화
+    if (!searchQuery.company.trim() && ! searchQuery.position.trim) {
+      resetSearch();
+      return;
     }
 
-    if (searchQuery.position.trim() !== '') {
-      filteredData = filteredData.filter(item => item.department.toLowerCase().includes(searchQuery.position.toLowerCase()));
+    let url;
+    if (sortByDateActive) {
+      url = `${config.API_URL}/resumes/search`;
+    }
+    else if (sortByLikesActive) {
+      url = `${config.API_URL}/resumes/scrap-counts`;
     }
 
-    setSortedData(filteredData);
+    try {
+      const response = await axios.get(url, {
+        params: {
+          company: searchQuery.company,
+          department: searchQuery.position,
+          page: currentPage // 현재 페이지도 함께 전송할 수 있도록 수정
+        }
+      });
+
+      setIsSearchMode(true);
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+    } catch (error) {
+      console.error('Failed to search resumes:', error);
+    }
   };
 
   const onPageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
+  };
+
+  const resetSearch = () => {
+    // setSearchTerm('');
+    setIsSearchMode(false);
+    setCurrentPage(1);
   };
 
   return (
@@ -106,7 +171,7 @@ export default function CoverLetterHome() {
       </SearchBox>
 
       <WritingContainer>
-        <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
+        <img src={userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px', borderRadius: '100%', border: '3px solid #E2E2E2' }} />
         <WritingBox onClick={navigateToInput}>
           합격 자소서를 남겨보세요
         </WritingBox>
@@ -152,21 +217,21 @@ export default function CoverLetterHome() {
                     <span> 학점: {coverLetter.gpa}</span>
                   </Information2>
                   <Information3>
-                    {coverLetter.titles[0]}
+                    {coverLetter.titles}
                     <br/>
-                    {coverLetter.contents[0]}
+                    {coverLetter.contents}
                   </Information3>
                 </InformationContainer>
                 <ScrapIconWrap>
                   <ScrapIcon src="./assets/scrap.png" />
-                  <ScrapCount>{coverLetter.scrapCount}</ScrapCount>
+                  <ScrapCount>{coverLetter.scrapCount.toLocaleString()}</ScrapCount>
                 </ScrapIconWrap>
               </SearchResultBox>
           );
         })}
       </SearchResultWrap>
 
-      <CoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} />
+      <CoinUseQuestionModal isOpen={isModalOpen} onClose={closeModal} selectedItem={selectedItem} />
 
       <TalkPagination
           currentPage={currentPage}
@@ -322,6 +387,8 @@ const SearchResultBox = styled.div`
   margin-top: 30px;
   border-bottom: 2px solid #E2E2E2;
   padding-bottom: 16px;
+  overflow: hidden;
+  padding-bottom: 5px; 
 `;
 
 const InformationContainer = styled.div`

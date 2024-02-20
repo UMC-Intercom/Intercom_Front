@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function SignUp2() {
   const navigate = useNavigate();
-  const navigateToOnBoarding1 = () => navigate('/onboarding1');
+  const navigateToOnBoarding1 = () => navigate('/onboarding2');
   const navigateToSignUp3 = () => navigate('/signup3');
 
   const handleLaterButtonClick = () => {
@@ -20,7 +20,7 @@ export default function SignUp2() {
     <Container>
         <Text1>거의 다 왔어요!</Text1>
         <Text2>보다 더 정확한 추천을 위해<br /> <Strong>두가지만</Strong> 더 알려주세요</Text2>
-        <Image><img src='./assets/emptybox.png'></img></Image>
+        <Image><img src='./assets/signupresult.png' style={{width: '385px', height:'355px'}}></img></Image>
         <ButtonWrap>
           <LaterButton onClick={navigateToSignUp3}>나중에 하기</LaterButton>
           <SettingButton onClick={navigateToOnBoarding1}>설정하기</SettingButton>

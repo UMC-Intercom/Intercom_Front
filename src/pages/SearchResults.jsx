@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Select, { components } from 'react-select';
 import { useLocation, Link } from "react-router-dom";
 import SearchModal from './SearchModal';
+import TalkPagination from './TalkPagination';
 
 
 const StyledLink = styled(Link)`
@@ -182,7 +183,8 @@ const customStyles = {
   placeholder: (provided) => ({
     ...provided,
     color: '#636363',
-    fontFamily: 'SUITE' //폰트 바꿈
+    fontFamily: 'SUITE', //폰트 바꿈
+    fontWeight: '700',
   }),
   option: (provided, state) => ({
     ...provided,
@@ -332,12 +334,25 @@ const SearchResults = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { selectedJobs, selectedLocation, searchInput } = location.state || {};
   const [searchResults, setSearchResults] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); // New state for current page
+  const resultsPerPage = 24; // Results per page set to 24
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isButtonSelected, setIsButtonSelected] = useState({
     button1: false,
     button2: false,
     button3: false,
   });
+
+  const totalPages = Math.ceil(searchResults.length / resultsPerPage);
+
+  // Get current page results
+  const indexOfLastResult = currentPage * resultsPerPage;
+  const indexOfFirstResult = indexOfLastResult - resultsPerPage;
+  const currentResults = searchResults.slice(indexOfFirstResult, indexOfLastResult);
+
+  // Pagination change handler
+  const paginate = pageNumber => setCurrentPage(pageNumber);
 
   useEffect(() => {
     if (location.state?.searchResults) {
@@ -438,6 +453,8 @@ const SearchResults = () => {
                         ))}
                 </ContentsBox>
             </PopularNoticesBox>
+
+            <TalkPagination currentPage={currentPage} totalPages={totalPages} onPageChange={paginate} />
 
             {isModalOpen && (
               <SearchModal

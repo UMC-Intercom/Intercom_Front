@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoinUseModal from './CoinUseModal';
 
-const CoinUseQuestionModal = ({ isOpen, onClose }) => {
+const CoinUseQuestionModal = ({ isOpen, onClose, selectedItem}) => {
     const [coinUseModalOpen, setCoinUseModalOpen] = useState(false);
 
     const handleConfirm = () => {
@@ -21,7 +21,7 @@ const CoinUseQuestionModal = ({ isOpen, onClose }) => {
                     <ModalOverlay>
                         <ModalContainer>
                             <ModalContent>
-                                <ModalText>10코인을 사용하여<br/>글을 열람 할까요?</ModalText>
+                                <ModalText>20코인을 사용하여<br/>글을 열람 할까요?</ModalText>
                                 <ModalButtons>
                                     <CancelButton onClick={onClose}>취소</CancelButton>
                                     <ConfirmButton onClick={handleConfirm}>사용하기</ConfirmButton>
@@ -29,7 +29,7 @@ const CoinUseQuestionModal = ({ isOpen, onClose }) => {
                             </ModalContent>
                         </ModalContainer>
                     </ModalOverlay>
-                    <CoinUseModal isOpen={coinUseModalOpen} onClose={handleClose} />
+                    <CoinUseModal isOpen={coinUseModalOpen} onClose={handleClose} selectedItem={selectedItem}/>
                 </>
             )}
         </>

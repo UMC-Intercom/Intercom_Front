@@ -692,22 +692,26 @@ const MyCareer = () => {
   const [activities, setActivities] = useState([]);
   const [skills, setSkills] = useState([]);
   const [profileImage, setProfileImage] = useState('');
-  const [links, setLinks] = useState([]); // 링크 상태 초기화
+  const [linkUrl, setLinkUrl] = useState('');
 
-  const renderLinks = () => {
-    return links.map((link, index) => (
-      <CenteredContainer key={index}>
-        <LinkBox  style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
+
+  const renderLink = () => {
+    if (!linkUrl) return null; // 링크 URL이 없으면 렌더링하지 않음
+
+    return (
+      <CenteredContainer>
+        <LinkBox style={{ width: isPdfDownloadMode ? '655px' : '690px' }}>
           <LinkEntry>
-            {/* LinkName을 <a> 태그로 변경합니다. */}
-            <LinkName as="a" href={link.url} target="_blank" rel="noopener noreferrer">
-              {link.title}
-            </LinkName>
+            {/* a 태그를 사용하여 링크 제공 */}
+            <LinkValue href={linkUrl} target="_blank" rel="noopener noreferrer">
+              {linkUrl}
+            </LinkValue>
           </LinkEntry>
         </LinkBox>
       </CenteredContainer>
-    ));
+    );
   };
+
   
   useEffect(() => {
     const fetchCareerInfo = async () => {
@@ -732,11 +736,9 @@ const MyCareer = () => {
         setActivities(data.activity);
         setSkills(data.skill ? data.skill.split(', ') : []);
         setProfileImage(data.careerProfile);
-        const linkData = data.link ? data.link.split(',').map(linkItem => {
-          const [title, url] = linkItem.split('|').map(item => item.trim());
-          return { title, url };
-        }) : [];
-        setLinks(linkData);
+        if (data.link) {
+          setLinkUrl(data.link.trim());
+        }
       } catch (error) {
         console.error('Failed to fetch career info:', error);
       }
@@ -921,7 +923,7 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
         <CareerBox  id="pdf-content" style={{ width: isPdfDownloadMode ? '757px' : '792px' }}>
         {isPdfDownloadMode && (
         <ProfileSection>
-          <IDPhoto src={profileImage} alt="ID Photo" />
+          <IDPhoto src="./assets/Idphoto2.png" alt="ID Photo" />
           <ProfileDetailsContainer2>
             <ProfileName2>{userInfo.name}</ProfileName2>
             <ProfileDetail2>이메일 <ProfileEmailValue>{userInfo.email}</ProfileEmailValue></ProfileDetail2>
@@ -1018,12 +1020,12 @@ const profileImageUrl = localStorage.getItem('careerProfileImage') || './assets/
           )}
 
           {/* 링크 섹션 렌더링 */}
-          {links.length > 0 && (
-            <>
-              <LinkTitle>링크</LinkTitle>
-              {renderLinks()}
-              <SectionDivider />
-            </>
+          {linkUrl && (
+        <>
+          <LinkTitle>링크</LinkTitle>
+          {renderLink()}
+          <SectionDivider />
+        </>
           )}
 
         </CareerBox>

@@ -13,7 +13,7 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
   const location = useLocation();
   const { toggleLogin } = useAuth();
   const { isLoggedIn } = useAuth();
-  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: './assets/MyProfile.png'});
+  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: '/assets/MyProfile.png'});
 
 
   const handleLogout = () => {
@@ -116,13 +116,13 @@ const SettingsSidebar = ({ $isVisible, onClose }) => {
       <MenuItem onMouseEnter={() => setHoveredItem('scraps')}
                    onMouseLeave={() => setHoveredItem(null)}
                    onClick={handleScrapsClick}>
-        {hoveredItem === 'scraps' && <CheckIcon src="./assets/Check.png" alt="Check" />}
+        {hoveredItem === 'scraps' && <CheckIcon src="/assets/Check.png" alt="Check" />}
         <ItemText>스크랩</ItemText>
       </MenuItem>
       <MenuItem onMouseEnter={() => setHoveredItem('settings')}
                 onMouseLeave={() => setHoveredItem(null)}
                 onClick={handleSettingsClick}>
-        {hoveredItem === 'settings' && <CheckIcon src="./assets/Check.png" alt="Check" />}
+        {hoveredItem === 'settings' && <CheckIcon src="/assets/Check.png" alt="Check" />}
         <ItemText>설정</ItemText>
         <LogoutLine />
       </MenuItem>
@@ -158,10 +158,11 @@ const ProfileIcon = styled.img`
   width: 1.875rem;
   height: 1.875rem;
   flex-shrink: 0;
+  border-radius: 50%;
 `;
 
 const Username = styled.div`
-  width: 4.92188rem;
+  width: auto;
   height: 1.73613rem;
   margin-left: 0.39rem;
   flex-shrink: 0;

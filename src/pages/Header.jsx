@@ -10,7 +10,7 @@ import NotificationModal from "./NotificationModal";
 const Header = () => {
   const [activePage, setActivePage] = useState("/home");
   const { isLoggedIn, toggleLogin } = useAuth();
-  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: './assets/MyProfile.png'});
+  const [userProfile, setUserProfile] = useState({ name: "사용자", profileImageUrl: '/assets/MyProfile.png'});
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,7 +106,7 @@ const Header = () => {
         <Logo src="/assets/Logo.png" alt="IntercomLogo" onClick={() => handlePageChange('/home')}/>
         <PageLists>
           <Pages active={activePage === '/home'} onClick={() => handlePageChange('/home')}>홈</Pages>
-          <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>저장한 공고</Pages>
+          <Pages active={activePage === '/scrap'} onClick={() => handlePageChange('/scrap')}>스크랩</Pages>
           <Pages active={activePage === '/talktalk'} onClick={() => handlePageChange('/talktalk')}>톡톡</Pages>
           <Pages active={activePage === '/mycareer'} onClick={() => handlePageChange('/mycareer')}>내 커리어</Pages>
           <Pages active={activePage === '/cover-letters-home'} onClick={() => handlePageChange('/cover-letters-home')}>합격 자소서</Pages>
@@ -151,28 +151,44 @@ const Header = () => {
 
 export default Header;
 
-const ModalContent = styled.div` 
-  text-align: center;
-`;
+const breakpoints = {
+  mobile: '480px',
+  tablet: '768px',
+};
 
-const CloseButton = styled.button`
-  margin-top: 10px;
-  cursor: pointer;
-`;
+const mediaQueries = {
+  mobile: `@media screen and (max-width: ${breakpoints.mobile})`,
+  tablet: `@media screen and (max-width: ${breakpoints.tablet})`,
+};
+
 
 const HeaderContainer = styled.header`
   width: 100%;
   height: 6.125rem;
   box-shadow: 0rem 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+
+  ${mediaQueries.mobile} {
+    height: auto; // 모바일에서 높이 자동 조정
+    padding: 1rem 0; // 상하 패딩 추가
+  }
 `;
 
 const HeaderBox = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%;    
-`;
+  justify-content: space-between; // 내용물 사이의 간격을 균등하게 분배
+  height: 100%;
+  max-width: 1200px; // 최대 너비 설정
+  margin: 0 auto; // 좌우 마진을 자동으로 조정하여 중앙 정렬
+  padding: 0 20px; // 좌우 패딩 추가로 내용물이 화면 가장자리에 닿지 않도록 조정
 
+  ${mediaQueries.mobile} {
+    height: 7rem;
+    flex-direction: column; // Stack elements vertically on mobile
+    align-items: center; // Center items
+  }
+  
+`;
 const PageLists = styled.div`
   display: flex;
   align-items: center;
@@ -180,6 +196,16 @@ const PageLists = styled.div`
   width: 47.1875rem;
   height: 2.125rem;
   margin: 0.625rem 0;
+  ${mediaQueries.tablet} {
+    justify-content: center; // Center items on tablet
+  }
+
+  ${mediaQueries.mobile} {
+    width: 100%; // Use full width to accommodate all items
+    justify-content: center;
+    flex-wrap: wrap; // Allow items to wrap into multiple lines
+    gap: 10px; // Add some gap between items for easier tapping
+  }
 `;
 
 const Pages = styled.div`
@@ -206,6 +232,18 @@ const Pages = styled.div`
     transform: translateX(-50%) scaleX(${props => props.active ? 1 : 0});
     transition: transform 0.3s ease;
   }
+
+
+   ${mediaQueries.mobile} {
+    font-size: 0.75rem; // Adjust font size for mobile
+    padding: 0.05rem; // Adjust padding for mobile
+
+    &::after {
+      width: 2.4rem; // Adjust width of underline for mobile
+      left: 50%;
+      transform: translateX(-50%) scaleX(${props => props.active ? 1 : 0}); // Ensure underline stays centered
+    }
+  }
 `;
 
 const Logo = styled.img`
@@ -213,6 +251,11 @@ const Logo = styled.img`
   height: 2.5625rem;
   cursor: pointer;
   margin-bottom:
+  ${mediaQueries.mobile} {
+    margin-right: 2rem;
+    width: 50%; // You might want to adjust this for mobile
+  }
+
   `;
 
 const ButtonBox = styled.div`
@@ -221,6 +264,19 @@ const ButtonBox = styled.div`
   justify-content: space-evenly;
   margin: 0.625rem 0; 
   margin-left: 2.5rem; 
+
+ ${mediaQueries.tablet} {
+    justify-content: center; // 태블릿에서 중앙 정렬
+  }
+
+  ${mediaQueries.mobile} {
+    display: flex;
+    justify-content: center;
+margin-top: -0.5rem;
+align-items: center;
+margin-left: -2.5rem;
+margin-bottom: -0.5rem;
+  }
 `;
 
 const SearchButton = styled.img`
@@ -228,16 +284,21 @@ const SearchButton = styled.img`
   height: 1.5rem; 
   cursor: pointer;
   margin-right: 1.25rem;
+  ${mediaQueries.mobile} {
+    justify-content: center; // 태블릿에서 중앙 정렬
+    width: 1rem;
+    height: auto;
+  }
 `;
 
 const JoinButton = styled.button`
   font-family: 'SUITE', sans-serif;
-  width: 7.8125rem; 
-  height: 2.5rem; 
+  width: 7.8125rem;
+  height: 2.5rem;
   background-color: transparent;
-  border-radius: 0.4375rem; 
-  border: 0.0625rem solid #E2E2E2; 
-  font-size: 1rem; 
+  border-radius: 0.4375rem;
+  border: 0.0625rem solid #E2E2E2;
+  font-size: 1rem;
   font-weight: bold;
   color: #5B00EF;
   box-shadow: none;
@@ -246,19 +307,32 @@ const JoinButton = styled.button`
   &:hover {
     background-color: #f2f2f2;
   }
+
+  ${mediaQueries.mobile} {
+    font-size: 0.75rem; // 모바일에서 폰트 크기 조정
+    padding: 0.5rem 1rem; // 모바일에서 버튼 패딩 조정
+  }
 `;
+
 
 const NotificationImage = styled.img`
   width: 1.5rem;
   height: 1.5rem; 
   cursor: pointer;
   margin-right: 1.25rem; 
+  ${mediaQueries.mobile} {
+    justify-content: center; // 태블릿에서 중앙 정렬
+    width: 1rem;
+    height: auto;
+  }
 `;
 
 const UserProfileBox = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
+
+  
 `;
 
 const ProfileBox = styled.div`
@@ -270,16 +344,33 @@ const ProfileBox = styled.div`
 const ProfileImage = styled.img`
   width: 1.5rem;
   height: 1.5rem;
+  border-radius: 50%;
   margin-right: 0.31rem; 
   margin-top: -0.1rem;
+ 
 `;
 
 const UserName = styled.span`
-width: 5rem;
+width: auto;
+max-width: 150px; // 최대 너비 설정
 height: 1.75rem;
 color: #5B00EF;
 text-align: right;
+align-items: center;
 font-family: SUITE;
 font-size: 1.32813rem;
 font-weight: 700;
+overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+${mediaQueries.tablet} {
+  font-size: 1rem; // 태블릿에서 폰트 크기 조정
+}
+
+${mediaQueries.mobile} {
+  font-size: 0.85rem; // 모바일에서 폰트 크기 조정
+  max-width: 100px; // 모바일에서 최대 너비 조정
+  margin-top: 0.7rem;
+}
 `;

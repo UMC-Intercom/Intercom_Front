@@ -3,6 +3,12 @@ import axios from "axios";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import TalkPagination from "./TalkPagination"; 
+import Slider from 'react-slick'; // npm install react-slick
+import "slick-carousel/slick/slick.css"; //npm install react-slick slick-carousel 
+import "slick-carousel/slick/slick-theme.css";
+
+
+
 
 const ITEMS_PER_PAGE = 24;
 const Home = () => {
@@ -128,7 +134,7 @@ const toggleScrap = async (jobId) => {
 const ScrapIcon = ({ jobId, isScrapped }) => (
   <div style={{ position: 'absolute', top: '8px', right: '8px', cursor: 'pointer', zIndex: 2 }}>
     <img
-      src={isScrapped ? "/assets/SavedNotices.png" : "/assets/vector9.png"}
+      src={isScrapped ? "/assets/scrap.png" : "/assets/Vector9.png"}
       alt="Scrap"
       onClick={(event) => {
         event.stopPropagation();
@@ -147,6 +153,29 @@ const calculateRemainingDays = (expirationDate) => {
   const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
   return daysDiff > 0 ? `D-${daysDiff}` : '기한 만료';
 };
+
+
+  const BannerSlider = () => {
+  const settings = {
+      infinite: true, // 무한 반복 여부
+      speed: 12000, // 애니메이션 전환 속도 (밀리초 단위)
+      slidesToShow: 1, // 한 번에 보여줄 슬라이드 수
+      slidesToScroll: 1, // 스크롤할 때마다 넘어가는 슬라이드 수
+      autoplay: true, // 자동 재생 여부
+      autoplaySpeed: 1, // 자동 재생 시간 간격 (밀리초 단위)
+  };
+  return (
+    <StyledSlider {...settings}>
+      <div onClick={() => navigate('/type-test-home')}>
+        <img src="/assets/Banner.png" alt="Banner 1" style={{width: "100%", display: "block"}} />
+      </div>
+      <div onClick={() => navigate('/type-test-home')}>
+        <img src="/assets/Frame8.png" alt="Banner 2" style={{width: "100%", display: "block"}} />
+      </div>
+    </StyledSlider>
+  );
+};
+
   return (
     <Main>
      
@@ -155,7 +184,7 @@ const calculateRemainingDays = (expirationDate) => {
           <Icons onClick={() => handlePageChange('/scrap')}>
             <img src="/assets/SavedNotices.png" alt="SavedNotices" 
             style={{width: "4rem", height: "5rem", marginBottom: "1.25rem"}} />
-            <span>저장한 공고</span>
+            <span>스크랩</span>
           </Icons>
           <Icons onClick={() => handlePageChange('/mycareer')}>
             <img src="/assets/MyCareer.png" alt="MyCareer"
@@ -178,11 +207,10 @@ const calculateRemainingDays = (expirationDate) => {
              <span>면접 후기</span>
           </Icons>
         </PageIcons>
-      </MenuBox>
-      <BannerImg>
-        <img src="/assets/Banner.png" alt="Banner" 
-        style={{width: "75rem"}} />
-      </BannerImg>
+     </MenuBox>
+     
+      <BannerSlider onClick={() => navigate('/type-test-home')}
+      style={{ marginTop:"50px"}}/> 
       <PopularNoticesBox>
                 <span style={{ fontSize: "1.563rem", fontWeight: "800" }}>실시간 인기 공고</span>
                 {isLoggedIn && (
@@ -216,7 +244,7 @@ const calculateRemainingDays = (expirationDate) => {
                      <SecondaryTitle>{job.company}</SecondaryTitle>
                    </TextWrap>
                    <Deadline>{calculateRemainingDays(job.expirationDate)}</Deadline>
-                   <Views>조회 {job.viewCount}</Views>
+                   <Views>조회 {job.viewCount.toLocaleString()}회</Views>
                  </div>
                </NoticeItem>
                 ))}
@@ -235,7 +263,15 @@ const calculateRemainingDays = (expirationDate) => {
 
 export default Home;
 
+const breakpoints = {
+  mobile: '480px',
+  tablet: '768px'
+};
 
+const mediaQueries = {
+  mobile: `@media screen and (max-width: ${breakpoints.mobile})`,
+  tablet: `@media screen and (max-width: ${breakpoints.tablet})`
+};
 
 
 const PopularNoticesBox = styled.div`
@@ -245,6 +281,23 @@ const PopularNoticesBox = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  ${mediaQueries.mobile} {
+    width: 100%;
+    height:100%
+    padding: 0.5rem;
+    margin-left: -25px;
+    span{
+     
+        margin-left: 13px;
+      
+    }
+  }
+
+  ${mediaQueries.tablet} {
+    width: 100%;
+    padding: 1rem;
+  }
 `;
 
 const ContentsBox = styled.div`
@@ -252,6 +305,15 @@ const ContentsBox = styled.div`
   min-height: auto; 
   background-color: #FFFFFF;
   border-radius: 1.25rem;
+
+  ${mediaQueries.mobile} {
+    width: 100%; 
+    height: 100%; 
+    // 모바일에서는 너비를 화면 너비에 맞게 조절
+    padding: 0.5rem; // 모바일에서 패딩 줄임
+    margin: 0; // 모바일에서 좌우 마진 추가로 컨텐츠 간격 조절
+  }
+
 `;
 
 const Content = styled.div`
@@ -259,7 +321,14 @@ const Content = styled.div`
   gap: 1.563rem;
   flex-wrap: wrap;
 
-  @media (max-width: 75rem) {
+  ${mediaQueries.mobile} {
+    gap: 8px; // 모바일에서 갭 크기 줄임
+    justify-content: space-around; // 모바일에서 컨텐츠를 공간에 균일하게 분포
+    margin: 0 auto; // 모바일에서 마진으로 컨텐츠 간격 조절
+  }
+
+  ${mediaQueries.tablet} {
+    gap: 1.25rem;
     justify-content: space-around;
   }
 `;
@@ -281,6 +350,16 @@ const ImageWrapper = styled.div`
     height: 100%;
     object-fit: cover;
   }
+
+    ${mediaQueries.mobile} {
+      width: 100%; // 이미지 크기 조정
+      height: auto;
+      object-fit: cover;
+    img {
+      width: 100%; // 이미지 크기 조정
+      height: auto;
+      object-fit: cover;
+  }}
 `;
 
 const ScrapIcon = styled.div`
@@ -288,13 +367,16 @@ const ScrapIcon = styled.div`
   top: 8px;
   right: 8px;
   cursor: pointer;
+  z-index: 2; /* 스크랩 버튼이 이미지 위에 오도록 z-index 추가 */
+  
   img {
     width: 24px;
     height: 24px;
-    
   }
 `;
+
 const NoticeItem = styled.div`
+  position: relative; /* 스크랩 버튼을 포함한 공고 아이템을 상대적으로 위치 설정 */
   flex: 0 0 calc(25% - 1.25rem);
   display: flex;
   flex-direction: column;
@@ -316,6 +398,20 @@ const NoticeItem = styled.div`
     text-align: left;
     margin-top: 1.25rem;
   }
+
+  ${mediaQueries.mobile} {
+    flex: 1 0 46%; // 모바일에서 공고 아이템의 너비 조정
+  height: 50%;
+
+  span, div {
+    align-items: left;
+    font-size: 0.75rem; // 모바일에서 텍스트 크기 조정
+  }
+
+}
+
+
+
 `;
 
 const BannerImg = styled.div`
@@ -323,10 +419,19 @@ const BannerImg = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 4rem;
+  cursor: pointer;
 `;
 
 const Main = styled.div`
   padding: 1.25rem;
+
+  ${mediaQueries.mobile} {
+    padding: 1rem;
+  }
+
+  ${mediaQueries.tablet} {
+    padding: 1rem;
+  }
 `;
 
 const MenuBox = styled.div`
@@ -334,6 +439,10 @@ const MenuBox = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  ${mediaQueries.mobile} {
+    flex-direction: column; // 모바일에서는 아이콘을 세로로 배치
+  }
 `;
 
 const PageIcons = styled.div`
@@ -344,6 +453,12 @@ const PageIcons = styled.div`
   width: 90%;
   margin-top: 4.375rem;
   max-width: 58rem;
+
+  ${mediaQueries.mobile} {
+
+    justify-content: center;
+    margin-top: 2rem; // 모바일에서 상단 여백 줄임
+  }
 `;
 
 const Icons = styled.div`
@@ -356,6 +471,31 @@ const Icons = styled.div`
     font-size: 1.063rem;
     text-align: center;
   }
+  ${mediaQueries.mobile} {
+
+    img {
+      margin-right: 1.375rem;
+      margin-left: 0.375rem;
+      width: 50%; // 모바일에서 아이콘 크기를 50%로 조정
+    }
+
+    span {
+      margin-bottom: 1rem;
+
+      font-size: 0.8rem; // 모바일에서 폰트 크기를 0.8rem으로 조정
+    }
+  }
+
+  ${mediaQueries.tablet} {
+    img {
+      width: 70%; // 태블릿에서 아이콘 크기를 70%로 조정
+    }
+
+    span {
+      font-size: 0.9rem; // 태블릿에서 폰트 크기를 0.9rem으로 조정
+    }
+  }
+
 `;
 
 const Title = styled.span`
@@ -402,6 +542,8 @@ const InterestButton = styled.button`
   font-size: 1.063rem;
   font-weight: 700;
 
+  
+
 `;
 
 const InterestButtons = styled.div`
@@ -409,10 +551,48 @@ const InterestButtons = styled.div`
   justify-content: left;
   flex-wrap: wrap;
   margin-bottom: 20px;
+  ${mediaQueries.mobile} {
+    margin-left: 13px;
+  }
 `;
 const TextWrap = styled.div`
-  margin-bottom: 15px; `
+  margin-bottom: 15px; 
+  `;
+
 const SecondaryTitle = styled.div`
 font-size: 17px;
 font-weight: 700;
-margin-top: 14px;`
+margin-top: 14px;
+${mediaQueries.mobile} {
+  margin-left: 13px;
+}`;
+
+const StyledSlider = styled(Slider)`
+  .slick-slide {
+    outline: none; 
+  }
+
+  .slick-dots { 
+    bottom: -30px;
+  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto; 
+margin-top: 70px;
+max-width:1300px;
+
+
+${mediaQueries.mobile} {
+  margin-top: -20px;
+  max-width: 90%;
+}
+
+${mediaQueries.tablet} {
+  margin-top: 50px;
+  max-width: 95%;
+}
+
+
+
+`;

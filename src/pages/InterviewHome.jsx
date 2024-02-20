@@ -6,11 +6,12 @@ import InterviewCoinUseQuestionModal from './InterviewCoinUseQuestionModal';
 import axios from "axios";
 import config from "../path/config";
 import TalkPagination from "./TalkPagination";
+import { useAuth } from './AuthContext';
 
 
 export default function InterviewHome() {
   const navigate = useNavigate();
-  const navigateToInput = () => navigate('/interviews');
+  const { isLoggedIn } = useAuth();
   const [sortByDateActive, setSortByDateActive] = useState(true);
   const [sortByLikesActive, setSortByLikesActive] = useState(false);
 //  const [sortedData, setSortedData] = useState(fakeInterviewData);
@@ -28,11 +29,42 @@ export default function InterviewHome() {
   const ITEMS_PER_PAGE = 10;
   const indexOfLast = currentPage * ITEMS_PER_PAGE;
   const indexOfFirst = indexOfLast - ITEMS_PER_PAGE;
+  const [isSearchMode, setIsSearchMode] = useState(false); // 검색 모드 상태
+  const [userProfile, setUserProfile] = useState(null);
+
+  
+  useEffect(() => {
+    if (isLoggedIn) {
+      const profile = localStorage.getItem('userProfile');
+  
+      if (profile === null || profile === "null") { 
+        setUserProfile("./assets/MyProfile.png");
+      } else {
+        setUserProfile(profile);
+      }
+    } else {
+     
+      setUserProfile("./assets/MyProfile.png");
+    }
+  }, [isLoggedIn]);
+  
 
   const fetchPosts = async (page) => {
+    let url = `${config.API_URL}/interviews?page=${currentPage}`;
+
+    if (!isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/interviews/scrap-counts?page=${currentPage}`;
+    }
+    if (isSearchMode && sortByDateActive) {
+      url = `${config.API_URL}/interviews/search?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+    else if (isSearchMode && sortByLikesActive) {
+      url = `${config.API_URL}/interviews/search/scrap-counts?company=${searchQuery.company}&department=${searchQuery.position}&page=${currentPage}`;
+    }
+
     try{
-      const sortBy = sortByDateActive ? '' : '/scrap-counts';
-      const response = await axios.get(`${config.API_URL}/interviews${sortBy}?page=${currentPage}`);
+      // const sortBy = sortByDateActive ? '' : '/scrap-counts';
+      const response = await axios.get(url);
 
       setSortedData(response.data.content);
       setTotalPages(response.data.totalPages);
@@ -46,9 +78,23 @@ export default function InterviewHome() {
     fetchPosts(currentPage);
   }, [currentPage, sortByDateActive]);
 
+
+
   const handleResultClick = (item) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
+    if (isLoggedIn) {
+      setSelectedItem(item);
+      setIsModalOpen(true);
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
+  };
+
+  const navigateToInput = () => {
+    if (isLoggedIn) {
+      navigate('/interviews-input1'); // 로그인했다면 입력 페이지로 이동
+    } else {
+      navigate('/join'); // 로그인하지 않았다면 회원가입 페이지로 리다이렉트
+    }
   };
 
   const closeModal = () => {
@@ -78,18 +124,43 @@ export default function InterviewHome() {
     window.scrollTo(0,0);
   };
 
-  const handleSearch = () => {
-    let filteredData = fakeInterviewData;
-
-    if (searchQuery.company.trim() !== '') {
-      filteredData = filteredData.filter(item => item.company.toLowerCase().includes(searchQuery.company.toLowerCase()));
+  const handleSearch = async () => {
+    // 빈칸 검색 시 검색 모드 종료 및 상태 초기화
+    if (!searchQuery.company.trim() && ! searchQuery.position.trim) {
+      resetSearch();
+      return;
     }
 
-    if (searchQuery.position.trim() !== '') {
-      filteredData = filteredData.filter(item => item.department.toLowerCase().includes(searchQuery.position.toLowerCase()));
+    let url;
+    if (sortByDateActive) {
+      url = `${config.API_URL}/interviews/search`;
+    }
+    else if (sortByLikesActive) {
+      url = `${config.API_URL}/interviews/scrap-counts`;
     }
 
-    setSortedData(filteredData);
+    try {
+      const response = await axios.get(url, {
+        params: {
+          company: searchQuery.company,
+          department: searchQuery.position,
+          page: currentPage // 현재 페이지도 함께 전송할 수 있도록 수정
+        }
+      });
+
+      setIsSearchMode(true);
+      setSortedData(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalElements(response.data.totalElements);
+    } catch (error) {
+      console.error('Failed to search interviews:', error);
+    }
+  };
+
+  const resetSearch = () => {
+    // setSearchTerm('');
+    setIsSearchMode(false);
+    setCurrentPage(1);
   };
 
   return (
@@ -104,7 +175,7 @@ export default function InterviewHome() {
         </SearchBox>
 
         <WritingContainer>
-          <img src="./assets/CoverLetterProfile.png" alt="Profile Icon" style={{ marginRight: '1.5rem' }} />
+          <img src={userProfile} alt="Profile Icon" style={{ marginRight: '1.5rem', width: '78px', height: '78px', borderRadius: '100%', border: '3px solid #E2E2E2' }} />
           <WritingBox onClick={navigateToInput}>
             면접 후기를 남겨보세요
           </WritingBox>
@@ -148,12 +219,12 @@ export default function InterviewHome() {
                       <span> 학점: {interview.gpa}</span>
                     </Information2>
                     <Information3>
-                      {interview.contents && interview.contents.length > 0 ? interview.contents[0] : '내용이 없습니다.'}
+                      {interview.contents && interview.contents.length > 0 ? interview.contents : '내용이 없습니다.'}
                     </Information3>
                   </InformationContainer>
                   <ScrapIconWrap>
                     <ScrapIcon src="./assets/scrap.png" />
-                    <ScrapCount>{interview.scrapCount}</ScrapCount>
+                    <ScrapCount>{interview.scrapCount.toLocaleString()}</ScrapCount>
                   </ScrapIconWrap>
                 </SearchResultBox>
             );
@@ -316,6 +387,8 @@ const SearchResultBox = styled.div`
   margin-top: 30px;
   border-bottom: 2px solid #E2E2E2;
   padding-bottom: 16px;
+  overflow: hidden; 
+  padding-bottom: 5px; 
 `;
 
 const InformationContainer = styled.div`

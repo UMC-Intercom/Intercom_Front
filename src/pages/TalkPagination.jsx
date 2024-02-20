@@ -13,7 +13,9 @@ const NumbersContainer = styled.div`
   min-width: ${({ pagesCount }) => `${pagesCount * 40}px`}; 
 `;
 
-const PageNumber = styled.button`
+const PageNumber = styled.button.attrs(props => ({
+  isActive: undefined, 
+}))`
   border: none;
   padding: 5px 10px;
   margin: 0 5px;
